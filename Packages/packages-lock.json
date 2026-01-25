@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.brunomikoski.animationsequencer": {
+      "version": "https://github.com/brunomikoski/Animation-Sequencer.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "26d5395855eff17671788a7740496d320345308f"
+    },
     "com.unity.2d.animation": {
       "version": "10.2.1",
       "depth": 1,
