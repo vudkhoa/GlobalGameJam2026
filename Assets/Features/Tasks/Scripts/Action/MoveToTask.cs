@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MoveTo_Task", menuName = "Tasks/MoveTo")]
+[CreateAssetMenu(fileName = "MoveTo_Task", menuName = "Tasks/Action/MoveTo")]
 public class MoveToTask : BaseTask
 {
     [SerializeField] private BaseMovement _movement;
