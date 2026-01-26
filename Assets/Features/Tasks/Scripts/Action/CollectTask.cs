@@ -23,6 +23,8 @@ public class CollectTask : BaseTask
         Collider[] hits = Physics.OverlapSphere(position, 0.1f);
         Transform itemTarget = hits.Length > 0 ? hits[0].transform : null;
 
+        Debug.Log($"Execute Collect Task");
+
         _collection.Collect(transform, itemTarget);
 
         await UniTask.Delay(TimeSpan.FromSeconds(_duration));
