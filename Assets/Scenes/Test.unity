@@ -160,11 +160,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 146917033}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ea115f4037e00243a7c156502d60bbc, type: 3}
+  m_Script: {fileID: 11500000, guid: 371d2e5b95c202845bdf9bc84f50ac46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movement: {fileID: 11400000, guid: bebe04db9d1517f49972c4f508152a44, type: 2}
-  _destination: {fileID: 1116264148}
+  _waypoints:
+  - {fileID: 1116264148}
+  - {fileID: 1457784422}
+  - {fileID: 1570514257}
+  _tasks:
+  - {fileID: 11400000, guid: db5bedfc81d5dd940b3e6a079c1948ee, type: 2}
+  - {fileID: 11400000, guid: cfa3633ed90c14c4e8d421f613a0bb8e, type: 2}
+  - {fileID: 11400000, guid: cfa3633ed90c14c4e8d421f613a0bb8e, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

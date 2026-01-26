@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb08db89084eaa47af88f3477add5da, type: 3}
   m_Name: Linear_Movement
   m_EditorClassIdentifier: 
-  _speed: 1
+  _speed: 2

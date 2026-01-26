@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Stair_Movement
   m_EditorClassIdentifier: 
   _speed: 1
-  _stepHeight: 0.5
-  _stepDepth: 0.3
-  _transitionSpeed: 1
+  _stepHeight: 1
+  _stepDepth: 0
+  _transitionSpeed: 0.2

@@ -9,9 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71d45e3577494ab478ea24a93bd4b064, type: 3}
-  m_Name: Jump_Movement
+  m_Script: {fileID: 11500000, guid: 6fe70d91bf85c74438469cadfea029c8, type: 3}
+  m_Name: StairTo_Task
   m_EditorClassIdentifier: 
-  _speed: 1
-  _jumpHeight: 1
-  _stepDistance: 2
+  _movement: {fileID: 11400000, guid: 628fb2c7c189ba842af97f2c1d7fdfd8, type: 2}
