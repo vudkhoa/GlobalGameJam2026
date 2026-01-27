@@ -128,7 +128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 146917034}
-  - component: {fileID: 146917035}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -151,26 +150,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &146917035
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 146917033}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 371d2e5b95c202845bdf9bc84f50ac46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _waypoints:
-  - {fileID: 1116264148}
-  - {fileID: 1457784422}
-  - {fileID: 1570514257}
-  _tasks:
-  - {fileID: 11400000, guid: db5bedfc81d5dd940b3e6a079c1948ee, type: 2}
-  - {fileID: 11400000, guid: 9d4600a03a00bfe47ac64ceea9177fa9, type: 2}
-  - {fileID: 11400000, guid: cfa3633ed90c14c4e8d421f613a0bb8e, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,6 +251,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1066468590}
+  - component: {fileID: 1066468591}
   m_Layer: 0
   m_Name: Environment
   m_TagString: Untagged
@@ -297,6 +277,19 @@ Transform:
   - {fileID: 1570514257}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1066468591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1066468589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 371d2e5b95c202845bdf9bc84f50ac46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tasks: []
 --- !u!1 &1116264147
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,6 +299,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1116264148}
+  - component: {fileID: 1116264149}
   m_Layer: 0
   m_Name: way_point (1)
   m_TagString: Untagged
@@ -328,6 +322,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1066468590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1116264149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116264147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1141bfd8ae2e43c47bc8d4394fecd426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tasks:
+  - {fileID: 11400000, guid: db5bedfc81d5dd940b3e6a079c1948ee, type: 2}
 --- !u!1 &1457784421
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,6 +345,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1457784422}
+  - component: {fileID: 1457784423}
   m_Layer: 0
   m_Name: way_point (2)
   m_TagString: Untagged
@@ -359,6 +368,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1066468590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1457784423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457784421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1141bfd8ae2e43c47bc8d4394fecd426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tasks:
+  - {fileID: 11400000, guid: 9d4600a03a00bfe47ac64ceea9177fa9, type: 2}
 --- !u!1 &1570514256
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,6 +391,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1570514257}
+  - component: {fileID: 1570514258}
   m_Layer: 0
   m_Name: way_point (3)
   m_TagString: Untagged
@@ -390,6 +414,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1066468590}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1570514258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570514256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1141bfd8ae2e43c47bc8d4394fecd426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tasks:
+  - {fileID: 11400000, guid: cfa3633ed90c14c4e8d421f613a0bb8e, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

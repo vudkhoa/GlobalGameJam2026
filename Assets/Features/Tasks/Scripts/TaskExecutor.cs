@@ -4,20 +4,47 @@ using UnityEngine;
 
 public class TaskExecutor : MonoBehaviour
 {
-    [SerializeField] private List<Transform> _waypoints;
+    private TaskInstaller[] _taskInstallers;
     [SerializeField] private List<BaseTask> _tasks;
 
-    private void Start()
+    private void OnEnable()
     {
-        ExecuteTasks().Forget();
+        Debug.Log($"[{nameof(TaskExecutor)}] OnEnable called on {name}");
+        _taskInstallers = GetComponentsInChildren<TaskInstaller>();
+        Debug.Log($"[{nameof(TaskExecutor)}] Found {_taskInstallers.Length} TaskInstaller(s)");
+
+        _tasks = new List<BaseTask>();
+
+        foreach (var installer in _taskInstallers)
+        {
+            if (installer.Tasks == null) continue;
+            // if (!installer.gameObject.activeInHierarchy) continue; // GetComponentsInChildren already checks active by default unless includeInactive is true
+
+            foreach (var task in installer.Tasks)
+            {
+                _tasks.Add(task);
+            }
+        }
+        Debug.Log($"[{nameof(TaskExecutor)}] Registered {_tasks.Count} tasks");
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Execute Tasks");
+            ExecuteTasks().Forget();
+        }
     }
 
     [ContextMenu("Execute Tasks")]
     public async UniTask ExecuteTasks()
     {
-        if (_waypoints == null || _waypoints.Count == 0)
+        Transform player = GameProvider.Instance.Player;
+
+        if (_taskInstallers == null || _taskInstallers.Length == 0)
         {
-            Debug.LogWarning($"{name}: No waypoints assigned.");
+            Debug.LogWarning($"{name}: No task installers assigned.");
             return;
         }
 
@@ -27,17 +54,16 @@ public class TaskExecutor : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < _waypoints.Count; i++)
+        for (int i = 0; i < _taskInstallers.Length; i++)
         {
-            var target = _waypoints[i];
+            var target = _taskInstallers[i];
             if (target == null) continue;
 
-            // Lấy task tương ứng, nếu hết task thì quay vòng lại từ đầu
             var task = _tasks[i % _tasks.Count];
 
             if (task != null)
             {
-                await task.Execute(transform, target.position);
+                await task.Execute(player, target.transform.position);
             }
         }
     }
