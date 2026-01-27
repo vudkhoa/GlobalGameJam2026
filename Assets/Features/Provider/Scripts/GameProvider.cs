@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameProvider : MonoSingleton<GameProvider>
 {
-    [SerializeField] private Transform _player;
+    private Transform _player;
 
     public Transform Player => _player;
 

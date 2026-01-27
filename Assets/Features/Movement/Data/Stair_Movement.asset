@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 798077e72038b974d84c00c0b3f9318e, type: 3}
   m_Name: Stair_Movement
   m_EditorClassIdentifier: 
-  _speed: 1
+  _speed: 2
   _stepHeight: 1
   _stepDepth: 0
   _transitionSpeed: 0.2

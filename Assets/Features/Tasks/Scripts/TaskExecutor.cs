@@ -5,27 +5,24 @@ using UnityEngine;
 public class TaskExecutor : MonoBehaviour
 {
     private TaskInstaller[] _taskInstallers;
-    [SerializeField] private List<BaseTask> _tasks;
+    private List<BaseTask> _tasks;
 
     private void OnEnable()
     {
-        Debug.Log($"[{nameof(TaskExecutor)}] OnEnable called on {name}");
         _taskInstallers = GetComponentsInChildren<TaskInstaller>();
-        Debug.Log($"[{nameof(TaskExecutor)}] Found {_taskInstallers.Length} TaskInstaller(s)");
 
         _tasks = new List<BaseTask>();
 
         foreach (var installer in _taskInstallers)
         {
             if (installer.Tasks == null) continue;
-            // if (!installer.gameObject.activeInHierarchy) continue; // GetComponentsInChildren already checks active by default unless includeInactive is true
+            if (!installer.gameObject.activeInHierarchy) continue;
 
             foreach (var task in installer.Tasks)
             {
                 _tasks.Add(task);
             }
         }
-        Debug.Log($"[{nameof(TaskExecutor)}] Registered {_tasks.Count} tasks");
     }
 
     private void Update()
@@ -41,6 +38,7 @@ public class TaskExecutor : MonoBehaviour
     public async UniTask ExecuteTasks()
     {
         Transform player = GameProvider.Instance.Player;
+        if (player == null) return;
 
         if (_taskInstallers == null || _taskInstallers.Length == 0)
         {
