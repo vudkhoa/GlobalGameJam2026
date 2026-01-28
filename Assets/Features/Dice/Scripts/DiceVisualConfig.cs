@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "DiceVisualConfig", menuName = "Features/Dice/VisualConfig")]
 public class DiceVisualConfig : ScriptableObject
