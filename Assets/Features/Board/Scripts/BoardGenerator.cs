@@ -19,7 +19,7 @@ public class BoardGenerator : ScriptableObject
         {
             for (int y = 0; y < _height; y++)
             {
-                var tile = Instantiate(_prefab, Helper.CalculateCenterPosition(x, y, _width, _height, spacing), Quaternion.identity);
+                var tile = Instantiate(_prefab, Helpers.CalculateCenterPosition(x, y, _width, _height, spacing), Quaternion.identity);
                 tile.SetParent(parent);
 
                 board.Add(tile);
