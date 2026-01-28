@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static partial class Helper
+public static partial class Helpers
 {
     public static Vector3 CalculateCenterPosition(int x, int y, int width, int height, Vector3 spacing)
     {
