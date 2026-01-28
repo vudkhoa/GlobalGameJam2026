@@ -12,4 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 432ccc45ffe1059418da8d91221bcdb4, type: 3}
   m_Name: Dice_Visual_Config
   m_EditorClassIdentifier: 
-  _faceSprites: []
+  _faceSprites:
+  - {fileID: -9139112611577883541, guid: 73c66f4daec54ac4e8da9bf456ea03c4, type: 3}
+  - {fileID: 6905529946164082601, guid: 160224af879679d42b5bd2531c9654c0, type: 3}
+  - {fileID: -6678591545739842511, guid: 647f959d744fd854583dcfda9d49960e, type: 3}
+  - {fileID: 3555225936213088695, guid: 18c4f3f08c13a7f4a884e6c7991b8c32, type: 3}
+  - {fileID: -3786634019952206618, guid: 11b18a78d149e7e42b7e6144a8809879, type: 3}
+  - {fileID: 4178964198257521019, guid: 55212c419cd7b8843accd2bcf6687447, type: 3}
