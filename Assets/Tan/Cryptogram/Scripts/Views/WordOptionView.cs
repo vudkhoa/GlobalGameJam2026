@@ -38,8 +38,6 @@ public class WordOptionView : MonoBehaviour
 
         btnComp.interactable = false;
 
-        // --- SỬA DÒNG NÀY ---
-        // Ép kiểu transform thành RectTransform để dùng được DOShakeAnchorPos
         (transform as RectTransform).DOShakeAnchorPos(0.5f, 10f, 20)
                  .OnComplete(() => {
                      btnComp.interactable = true;
