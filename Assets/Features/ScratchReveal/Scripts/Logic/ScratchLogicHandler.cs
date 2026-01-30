@@ -18,6 +18,8 @@ public class ScratchLogicHandler
 
     // State
     private int _frameCounter;
+    private Vector2 _lastUV;
+    private bool _hasLastUV;
     private const int UPDATE_PROGRESS_EVERY_N_FRAMES = 10;
 
     // Constructor (DI)
@@ -40,18 +42,39 @@ public class ScratchLogicHandler
         if (_coordinateConverter.ScreenToUV(screenPosition, out Vector2 uv))
         {
             _maskRenderer.DrawBrushAtUV(uv);
+            _lastUV = uv;
+            _hasLastUV = true;
         }
     }
 
     /// <summary>
     /// Continue scratch operation at screen position
-    /// Called when pointer moves while scratching
+    /// Interpolates between last position for smooth strokes
     /// </summary>
     public void ContinueScratchAtPosition(Vector2 screenPosition)
     {
         if (_coordinateConverter.ScreenToUV(screenPosition, out Vector2 uv))
         {
-            _maskRenderer.DrawBrushAtUV(uv);
+            // Interpolate between last position and current for smooth continuous stroke
+            if (_hasLastUV)
+            {
+                float distance = Vector2.Distance(_lastUV, uv);
+                int steps = Mathf.Max(1, Mathf.CeilToInt(distance * 100)); // More steps for longer distances
+
+                for (int i = 0; i <= steps; i++)
+                {
+                    float t = i / (float)steps;
+                    Vector2 interpolatedUV = Vector2.Lerp(_lastUV, uv, t);
+                    _maskRenderer.DrawBrushAtUV(interpolatedUV);
+                }
+            }
+            else
+            {
+                _maskRenderer.DrawBrushAtUV(uv);
+            }
+
+            _lastUV = uv;
+            _hasLastUV = true;
 
             // Periodically update progress (optimization - avoid calling every frame)
             _frameCounter++;
@@ -69,6 +92,7 @@ public class ScratchLogicHandler
     /// </summary>
     public void FinalizeScratch()
     {
+        _hasLastUV = false; // Reset for next stroke
         UpdateProgress();
     }
 

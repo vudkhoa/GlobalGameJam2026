@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Renders brush strokes to RenderTexture mask
-/// Pure rendering logic - no business logic
+/// Uses circular brush with randomized opacity for realistic scratch feel
 /// </summary>
 public class MaskRenderer
 {
@@ -10,6 +10,7 @@ public class MaskRenderer
     private readonly float _brushSize;
     private readonly float _brushOpacity;
     private readonly Material _brushMaterial;
+    private readonly RenderTexture _tempTexture;
 
     public MaskRenderer(RenderTexture maskTexture, float brushSize, float brushOpacity)
     {
@@ -17,38 +18,59 @@ public class MaskRenderer
         _brushSize = brushSize;
         _brushOpacity = brushOpacity;
 
-        // Create persistent material for brush rendering
-        _brushMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
+        // Create temp texture for blitting
+        _tempTexture = new RenderTexture(maskTexture.width, maskTexture.height, 0, maskTexture.format);
+
+        // Use circular brush shader
+        Shader brushShader = Shader.Find("Hidden/CircularBrush");
+        if (brushShader == null)
+        {
+            Debug.LogError("CircularBrush shader not found! Falling back to Internal-Colored");
+            brushShader = Shader.Find("Hidden/Internal-Colored");
+        }
+        _brushMaterial = new Material(brushShader);
     }
 
     /// <summary>
-    /// Draw brush at UV position (0-1 range) on mask texture
+    /// Draw circular brush at UV position with randomized opacity
     /// </summary>
     public void DrawBrushAtUV(Vector2 uv)
     {
+        // Randomize opacity for realistic scratch-off feel
+        // Each stroke has slightly different strength
+        float randomOpacity = _brushOpacity * Random.Range(0.7f, 1.0f);
+
         RenderTexture previous = RenderTexture.active;
         RenderTexture.active = _maskTexture;
 
         GL.PushMatrix();
         GL.LoadPixelMatrix(0, 1, 1, 0);
 
-        // Enable additive blending (accumulate white on black)
+        // Setup blend mode for accumulation
         _brushMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
         _brushMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
         _brushMaterial.SetInt("_BlendOp", (int)UnityEngine.Rendering.BlendOp.Max);
         _brushMaterial.SetPass(0);
 
         GL.Begin(GL.QUADS);
-        GL.Color(new Color(1, 1, 1, _brushOpacity));
+
+        // Randomized color for variation (subtle)
+        float colorVar = Random.Range(0.95f, 1.0f);
+        GL.Color(new Color(colorVar, colorVar, colorVar, randomOpacity));
 
         // Calculate brush size in UV space
         float halfSize = _brushSize / _maskTexture.width * 0.5f;
 
-        // Draw quad (brush) at UV position
-        GL.Vertex3(uv.x - halfSize, uv.y - halfSize, 0);
-        GL.Vertex3(uv.x + halfSize, uv.y - halfSize, 0);
-        GL.Vertex3(uv.x + halfSize, uv.y + halfSize, 0);
-        GL.Vertex3(uv.x - halfSize, uv.y + halfSize, 0);
+        // Add slight random offset for organic feel
+        float offsetX = Random.Range(-0.002f, 0.002f);
+        float offsetY = Random.Range(-0.002f, 0.002f);
+        Vector2 finalUV = new Vector2(uv.x + offsetX, uv.y + offsetY);
+
+        // Draw quad with UV coordinates for circular shader
+        GL.TexCoord2(0, 0); GL.Vertex3(finalUV.x - halfSize, finalUV.y - halfSize, 0);
+        GL.TexCoord2(1, 0); GL.Vertex3(finalUV.x + halfSize, finalUV.y - halfSize, 0);
+        GL.TexCoord2(1, 1); GL.Vertex3(finalUV.x + halfSize, finalUV.y + halfSize, 0);
+        GL.TexCoord2(0, 1); GL.Vertex3(finalUV.x - halfSize, finalUV.y + halfSize, 0);
 
         GL.End();
         GL.PopMatrix();
@@ -74,6 +96,11 @@ public class MaskRenderer
         if (_brushMaterial != null)
         {
             Object.Destroy(_brushMaterial);
+        }
+        if (_tempTexture != null)
+        {
+            _tempTexture.Release();
+            Object.Destroy(_tempTexture);
         }
     }
 }
