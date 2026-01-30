@@ -21,12 +21,18 @@ public class JournalSlotView : MonoBehaviour
 
         if (isHidden)
         {
-            textDisplay.text = "";           // Ẩn chữ đi
-            underlineObj.SetActive(true);    // Hiện dòng kẻ
+            textDisplay.text = word; 
+        
+            // 2. Chỉnh màu chữ về trong suốt (Alpha = 0)
+            textDisplay.color = new Color(0, 0, 0, 0); 
+            
+            // 3. Hiện dòng kẻ
+            if (underlineObj) underlineObj.SetActive(true);
         }
         else
         {
             textDisplay.text = word;         // Hiện chữ sẵn
+            textDisplay.color = new Color(0.2f, 0.2f, 0.2f, 1f);
             underlineObj.SetActive(false);   // Tắt dòng kẻ (hoặc để tùy design)
         }
 
@@ -38,6 +44,7 @@ public class JournalSlotView : MonoBehaviour
     {
         IsFilled = true;
         textDisplay.text = requiredWord;
+        textDisplay.color = new Color(0.2f, 0.2f, 0.2f, 1f);
         textDisplay.maxVisibleCharacters = 0; // Reset về 0 để chạy hiệu ứng
 
         // 1. Hiệu ứng viết chữ (Typewriter)

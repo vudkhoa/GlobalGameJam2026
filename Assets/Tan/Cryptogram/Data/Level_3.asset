@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e048d5c8104e5474a88136209876269e, type: 3}
-  m_Name: Level_1
+  m_Name: Level_3
   m_EditorClassIdentifier: 
-  sentence: "H\xF4m nay kh\xE1n gi\u1EA3 {c\u01B0\u1EDDi} r\u1EA5t vui. / T\xF4i
-    th\u1EA5y th\u1EADt {h\u1EA1nh ph\xFAc}."
-  typingSpeed: 0.05
-  phaseType: 0
+  sentence: "Kh\xF4ng ai {l\u1EAFng nghe} t\xF4i c\u1EA3. / L\xE0m \u01A1n h\xE3y
+    {d\u1EEBng l\u1EA1i}."
+  typingSpeed: 0.02
+  phaseType: 1
