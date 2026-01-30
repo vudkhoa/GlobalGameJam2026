@@ -4,7 +4,7 @@ using UnityEngine;
 /// Configuration for scratch reveal system
 /// ScriptableObject for easy tweaking in Inspector
 /// </summary>
-[CreateAssetMenu(fileName = "ScratchSettings", menuName = "ScratchReveal/Settings")]
+[CreateAssetMenu(fileName = "ScratchSettings", menuName = "ScratchToReveal/Settings")]
 public class ScratchSettings : ScriptableObject
 {
     [Header("Brush Settings")]

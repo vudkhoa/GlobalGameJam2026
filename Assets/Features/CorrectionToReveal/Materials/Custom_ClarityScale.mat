@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_ImageClaritySketch
+  m_Name: Custom_ClarityScale
   m_Shader: {fileID: 4800000, guid: 2bec5a3c2d5c87f47897626c64a71dec, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -24,18 +24,20 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 9553eda5f988062468143f72d7f495f9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Brightness: 1
-    - _Clarity: 1
-    - _Contrast: 1
-    - _Saturation: 1
-    - _SketchFrequency: 20
-    - _SketchIntensity: 0.5
-    - _SketchThickness: 1
+    - _BlurAmount: 5
+    - _Brightness: 0.47
+    - _Clarity: 0
+    - _Contrast: 2.48
+    - _HorizontalScale: 1.5
+    - _Saturation: 1.1
+    - _SketchFrequency: 26.8
+    - _SketchIntensity: 0
+    - _SketchThickness: 0.1
     m_Colors:
     - _SketchColor: {r: 0, g: 0, b: 0.5, a: 1}
   m_BuildTextureStacks: []

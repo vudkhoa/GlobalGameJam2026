@@ -32,15 +32,25 @@ Material:
     - _BlendMode: 0.5
     - _Brightness: 1
     - _Contrast: 1
-    - _EdgeDetection: 0.5
-    - _Hue: 0
+    - _EdgeDetection: 1
+    - _Hue: -82
+    - _Layer1Width: 50
+    - _Layer2Width: 50
+    - _Layer3Width: 50
     - _LayerSpacing: 10
     - _OutlineAlpha: 1
     - _OutlineCount: 3
-    - _OutlineThickness: 1
+    - _OutlineThickness: 0.89
     - _Saturation: 1
-    - _Sharpness: 1
+    - _SeparationAmount: 0
+    - _Sharpness: 0
+    - _ShowLayer1: 1
+    - _ShowLayer2: 1
+    - _ShowLayer3: 1
     m_Colors:
+    - _Layer1Color: {r: 1, g: 0, b: 0, a: 1}
+    - _Layer2Color: {r: 0, g: 1, b: 0, a: 1}
+    - _Layer3Color: {r: 0, g: 0, b: 1, a: 1}
     - _OutlineColor1: {r: 1, g: 0, b: 0, a: 1}
     - _OutlineColor2: {r: 0, g: 1, b: 0, a: 1}
     - _OutlineColor3: {r: 0, g: 0, b: 1, a: 1}
