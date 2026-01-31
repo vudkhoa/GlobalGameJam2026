@@ -36,9 +36,11 @@ public class MaskRenderer
     /// </summary>
     public void DrawBrushAtUV(Vector2 uv)
     {
-        // Randomize opacity for realistic scratch-off feel
-        // Each stroke has slightly different strength
-        float randomOpacity = _brushOpacity * Random.Range(0.7f, 1.0f);
+        // Use a random seed for the noise pattern in shader
+        // This ensures every stroke has a different 'grain' texture
+        // Accumulating these grains fills the mask (reveals image)
+        float seed = Random.Range(0f, 100f);
+        _brushMaterial.SetFloat("_Seed", seed);
 
         RenderTexture previous = RenderTexture.active;
         RenderTexture.active = _maskTexture;
@@ -46,20 +48,29 @@ public class MaskRenderer
         GL.PushMatrix();
         GL.LoadPixelMatrix(0, 1, 1, 0);
 
-        // Setup blend mode for accumulation
+        // Setup blend mode for accumulation (Additive)
         _brushMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
         _brushMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-        _brushMaterial.SetInt("_BlendOp", (int)UnityEngine.Rendering.BlendOp.Max);
+        _brushMaterial.SetInt("_BlendOp", (int)UnityEngine.Rendering.BlendOp.Add);
         _brushMaterial.SetPass(0);
 
         GL.Begin(GL.QUADS);
 
-        // Randomized color for variation (subtle)
-        float colorVar = Random.Range(0.95f, 1.0f);
-        GL.Color(new Color(colorVar, colorVar, colorVar, randomOpacity));
+        // Use fixed low opacity - relying on 'grain accumulation' directly
+        // The shader will output binary noise (0 or 1) multiplied by this
+        // Lower opacity allows softer edges if shader supports it, 
+        // but for grain scratch, we often want mostly solid grains.
+        // Let's use _brushOpacity directly but reduced to avoid instant white.
+        float effectiveOpacity = _brushOpacity * 0.5f;
 
-        // Calculate brush size in UV space
-        float halfSize = _brushSize / _maskTexture.width * 0.5f;
+        // Random slight color variation
+        float colorVar = Random.Range(0.95f, 1.0f);
+        GL.Color(new Color(colorVar, colorVar, colorVar, effectiveOpacity));
+
+        // Randomized size for organic feel
+        // Varies the brush footprint slightly per frame
+        float sizeVar = Random.Range(0.85f, 1.15f);
+        float halfSize = (_brushSize * sizeVar) / _maskTexture.width * 0.5f;
 
         // Add slight random offset for organic feel
         float offsetX = Random.Range(-0.002f, 0.002f);
