@@ -191,7 +191,7 @@ public class PuzzleController : MonoBehaviour
                         // Lấy ID từ Map
                         int assignedNumber = _charToNumberMap.ContainsKey(upperC) ? _charToNumberMap[upperC] : 0;
                         // Tạo Slot ẩn
-                        CreateLetterSlot(upperC.ToString(), assignedNumber, true, currentRowTransform);
+                        CreateLetterSlot(c.ToString(), assignedNumber, true, currentRowTransform);
                     }
                 }
                 else
@@ -314,7 +314,7 @@ public class PuzzleController : MonoBehaviour
 
         if (inputNumber == targetSlotNumber)
         {
-            currentSlot.FillWord(letter);
+            currentSlot.FillWord(currentSlot.currentText);
             
             PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
             if (currentData.phaseType == PuzzlePhase.Glitch)

@@ -23,7 +23,6 @@ public class WordOptionView : MonoBehaviour
         // Reset state
         gameObject.SetActive(true);
         btnComp.onClick.RemoveAllListeners();
-        Debug.Log($"Setting up key '{letter}' with isActive={isActive}");
         if (isActive)
         {
             // Trạng thái Bấm Được
@@ -31,7 +30,6 @@ public class WordOptionView : MonoBehaviour
             canvasGroup.alpha = 1f;
             btnComp.onClick.AddListener(() =>
             {
-                Debug.Log($"Key '{_myLetter}' clicked.");
                 _onClickCallback?.Invoke(_myLetter, this);
             });
             canvasGroup.blocksRaycasts = true;
