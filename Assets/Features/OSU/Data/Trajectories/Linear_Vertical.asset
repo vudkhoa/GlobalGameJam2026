@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Vertical
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 270\xB0 (size=100, gap=40, total=800)"
+  trajectoryName: "Linear 270\xB0 (size=150, gap=40, total=1100)"
   boundaryRadius: 500
   normalizeToRadius: 0
   beatCount: 6
-  beatInterval: 1
-  beatSize: {x: 100, y: 100}
-  beatSpriteSet: {fileID: 0}
+  beatInterval: 0.8
+  beatSize: {x: 150, y: 150}
+  beatSpriteSet: {fileID: 11400000, guid: 5237840110b2d10469f5b476c2ee0271, type: 2}
   connectorToNext:
     connectorSprite: {fileID: 0}
     spriteSize: {x: 50, y: 10}

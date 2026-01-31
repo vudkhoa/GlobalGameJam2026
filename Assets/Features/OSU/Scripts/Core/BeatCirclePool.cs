@@ -10,8 +10,8 @@ public class BeatCirclePool : MonoBehaviour
     [Header("Pool Settings")]
     [SerializeField] private GameObject _beatCirclePrefab;
     [SerializeField] private Transform _poolContainer;
-    [SerializeField] private int _defaultCapacity = 10;
-    [SerializeField] private int _maxSize = 20;
+    [SerializeField] private int _defaultCapacity = 30;
+    [SerializeField] private int _maxSize = 50;
 
     private ObjectPool<BeatCircle> _pool;
 

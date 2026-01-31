@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Angle0_2
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 0\xB0 (size=100, gap=60, total=580)"
+  trajectoryName: "Linear 0\xB0 (size=150, gap=60, total=780)"
   boundaryRadius: 300
   normalizeToRadius: 0
   beatCount: 4
   beatInterval: 1
-  beatSize: {x: 100, y: 100}
+  beatSize: {x: 150, y: 150}
   beatSpriteSet: {fileID: 11400000, guid: b459a75e690deb944a62f801e5ada8d5, type: 2}
   connectorToNext:
     connectorSprite: {fileID: 0}

@@ -134,7 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.8}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 5616669970938324410}
   - component: {fileID: 7336837381784769206}
   - component: {fileID: 2514952988915893688}
+  - component: {fileID: 3851566534548277260}
   m_Layer: 5
   m_Name: BeatCircle
   m_TagString: Untagged
@@ -216,5 +217,19 @@ MonoBehaviour:
   _outerRing: {fileID: 390664589193874159}
   _innerRing: {fileID: 4459795485952580698}
   _hitEffectImage: {fileID: 0}
+  _canvasGroup: {fileID: 0}
   _defaultOuterSprite: {fileID: -5122814667194785740, guid: d3a3ecc7d137cc2409af19e30115e5b2, type: 3}
   _defaultInnerSprite: {fileID: 6622316888709034011, guid: 90f548cd36865654489326ce5d02e712, type: 3}
+  _debugMode: 0
+--- !u!225 &3851566534548277260
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5392269763808900827}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
