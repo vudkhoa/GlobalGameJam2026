@@ -1,18 +1,3 @@
-///
-/// Create by linh soi - Abi Game studio
-/// mentor Minh tito - CTO Abi Game studio
-/// 
-/// Manage list UI canvas for easy to use
-/// Member nen inherit UI canvas
-/// 
-/// Update: 09-10-2020 
-///             manage UI with Generic
-///         09-10-2021 
-///             Open, Close UI with Typeof(T)
-///         28/11/2022
-///             Close All UI
-///             Close delay time
-///
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -36,6 +21,11 @@ public class UIManager : MonoSingleton<UIManager>
     public Transform CanvasParentTF;
 
     #region Canvas
+
+    private void Start()
+    {
+        OpenUI<IngameUI>();
+    }
 
     //open UI
     //mo UI canvas
@@ -196,5 +186,3 @@ public class UIManager : MonoSingleton<UIManager>
 
     #endregion
 }
-
-// UIManager.Instance.OpenUI<GuideUI>().Init(); 

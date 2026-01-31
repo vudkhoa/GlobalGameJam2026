@@ -48,7 +48,7 @@ public class UIScreenManager : MonoBehaviour
     public void LoadNextUIScene()
     {
         curIndex++;
-
+        if (curIndex >= uiScreens.Count) { return; }
         LoadUIScreen(uiScreens[curIndex]);
     }
 
