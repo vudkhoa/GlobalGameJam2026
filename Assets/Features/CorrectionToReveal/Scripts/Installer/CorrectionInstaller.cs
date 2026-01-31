@@ -25,10 +25,14 @@ public class CorrectionInstaller : MonoBehaviour
 
     // Transient Level Data (Cleaned up/Recreated per level)
     private Material _currentMaterialInstance;
+    private Sprite _currentSpriteInstance;
     private CorrectionData _data;
     private CorrectionValidator _validator;
     private ShaderParameterApplier _shaderApplier;
     private List<ShaderParameter> _shaderParameters;
+
+    private CorrectionAnimationManager _animationManager;
+    public CorrectionAnimationManager AnimationManager => _animationManager;
 
     public CorrectionLogicHandler LogicHandler => _logicHandler;
     public RulerSpawner RulerSpawner => _rulerSpawner;
@@ -49,6 +53,14 @@ public class CorrectionInstaller : MonoBehaviour
         {
             _rulerSpawner = new RulerSpawner(rulerPrefab, _rulerContainer, defaultSpacing);
         }
+
+        // Setup Animation Manager
+        if (_animationManager == null)
+        {
+            _animationManager = GetComponent<CorrectionAnimationManager>();
+            if (_animationManager == null) _animationManager = gameObject.AddComponent<CorrectionAnimationManager>();
+        }
+        _animationManager.Initialize(_revealImage, _rulerContainer);
 
         // 2. Load the first level
         if (_levels.Count > 0)
@@ -143,7 +155,9 @@ public class CorrectionInstaller : MonoBehaviour
         {
             Texture2D tex = settings.TargetTexture;
             Rect rect = new Rect(0, 0, tex.width, tex.height);
-            _revealImage.sprite = Sprite.Create(tex, rect, Vector2.one * 0.5f);
+            _currentSpriteInstance = Sprite.Create(tex, rect, Vector2.one * 0.5f);
+
+            _revealImage.sprite = _currentSpriteInstance;
         }
     }
 
@@ -152,16 +166,31 @@ public class CorrectionInstaller : MonoBehaviour
         // Destroy Material Instance
         if (_currentMaterialInstance != null)
         {
-            Destroy(_currentMaterialInstance);
+            SafeDestroy(_currentMaterialInstance);
             _currentMaterialInstance = null;
         }
 
         // Destroy Sprite Instance
-        if (_revealImage != null && _revealImage.sprite != null)
+        if (_currentSpriteInstance != null)
         {
-            Destroy(_revealImage.sprite);
-            _revealImage.sprite = null;
+            SafeDestroy(_currentSpriteInstance);
+            _currentSpriteInstance = null;
         }
+
+        if (_revealImage != null) _revealImage.sprite = null;
+    }
+
+    private void SafeDestroy(Object obj)
+    {
+        if (obj == null) return;
+#if UNITY_EDITOR
+        if (Application.isPlaying)
+            Destroy(obj);
+        else
+            DestroyImmediate(obj);
+#else
+        Destroy(obj);
+#endif
     }
 
     private void OnParameterChanged(string propertyName, float value)

@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 125966500933652925}
   - component: {fileID: 8519304762065470814}
   - component: {fileID: 316190992854433447}
+  - component: {fileID: 6933502182684174895}
   m_Layer: 5
   m_Name: Game_Correction
   m_TagString: Untagged
@@ -242,6 +243,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _installer: {fileID: 8519304762065470814}
+--- !u!114 &6933502182684174895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5006260023295861163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 877abe336ff8b8e479ab034b469fbfa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startDuration: 0.8
+  _completeDuration: 1
+  _entranceEase: 27
+  _exitEase: 26
+  _successEase: 24
 --- !u!1 &8893405034422183421
 GameObject:
   m_ObjectHideFlags: 0
