@@ -10,23 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1de3483d80d5128498fc859a66bb66b2, type: 3}
-  m_Name: Correct_Dreamy_Reveal
+  m_Name: Correct_Mystical_Energy
   m_EditorClassIdentifier: 
-  CorrectionMaterial: {fileID: 2100000, guid: 86d79e5ca0d981f48aaaf2df87be6bab, type: 2}
-  TargetTexture: {fileID: 2800000, guid: c74961e89a770fc43b0da8b4f76d9a63, type: 3}
+  CorrectionMaterial: {fileID: 2100000, guid: 5d40dae8f9919024b96883c5fccf8026, type: 2}
+  TargetTexture: {fileID: 2800000, guid: f88597437b7365c448ca30fe116bfdbc, type: 3}
   ShaderProperties:
-  - PropertyName: _BlurAmount
-    DisplayName: Blur Amount
-    InitialValue: -5
+  - PropertyName: _Darkness
+    DisplayName: "Darkness (\u0110\u1ED9 t\u1ED1i)"
+    InitialValue: 3
     TargetValue: 0
     MinValue: 0
-    MaxValue: 5
-  - PropertyName: _DistortionAmount
-    DisplayName: Distortion Amount
+    MaxValue: 3
+  - PropertyName: _ShadowDistortion
+    DisplayName: "Shadow Distortion (Bi\u1EBFn d\u1EA1ng)"
     InitialValue: 5
     TargetValue: 0
     MinValue: 0
     MaxValue: 5
+  - PropertyName: _VignetteStrength
+    DisplayName: "Vignette (Vi\u1EC1n t\u1ED1i)"
+    InitialValue: 3
+    TargetValue: 0
+    MinValue: 0
+    MaxValue: 3
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150

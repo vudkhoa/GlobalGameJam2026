@@ -59,7 +59,6 @@ public class BeatConfig : ScriptableObject
         if (innerRingStartSize <= outerRingSize)
         {
             innerRingStartSize = outerRingSize + 50f;
-            Debug.LogWarning("[BeatConfig] innerRingStartSize must be > outerRingSize. Auto-adjusted.");
         }
 
         // Clamp alpha

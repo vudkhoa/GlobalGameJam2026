@@ -15,6 +15,7 @@ public class CorrectionInstaller : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Transform _rulerContainer;
     [SerializeField] private Image _revealImage;
+    [SerializeField] private CorrectionUIManager _uiManager;
 
     // Dependencies
     private CorrectionLogicHandler _logicHandler;
@@ -33,6 +34,8 @@ public class CorrectionInstaller : MonoBehaviour
 
     private CorrectionAnimationManager _animationManager;
     public CorrectionAnimationManager AnimationManager => _animationManager;
+    public List<ShaderParameter> CurrentShaderParameters => _shaderParameters;
+    public Material CurrentMaterial => _currentMaterialInstance;
 
     public CorrectionLogicHandler LogicHandler => _logicHandler;
     public RulerSpawner RulerSpawner => _rulerSpawner;
@@ -69,7 +72,7 @@ public class CorrectionInstaller : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[CorrectionInstaller] No levels configured!");
+            // No levels configured
         }
     }
 
@@ -99,7 +102,6 @@ public class CorrectionInstaller : MonoBehaviour
         if (settings == null) return;
 
         _currentLevelIndex = index;
-        Debug.Log($"[CorrectionInstaller] Loading Level {_currentLevelIndex + 1}/{_levels.Count}: {settings.name}");
 
         // 1. Cleanup Old Visuals (Prevent Memory Leaks)
         CleanupGeneratesAssets();
@@ -129,6 +131,12 @@ public class CorrectionInstaller : MonoBehaviour
         {
             // Transfer logic handler to new data context
             _logicHandler.LoadLevel(_data, _validator, _shaderApplier);
+        }
+
+        // Bind UI to Logic Handler
+        if (_uiManager != null)
+        {
+            _uiManager.Bind(_logicHandler);
         }
 
         // 6. Setup Rulers (Reuse objects)
@@ -203,7 +211,6 @@ public class CorrectionInstaller : MonoBehaviour
 
     private void OnCorrectionComplete()
     {
-        Debug.Log($"[CorrectionInstaller] Level {_currentLevelIndex + 1} Complete!");
     }
 
     private void OnDestroy()

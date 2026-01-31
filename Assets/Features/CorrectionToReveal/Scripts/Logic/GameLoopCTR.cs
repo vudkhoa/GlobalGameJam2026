@@ -29,7 +29,7 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         }
         else
         {
-            Debug.LogError("[GameLoopCTR] CorrectionInstaller reference is missing!");
+            // CorrectionInstaller reference is missing
         }
     }
 
@@ -45,23 +45,29 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         }
     }
 
-    public void StartGame()
+    public async void StartGame()
     {
         _isGameActive = true;
 
         // Initialize logic mechanism
         if (_logicHandler != null) _logicHandler.Initialize();
 
-        // Ensure rulers are interactable
+        // Disable rulers during entrance animation
+        if (_installer != null && _installer.RulerSpawner != null)
+        {
+            _installer.RulerSpawner.SetRulersInteractable(false);
+        }
+
+        // Play Entrance Animation with shader reveal
+        if (_animator != null && _installer != null)
+        {
+            await _animator.PlayLevelStart(_installer.CurrentShaderParameters, _installer.CurrentMaterial);
+        }
+
+        // Enable rulers after animation completes
         if (_installer != null && _installer.RulerSpawner != null)
         {
             _installer.RulerSpawner.SetRulersInteractable(true);
-        }
-
-        // Play Entrance Animation
-        if (_animator != null)
-        {
-            _animator.PlayLevelStart();
         }
 
         OnGameStarted?.Invoke();
@@ -82,8 +88,6 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         // Return 0 as default score
         OnGameCompleted?.Invoke(0);
         GetComponentInParent<BaseTask>()?.CompletedTask();
-
-        Debug.Log("[GameLoopCTR] Game Ended");
     }
 
     private async void HandleCorrectionComplete()
@@ -103,8 +107,6 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         // Try to advance to next level using the Installer
         if (_installer != null && _installer.AdvanceLevel())
         {
-            Debug.Log("[GameLoopCTR] Level Complete! Advancing to next level...");
-
             // Restart game loop for new level (This triggers StartGame -> PlayLevelStart)
             StartGame();
         }

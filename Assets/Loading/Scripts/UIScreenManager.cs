@@ -13,7 +13,7 @@ public class UIScreenManager : MonoBehaviour
     private Dictionary<string, RectTransform> _uiScreens = new();
     private int curIndex;
 
-    private void Start()
+    private void OnEnable()
     {
         CacheScreens();
 
@@ -48,7 +48,7 @@ public class UIScreenManager : MonoBehaviour
     public void LoadNextUIScene()
     {
         curIndex++;
-
+        if (curIndex >= uiScreens.Count) { return; }
         LoadUIScreen(uiScreens[curIndex]);
     }
 

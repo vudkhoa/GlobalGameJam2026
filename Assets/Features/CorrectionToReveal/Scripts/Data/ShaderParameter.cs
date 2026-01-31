@@ -29,10 +29,6 @@ public class ShaderParameter
     /// </summary>
     public bool IsCorrect(float tolerance)
     {
-        Debug.Log("[ShaderParameter] Checking Parameter: " + PropertyName);
-        Debug.Log("[ShaderParameter] Checking Current Value: " + CurrentValue);
-        Debug.Log("[ShaderParameter] Checking TargetValue Value: " + TargetValue);
-        Debug.Log("[ShaderParameter] IsCorrect: " + Mathf.Abs(CurrentValue - TargetValue) + " <= " + tolerance);
         return Mathf.Abs(CurrentValue - TargetValue) <= tolerance;
     }
 

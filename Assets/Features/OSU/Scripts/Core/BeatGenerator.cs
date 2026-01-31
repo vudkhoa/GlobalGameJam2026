@@ -13,7 +13,6 @@ public static class BeatGenerator
 
         if (phase.trajectoryConfigs == null || phase.trajectoryConfigs.Length == 0)
         {
-            Debug.LogWarning($"[BeatGenerator] Phase '{phase.phaseName}' has no trajectory configs!");
             return beats;
         }
 
@@ -23,7 +22,6 @@ public static class BeatGenerator
         {
             if (trajectoryConfig == null)
             {
-                Debug.LogWarning($"[BeatGenerator] Null trajectory config in phase '{phase.phaseName}'");
                 continue;
             }
 
@@ -49,7 +47,6 @@ public static class BeatGenerator
             }
         }
 
-        Debug.Log($"[BeatGenerator] Generated {beats.Count} beats for phase '{phase.phaseName}'");
         return beats;
     }
 }

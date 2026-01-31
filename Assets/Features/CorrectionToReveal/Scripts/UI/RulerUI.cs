@@ -258,7 +258,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
         if (_isHorizontal)
         {
             float targetX = Mathf.Lerp(-_containerWidth / 2f, _containerWidth / 2f, normalized);
-            _handle.anchoredPosition = new Vector2(targetX, 0);
+            _handle.anchoredPosition = new Vector2(targetX, 12f);
         }
         else
         {

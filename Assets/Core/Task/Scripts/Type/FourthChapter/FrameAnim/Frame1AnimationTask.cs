@@ -1,10 +1,18 @@
+using BrunoMikoski.AnimationSequencer;
 using Cysharp.Threading.Tasks;
 
 public class Frame1AnimationTask : BaseTask
 {
+    public AnimationSequencerController anim;
+    public float dur;
+
     public override UniTask Execute()
     {
-        AwaitDoneTask(3f);
+        if (anim != null)
+        {
+            anim.Play();
+        }
+        AwaitDoneTask(dur);
         return UniTask.WaitUntil(() => doneTask == true);
     }
 

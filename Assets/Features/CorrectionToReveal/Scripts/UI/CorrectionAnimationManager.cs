@@ -12,14 +12,20 @@ using UnityEngine.UI;
 public class CorrectionAnimationManager : MonoBehaviour
 {
     [Header("Animation Settings")]
-    [SerializeField] private float _startDuration = 0.8f;
-    [SerializeField] private float _completeDuration = 1.0f;
-    [SerializeField] private Ease _entranceEase = Ease.OutBack;
-    [SerializeField] private Ease _exitEase = Ease.InBack;
+    [SerializeField] private float _startDuration = 1.5f;
+    [SerializeField] private float _completeDuration = 1.2f;
+    [SerializeField] private Ease _entranceEase = Ease.OutCubic;
+    [SerializeField] private Ease _exitEase = Ease.InOutCubic;
     [SerializeField] private Ease _successEase = Ease.OutElastic;
+
+    [Header("Shader Animation")]
+    [SerializeField] private float _shaderAnimationDuration = 2.0f;
+    [SerializeField] private Ease _shaderEase = Ease.InOutSine;
 
     private Image _revealImage;
     private Transform _rulerContainer;
+    private List<ShaderParameter> _currentParameters;
+    private Material _currentMaterial;
 
     /// <summary>
     /// Initialize references
@@ -31,64 +37,146 @@ public class CorrectionAnimationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Play entrance animation for Image and Rulers
+    /// Play entrance animation for Image and Rulers with shader reveal
     /// </summary>
-    public void PlayLevelStart()
+    public async UniTask PlayLevelStart(List<ShaderParameter> parameters, Material material)
     {
-        // 1. Image Entrance (Fade + Scale Up)
+        _currentParameters = parameters;
+        _currentMaterial = material;
+
+        // Set shader to target values initially (fully corrected state)
+        if (_currentMaterial != null && _currentParameters != null)
+        {
+            foreach (var param in _currentParameters)
+            {
+                if (_currentMaterial.HasProperty(param.PropertyName))
+                {
+                    _currentMaterial.SetFloat(param.PropertyName, param.TargetValue);
+                }
+            }
+        }
+
+        // 1. Image Entrance (Smooth Fade + Gentle Scale)
         if (_revealImage != null)
         {
-            _revealImage.transform.localScale = Vector3.one * 0.8f;
+            _revealImage.transform.localScale = Vector3.one * 0.95f;
             Color c = _revealImage.color;
             c.a = 0f;
             _revealImage.color = c;
 
+            // Smooth scale and fade
             _revealImage.transform.DOScale(1f, _startDuration).SetEase(_entranceEase);
-            _revealImage.DOFade(1f, _startDuration);
+            _revealImage.DOFade(1f, _startDuration).SetEase(_entranceEase);
         }
 
-        // 2. Rulers Entrance (Staggered Slide/Scale)
+        // 2. Rulers Entrance (Smooth Staggered Fade + Slide)
         if (_rulerContainer != null)
         {
             int index = 0;
             foreach (Transform child in _rulerContainer)
             {
-                child.localScale = Vector3.zero;
-                // Stagger by 0.1s per ruler
-                child.DOScale(1f, 0.5f).SetEase(_entranceEase).SetDelay(index * 0.1f);
+                // Start from slightly below and transparent
+                CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
+                if (canvasGroup == null) canvasGroup = child.gameObject.AddComponent<CanvasGroup>();
+
+                Vector3 originalPos = child.localPosition;
+                child.localPosition = originalPos + Vector3.down * 30f;
+                canvasGroup.alpha = 0f;
+
+                // Smooth slide up and fade in
+                float delay = index * 0.15f;
+                child.DOLocalMove(originalPos, _startDuration * 0.8f)
+                    .SetEase(_entranceEase)
+                    .SetDelay(delay);
+                canvasGroup.DOFade(1f, _startDuration * 0.8f)
+                    .SetEase(_entranceEase)
+                    .SetDelay(delay);
+
                 index++;
             }
+        }
+
+        // Wait for entrance animations to complete
+        await UniTask.Delay((int)(_startDuration * 1000));
+
+        // 3. Animate shader from target values to initial values
+        await AnimateShaderParameters();
+    }
+
+    /// <summary>
+    /// Animate shader parameters from target to initial values
+    /// </summary>
+    private async UniTask AnimateShaderParameters()
+    {
+        if (_currentMaterial == null || _currentParameters == null) return;
+
+        var tweens = new List<Tween>();
+
+        foreach (var param in _currentParameters)
+        {
+            if (_currentMaterial.HasProperty(param.PropertyName))
+            {
+                float startValue = param.TargetValue;
+                float endValue = param.CurrentValue;
+
+                // Create tween for each parameter
+                Tween tween = DOTween.To(
+                    () => startValue,
+                    x => _currentMaterial.SetFloat(param.PropertyName, x),
+                    endValue,
+                    _shaderAnimationDuration
+                ).SetEase(_shaderEase);
+
+                tweens.Add(tween);
+            }
+        }
+
+        // Wait for all shader animations to complete
+        if (tweens.Count > 0)
+        {
+            await UniTask.WhenAll(tweens.Select(t => t.AsyncWaitForCompletion().AsUniTask()));
         }
     }
 
     /// <summary>
-    /// Play success animation
+    /// Play success animation - smooth and chill celebration
     /// Returns UniTask to allow GameLoop to wait
     /// </summary>
     public async UniTask PlayLevelComplete()
     {
         var tasks = new List<UniTask>();
 
-        // 1. Reveal Image Celebration (Punch/Flash)
+        // 1. Reveal Image Celebration (Gentle Pulse)
         if (_revealImage != null)
         {
-            // Flash or Punch
-            Tween t = _revealImage.transform.DOPunchScale(Vector3.one * 0.15f, _completeDuration, 5, 0.5f)
-                .SetEase(_successEase);
-            tasks.Add(t.AsyncWaitForCompletion().AsUniTask());
+            // Gentle breathing pulse effect
+            Sequence pulseSequence = DOTween.Sequence();
+            pulseSequence.Append(_revealImage.transform.DOScale(1.08f, _completeDuration * 0.4f).SetEase(Ease.OutCubic));
+            pulseSequence.Append(_revealImage.transform.DOScale(1.0f, _completeDuration * 0.6f).SetEase(Ease.InOutCubic));
+
+            tasks.Add(pulseSequence.AsyncWaitForCompletion().AsUniTask());
         }
 
-        // 2. Rulers Exit (Slide Out / Fade) -> Enhance focus on Image
+        // 2. Rulers Exit (Smooth Fade + Slide Down)
         if (_rulerContainer != null)
         {
             int index = 0;
-            // Iterate backwards or forwards?
             foreach (Transform child in _rulerContainer)
             {
-                // Quick exit
-                Tween t = child.DOScale(0f, 0.3f).SetEase(_exitEase).SetDelay(index * 0.05f);
-                // We don't necessarily need to wait for Rulers to disappear to finish the "Level Complete" sound/feel
-                // But let's track one of them or simple delay
+                CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
+                if (canvasGroup == null) canvasGroup = child.gameObject.AddComponent<CanvasGroup>();
+
+                float delay = index * 0.08f;
+
+                // Smooth slide down and fade out
+                child.DOLocalMoveY(child.localPosition.y - 30f, 0.6f)
+                    .SetEase(_exitEase)
+                    .SetDelay(delay);
+
+                canvasGroup.DOFade(0f, 0.6f)
+                    .SetEase(_exitEase)
+                    .SetDelay(delay);
+
                 index++;
             }
         }
@@ -101,6 +189,12 @@ public class CorrectionAnimationManager : MonoBehaviour
         else
         {
             await UniTask.Delay((int)(_completeDuration * 1000));
+        }
+
+        // 3. Image gentle fade out
+        if (_revealImage != null)
+        {
+            await _revealImage.DOFade(0f, 0.5f).SetEase(Ease.InOutCubic).AsyncWaitForCompletion().AsUniTask();
         }
     }
 }

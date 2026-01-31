@@ -65,7 +65,6 @@ public class VFXManager : MonoBehaviour
     {
         if (effectPrefab == null)
         {
-            Debug.LogWarning("[VFXManager] Effect prefab is null!");
             return null;
         }
 
@@ -116,7 +115,7 @@ public class VFXManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[VFXManager] Instance {instance.name} not found in active map!");
+            // Instance not found in active map
         }
     }
 
