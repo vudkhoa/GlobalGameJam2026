@@ -16,36 +16,20 @@ public static class ShaderParameterFactory
     {
         var parameters = new List<ShaderParameter>();
 
-        // Parameter 1: Blur Amount
-        parameters.Add(new ShaderParameter(
-            propertyName: "_BlurAmount",
-            displayName: "Blur Amount (Độ mờ)",
-            minValue: 0f,
-            maxValue: 10f,
-            currentValue: settings.InitialBlurAmount,
-            targetValue: settings.TargetBlurAmount
-        ));
+        if (settings == null || settings.ShaderProperties == null)
+            return parameters;
 
-        // Parameter 2: Horizontal Scale
-        parameters.Add(new ShaderParameter(
-            propertyName: "_HorizontalScale",
-            displayName: "Horizontal Scale (Scale ngang)",
-            minValue: 1f,
-            maxValue: 3f,
-            currentValue: settings.InitialHorizontalScale,
-            targetValue: settings.TargetHorizontalScale
-        ));
-
-        // TODO: Add more parameters here as needed
-        // Example:
-        // parameters.Add(new ShaderParameter(
-        //     propertyName: "_NewParameter",
-        //     displayName: "New Parameter",
-        //     minValue: 0f,
-        //     maxValue: 1f,
-        //     currentValue: settings.InitialNewParameter,
-        //     targetValue: settings.TargetNewParameter
-        // ));
+        foreach (var prop in settings.ShaderProperties)
+        {
+            parameters.Add(new ShaderParameter(
+                propertyName: prop.PropertyName,
+                displayName: prop.DisplayName,
+                minValue: prop.MinValue,
+                maxValue: prop.MaxValue,
+                currentValue: prop.InitialValue,
+                targetValue: prop.TargetValue
+            ));
+        }
 
         return parameters;
     }
