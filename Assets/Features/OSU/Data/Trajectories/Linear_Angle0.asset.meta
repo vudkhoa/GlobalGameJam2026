@@ -1,6 +1,16 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Features/OSU/Data/Trajectories/Linear_Angle0.asset.meta
 guid: 7e399487fdb3dd440b7b64ceb7a4e8cb
 NativeFormatImporter:
+========
+<<<<<<<< Updated upstream:Assets/Features/Drag/Prefabs.meta
+guid: d5c2ef0d9d0f0f947986952a5ca9dd16
+========
+guid: 9c302f873ffe91144acf96e4ca285938
+>>>>>>>> Stashed changes:Assets/Features/Drag.meta
+folderAsset: yes
+DefaultImporter:
+>>>>>>>> 2fe17ac (fix OSU UI display):Assets/Features/Drag/Prefabs.meta
   externalObjects: {}
   mainObjectFileID: 11400000
   userData: 

@@ -3,6 +3,7 @@ using UnityEngine;
 /// <summary>
 /// SRP: Base class for all trajectory configurations
 /// Responsibility: Define interface for beat position generation along trajectories
+/// ✅ NOW: Each trajectory can specify its own sprite set
 /// </summary>
 public abstract class TrajectoryConfig : ScriptableObject
 {
@@ -28,6 +29,11 @@ public abstract class TrajectoryConfig : ScriptableObject
 
     [Tooltip("Kích thước của beat (sizeDelta của RectTransform)")]
     public Vector2 beatSize = new Vector2(100f, 100f);
+
+    // ✅ NEW: Sprite set cho trajectory này
+    [Header("Visual Settings")]
+    [Tooltip("Sprite set cho tất cả beats trong trajectory này (optional - để null thì dùng default)")]
+    public BeatSpriteSet beatSpriteSet;
 
     /// <summary>
     /// Evaluate vị trí beat tại thời điểm t trong trajectory
