@@ -81,6 +81,7 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
 
         // Return 0 as default score
         OnGameCompleted?.Invoke(0);
+        GetComponentInParent<BaseTask>()?.CompletedTask();
 
         Debug.Log("[GameLoopCTR] Game Ended");
     }
