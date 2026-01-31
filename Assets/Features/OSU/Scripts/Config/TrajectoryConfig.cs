@@ -3,7 +3,6 @@ using UnityEngine;
 /// <summary>
 /// SRP: Base class for all trajectory configurations
 /// Responsibility: Define interface for beat position generation along trajectories
-/// ✅ NOW: Each trajectory can specify its own sprite set + connector config
 /// </summary>
 public abstract class TrajectoryConfig : ScriptableObject
 {
@@ -30,36 +29,19 @@ public abstract class TrajectoryConfig : ScriptableObject
     [Tooltip("Kích thước của beat (sizeDelta của RectTransform)")]
     public Vector2 beatSize = new Vector2(100f, 100f);
 
-    [Header("Visual Settings")]
-    [Tooltip("Sprite set cho tất cả beats trong trajectory này (optional)")]
-    public BeatSpriteSet beatSpriteSet;
-
-    // ✅ NEW: Connector config
-    [Tooltip("Config để nối từ beat cuối trajectory này đến beat đầu trajectory tiếp theo")]
-    public BeatConnectorData connectorToNext;
-
     /// <summary>
     /// Evaluate vị trí beat tại thời điểm t trong trajectory
     /// </summary>
+    /// <param name="t">Normalized time [0, 1] trong trajectory</param>
+    /// <param name="index">Thứ tự beat (0-based)</param>
+    /// <param name="totalCount">Tổng số beat trong phase</param>
+    /// <returns>Local position của beat</returns>
     public abstract Vector2 EvaluatePosition(float t, int index, int totalCount);
 
-    /// <summary>
-    /// Get vị trí của beat cuối cùng trong trajectory
-    /// </summary>
-    public Vector2 GetLastBeatPosition()
-    {
-        return EvaluatePosition(1f, beatCount - 1, beatCount);
-    }
-
-    /// <summary>
-    /// Get vị trí của beat đầu tiên trong trajectory
-    /// </summary>
-    public Vector2 GetFirstBeatPosition()
-    {
-        return EvaluatePosition(0f, 0, beatCount);
-    }
-
 #if UNITY_EDITOR
+    /// <summary>
+    /// Validate config trong Editor
+    /// </summary>
     protected virtual void OnValidate()
     {
         boundaryRadius = Mathf.Max(0f, boundaryRadius);

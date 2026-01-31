@@ -9,20 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9b78445f80d7cc49a46b2aae9fd8d7e, type: 3}
-  m_Name: Wave_BottomToTop
+  m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
+  m_Name: Linear_Trajectory
   m_EditorClassIdentifier: 
-  trajectoryName: Wave Right (amp=100, freq=1,0, len=1450)
-  boundaryRadius: 100
+  trajectoryName: "Linear 0\xB0 (size=100, gap=40, total=660)"
+  boundaryRadius: 500
   normalizeToRadius: 0
-  beatCount: 10
+  beatCount: 5
   beatInterval: 0.5
   beatSize: {x: 100, y: 100}
-  moveRight: 1
-  gap: 50
-  waveAmplitude: 100
-  waveFrequency: 1
-  minY: -200
-  maxY: 200
-  pathSeed: 0
-  randomness: 0.5
+  angle: 0
+  gap: 40
