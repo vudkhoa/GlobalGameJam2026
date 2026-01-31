@@ -1,50 +1,48 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Applies shader parameters to material
+/// Applies shader parameters to material dynamically
 /// Single Responsibility: Material property management
 /// </summary>
 public class ShaderParameterApplier
 {
     private readonly Material _material;
-    private readonly string _blurPropertyName;
-    private readonly string _scalePropertyName;
-    
-    public ShaderParameterApplier(Material material, string blurPropertyName, string scalePropertyName)
+
+    public ShaderParameterApplier(Material material)
     {
         _material = material;
-        _blurPropertyName = blurPropertyName;
-        _scalePropertyName = scalePropertyName;
     }
-    
+
     /// <summary>
-    /// Apply blur amount to shader
+    /// Apply a single parameter to shader by property name
     /// </summary>
-    public void ApplyBlurAmount(float value)
+    public void ApplyParameter(string propertyName, float value)
     {
-        if (_material != null)
+        if (_material != null && _material.HasProperty(propertyName))
         {
-            _material.SetFloat(_blurPropertyName, value);
+            _material.SetFloat(propertyName, value);
+        }
+        else
+        {
+            Debug.LogWarning($"Material does not have property: {propertyName}");
         }
     }
-    
+
     /// <summary>
-    /// Apply horizontal scale to shader
+    /// Apply all parameters from a list
     /// </summary>
-    public void ApplyHorizontalScale(float value)
+    public void ApplyAllParameters(List<ShaderParameter> parameters)
     {
-        if (_material != null)
+        if (_material == null)
         {
-            _material.SetFloat(_scalePropertyName, value);
+            Debug.LogError("Material is null!");
+            return;
         }
-    }
-    
-    /// <summary>
-    /// Apply all parameters from CorrectionData
-    /// </summary>
-    public void ApplyAllParameters(CorrectionData data)
-    {
-        ApplyBlurAmount(data.BlurAmount);
-        ApplyHorizontalScale(data.HorizontalScale);
+
+        foreach (var param in parameters)
+        {
+            ApplyParameter(param.PropertyName, param.CurrentValue);
+        }
     }
 }

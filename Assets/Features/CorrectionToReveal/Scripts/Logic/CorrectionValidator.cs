@@ -14,7 +14,7 @@ public class CorrectionValidator
     }
 
     /// <summary>
-    /// Check if correction is complete
+    /// Check if ALL parameters are correct
     /// </summary>
     public bool IsCorrect()
     {
@@ -22,34 +22,10 @@ public class CorrectionValidator
     }
 
     /// <summary>
-    /// Get overall progress (0-1)
+    /// Get overall progress (0-1) across all parameters
     /// </summary>
     public float GetProgress()
     {
         return _data.GetOverallProgress();
-    }
-
-    /// <summary>
-    /// Get individual parameter progress
-    /// </summary>
-    public (float blurProgress, float scaleProgress) GetIndividualProgress()
-    {
-        return (_data.GetBlurProgress(), _data.GetScaleProgress());
-    }
-
-    /// <summary>
-    /// Check if blur is correct
-    /// </summary>
-    public bool IsBlurCorrect()
-    {
-        return Mathf.Abs(_data.BlurAmount - _data.TargetBlurAmount) <= _data.Tolerance;
-    }
-
-    /// <summary>
-    /// Check if scale is correct
-    /// </summary>
-    public bool IsScaleCorrect()
-    {
-        return Mathf.Abs(_data.HorizontalScale - _data.TargetHorizontalScale) <= _data.Tolerance;
     }
 }

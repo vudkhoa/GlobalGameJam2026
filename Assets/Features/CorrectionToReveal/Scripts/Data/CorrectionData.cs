@@ -1,67 +1,76 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
 /// Data class for Correction mini-game
-/// Stores shader parameters and their target values
+/// Stores shader parameters dynamically
 /// </summary>
 [System.Serializable]
 public class CorrectionData
 {
     [Header("Shader Parameters")]
-    [Tooltip("Current blur amount (0-10)")]
-    public float BlurAmount = 5.0f;
-    
-    [Tooltip("Current horizontal scale (0.1-3)")]
-    public float HorizontalScale = 1.5f;
-    
-    [Header("Target Values")]
-    [Tooltip("Target blur amount for winning condition")]
-    public float TargetBlurAmount = 0.0f;
-    
-    [Tooltip("Target horizontal scale for winning condition")]
-    public float TargetHorizontalScale = 1.0f;
-    
+    [Tooltip("List of all adjustable shader parameters")]
+    public List<ShaderParameter> Parameters = new List<ShaderParameter>();
+
     [Header("Tolerance")]
     [Tooltip("Acceptable error margin for winning")]
     [Range(0.01f, 1.0f)]
     public float Tolerance = 0.1f;
-    
+
     /// <summary>
-    /// Check if current values are close enough to target values
+    /// Initialize with parameters from factory
+    /// </summary>
+    public void Initialize(List<ShaderParameter> parameters, float tolerance)
+    {
+        Parameters = parameters;
+        Tolerance = tolerance;
+    }
+
+    /// <summary>
+    /// Get parameter by property name
+    /// </summary>
+    public ShaderParameter GetParameter(string propertyName)
+    {
+        return Parameters.FirstOrDefault(p => p.PropertyName == propertyName);
+    }
+
+    /// <summary>
+    /// Update parameter value by property name
+    /// </summary>
+    public void UpdateParameter(string propertyName, float value)
+    {
+        var param = GetParameter(propertyName);
+        if (param != null)
+        {
+            param.CurrentValue = value;
+        }
+    }
+
+    /// <summary>
+    /// Check if ALL parameters are correct
     /// </summary>
     public bool IsCorrect()
     {
-        bool blurCorrect = Mathf.Abs(BlurAmount - TargetBlurAmount) <= Tolerance;
-        bool scaleCorrect = Mathf.Abs(HorizontalScale - TargetHorizontalScale) <= Tolerance;
-        
-        return blurCorrect && scaleCorrect;
+        return Parameters.All(p => p.IsCorrect(Tolerance));
     }
-    
+
     /// <summary>
-    /// Get progress percentage (0-1) for blur parameter
-    /// </summary>
-    public float GetBlurProgress()
-    {
-        float maxError = 10.0f; // Max blur range
-        float currentError = Mathf.Abs(BlurAmount - TargetBlurAmount);
-        return 1.0f - Mathf.Clamp01(currentError / maxError);
-    }
-    
-    /// <summary>
-    /// Get progress percentage (0-1) for scale parameter
-    /// </summary>
-    public float GetScaleProgress()
-    {
-        float maxError = 2.9f; // Max scale range (3 - 0.1)
-        float currentError = Mathf.Abs(HorizontalScale - TargetHorizontalScale);
-        return 1.0f - Mathf.Clamp01(currentError / maxError);
-    }
-    
-    /// <summary>
-    /// Get overall progress percentage (0-1)
+    /// Get overall progress (0-1) across all parameters
     /// </summary>
     public float GetOverallProgress()
     {
-        return (GetBlurProgress() + GetScaleProgress()) / 2.0f;
+        if (Parameters.Count == 0) return 0f;
+
+        float totalProgress = Parameters.Sum(p => p.GetProgress());
+        return totalProgress / Parameters.Count;
+    }
+
+    /// <summary>
+    /// Get count of adjustable parameters
+    /// </summary>
+    public int GetParameterCount()
+    {
+        return Parameters.Count;
     }
 }
