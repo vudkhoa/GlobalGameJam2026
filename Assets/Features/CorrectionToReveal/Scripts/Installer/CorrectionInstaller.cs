@@ -15,6 +15,7 @@ public class CorrectionInstaller : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Transform _rulerContainer;
     [SerializeField] private Image _revealImage;
+    [SerializeField] private CorrectionUIManager _uiManager;
 
     // Dependencies
     private CorrectionLogicHandler _logicHandler;
@@ -128,6 +129,12 @@ public class CorrectionInstaller : MonoBehaviour
         {
             // Transfer logic handler to new data context
             _logicHandler.LoadLevel(_data, _validator, _shaderApplier);
+        }
+
+        // Bind UI to Logic Handler
+        if (_uiManager != null)
+        {
+            _uiManager.Bind(_logicHandler);
         }
 
         // 6. Setup Rulers (Reuse objects)
