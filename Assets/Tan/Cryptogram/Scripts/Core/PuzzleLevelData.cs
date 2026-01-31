@@ -1,6 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[System.Serializable]
+public struct CharID
+{
+    public string character; 
+    public int id;          
+}
+
 [CreateAssetMenu(menuName = "Florence/LevelData")]
 public class PuzzleLevelData : ScriptableObject
 {
@@ -12,9 +19,11 @@ public class PuzzleLevelData : ScriptableObject
     public float typingSpeed = 0.05f;
     public PuzzlePhase phaseType = PuzzlePhase.Normal;
 
-    [Header("Cấu hình Tráo Đổi (Tùy chọn)")]
-    [Tooltip("Viết các từ có thể đổi chỗ vào cùng 1 dòng, cách nhau bằng dấu phẩy.\nVí dụ: mệt mỏi,trống rỗng")]
-    public List<string> interchangeableGroups;
+    [Header("Cấu hình số thủ công (Tùy chọn)")]
+    [Tooltip("Nếu để trống, game sẽ tự sinh số. Nếu điền, game sẽ dùng số này.")]
+    public List<CharID> manualMapping;
+
+    
 }
 
 public enum PuzzlePhase { Normal, Glitch }

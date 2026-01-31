@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 public class ChapterFlowManager : MonoBehaviour
 {
+    [Header("DEBUG")]
+    public bool skipIntro = false;
     [Header("1. INTRO CONFIG")]
     public List<Image> introSlides;
     [Tooltip("Kéo cái Gameobject 'FinalImageMask' vừa tạo vào đây")]
@@ -40,17 +42,44 @@ public class ChapterFlowManager : MonoBehaviour
     // Start có thể đổi thành async UniTaskVoid trong Unity
     async UniTaskVoid Start()
     {
-        // Token hủy task nếu object này bị destroy (tránh lỗi khi tắt game)
         var token = this.GetCancellationTokenOnDestroy();
 
-        // 1. Setup ban đầu
         SetupInitialState();
 
-        // 2. Chạy Intro (Chờ chạy xong mới đi tiếp)
-        await PlayIntroSequence(token);
+        if (skipIntro)
+        {
+            SkipIntroSequence();
+        }
+        else
+        {
+            await PlayIntroSequence(token);
+        }
 
-        // 3. Bắt đầu Game
         puzzleController.StartGameManually();
+    }
+
+    void SkipIntroSequence()
+    {
+        Debug.Log("--- SKIPPING INTRO ---");
+
+        foreach (var img in introSlides) img.gameObject.SetActive(false);
+
+        gameplayCanvasGroup.alpha = 1;
+        gameplayCanvasGroup.blocksRaycasts = true;
+
+        finalImageMaskRect.gameObject.SetActive(true);
+        finalImageContent.color = Color.white; // Alpha = 1
+
+        finalImageMaskRect.anchorMin = new Vector2(0.5f, 0.5f);
+        finalImageMaskRect.anchorMax = new Vector2(0.5f, 0.5f);
+        finalImageMaskRect.pivot = new Vector2(0.5f, 0.5f);
+        finalImageMaskRect.sizeDelta = targetSquareSize;
+
+        finalImageMaskRect.SetParent(targetFrameLeft);
+        finalImageMaskRect.anchoredPosition = Vector2.zero;
+        finalImageMaskRect.localScale = Vector3.one; 
+
+        rightPanelRect.anchoredPosition = new Vector2(targetRightPanelPosX, 0);
     }
 
     void SetupInitialState()
@@ -67,7 +96,6 @@ public class ChapterFlowManager : MonoBehaviour
     // --- LOGIC INTRO ---
     async UniTask PlayIntroSequence(System.Threading.CancellationToken token)
     {
-        // A. Chiếu slide ảnh
         foreach (var img in introSlides)
         {
             img.gameObject.SetActive(true);
@@ -83,57 +111,44 @@ public class ChapterFlowManager : MonoBehaviour
             img.gameObject.SetActive(false);
         }
 
-        // B. Ảnh cuối xuất hiện
         gameplayCanvasGroup.alpha = 1; 
         rightPanelRect.anchoredPosition = Vector2.zero; // Nằm giữa
 
-        // 2. Bật Mask lên (nó đang stretch full màn hình)
         finalImageMaskRect.gameObject.SetActive(true);
         finalImageContent.DOFade(1f, 1f).From(0f).WithCancellation(token);
         await UniTask.Delay(1500, cancellationToken: token);
 
-        // C. GIAI ĐOẠN 1: BIẾN HÌNH THÀNH VUÔNG Ở GIỮA
         Vector2 startSize = finalImageMaskRect.rect.size;
-        // Trước khi tween kích thước, phải đổi Anchor về giữa để nó co lại vào tâm
         finalImageMaskRect.anchorMin = new Vector2(0.5f, 0.5f);
         finalImageMaskRect.anchorMax = new Vector2(0.5f, 0.5f);
         finalImageMaskRect.pivot = new Vector2(0.5f, 0.5f);
-        // (Mẹo: Khi đổi anchor từ stretch về center, sizeDelta nó sẽ tự tính ra kích thước màn hình hiện tại, không cần set lại)
         finalImageMaskRect.sizeDelta = startSize;
 
         var seqPhase1 = DOTween.Sequence();
-        // Thu nhỏ Mask thành hình vuông (Ảnh bên trong sẽ bị cắt, không bị méo)
         seqPhase1.Join(finalImageMaskRect.DOSizeDelta(targetSquareSize, 1.5f).SetEase(Ease.InOutExpo));
         // Đảm bảo nó nằm đúng giữa (phòng hờ)
         seqPhase1.Join(finalImageMaskRect.DOAnchorPos(Vector2.zero, 1.5f).SetEase(Ease.InOutExpo));
 
         await seqPhase1.ToUniTask(cancellationToken: token);
         
-        // Dừng lại 1 chút ở giữa cho kịch tính
         await UniTask.Delay(500, cancellationToken: token);
 
 
-        // D. GIAI ĐOẠN 2: TÁCH ĐÔI (THE SPLIT)
         var seqPhase2 = DOTween.Sequence();
         
-        // 1. Ảnh lướt sang trái (vào vị trí khung tranh)
         seqPhase2.Join(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
         
-        // 2. Puzzle lướt sang phải (từ giữa ra vị trí đích)
-        // Dùng DOAnchorPosX vì nó trượt ngang trong Canvas
         seqPhase2.Join(rightPanelRect.DOAnchorPosX(targetRightPanelPosX, 1.5f).SetEase(Ease.InOutBack));
 
         await seqPhase2.ToUniTask(cancellationToken: token);
 
-        // E. HOÀN TẤT
-        // Gắn cái Mask vào làm con của khung tranh bên trái luôn cho gọn
         finalImageMaskRect.SetParent(targetFrameLeft);
         finalImageMaskRect.anchoredPosition = Vector2.zero;
         
         gameplayCanvasGroup.blocksRaycasts = true;
     }
 
-    // --- LOGIC OUTRO (Được gọi từ PuzzleController) ---
+    // --- LOGIC OUTRO ---
     public void TriggerOutro(PlayerDecision decision)
     {
         PlayOutroSequence(decision, this.GetCancellationTokenOnDestroy()).Forget();

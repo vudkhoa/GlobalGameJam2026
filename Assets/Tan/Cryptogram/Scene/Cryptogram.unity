@@ -391,9 +391,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b27b498094b01754faa1f0c8001b91e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyboardRowPrefab: {fileID: 5302887282627823249, guid: feb335cbf23cc0d46a6febc00972bf6e, type: 3}
+  keyboardContainer: {fileID: 1912304368}
   flowManager: {fileID: 152843916}
   choiceView: {fileID: 981048699}
-  autoStart: 0
+  autoStart: 1
   puzzleContentGroup: {fileID: 732195460}
   fadeDuration: 0.5
   storyLevels:
@@ -405,6 +407,7 @@ MonoBehaviour:
   lineRowPrefab: {fileID: 999716889323441029, guid: c256500458b185149b5e45ed85641139, type: 3}
   journalSlotPrefab: {fileID: 4658952754952145826, guid: 4c0481898415a0f468aadbb3f51fc484, type: 3}
   wordOptionPrefab: {fileID: 6865801012765633517, guid: e298ac9fa9fc6ab449064e138a8ac369, type: 3}
+  spacePrefab: {fileID: 8557264914991951504, guid: b48f38099bad8f1449264c6a53128fbb, type: 3}
 --- !u!4 &109010700
 Transform:
   m_ObjectHideFlags: 0
@@ -436,7 +439,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &152843916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -449,6 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a2bec7900240c34dbe797067c50b6ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skipIntro: 0
   introSlides:
   - {fileID: 1313353892}
   - {fileID: 646509208}
@@ -1045,7 +1049,7 @@ MonoBehaviour:
     m_Top: -130
     m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 30
+  m_Spacing: 70
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -2346,7 +2350,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1912304367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -2355,7 +2359,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
+  m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1

@@ -6,23 +6,52 @@ using DG.Tweening; // Để dùng DOTween
 
 public class WordOptionView : MonoBehaviour
 {
-    public TextMeshProUGUI wordText;
-    public Button btnComp;
+    [SerializeField] private TextMeshProUGUI wordText;
+    [SerializeField] private Button btnComp;
+    [SerializeField] private CanvasGroup canvasGroup;
     
-    private string _myWord;
+    private string _myLetter;
+    private int _myNumber;
     private Action<string, WordOptionView> _onClickCallback;
 
-    public void Setup(string word, Action<string, WordOptionView> callback)
+    public void SetupKeyboardKey(string letter, bool isActive, Action<string, WordOptionView> callback)
     {
-        _myWord = word;
-        wordText.text = word;
+        _myLetter = letter;
+        wordText.text = letter;
         _onClickCallback = callback;
 
-        // Xóa sự kiện cũ, thêm sự kiện mới
+        // Reset state
+        gameObject.SetActive(true);
         btnComp.onClick.RemoveAllListeners();
-        btnComp.onClick.AddListener(() => {
-            _onClickCallback?.Invoke(_myWord, this);
-        });
+        Debug.Log($"Setting up key '{letter}' with isActive={isActive}");
+        if (isActive)
+        {
+            // Trạng thái Bấm Được
+            btnComp.interactable = true;
+            canvasGroup.alpha = 1f;
+            btnComp.onClick.AddListener(() =>
+            {
+                Debug.Log($"Key '{_myLetter}' clicked.");
+                _onClickCallback?.Invoke(_myLetter, this);
+            });
+            canvasGroup.blocksRaycasts = true;
+        }
+        else
+        {
+            btnComp.interactable = false;
+            canvasGroup.alpha = 0.3f;
+            canvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    public void SetupFunctionKey(string icon, Action callback)
+    {
+        wordText.text = icon; 
+        btnComp.interactable = true;
+        canvasGroup.alpha = 1f;
+        
+        btnComp.onClick.RemoveAllListeners();
+        btnComp.onClick.AddListener(() => callback?.Invoke());
     }
 
     public void Disappear()

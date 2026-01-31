@@ -12,9 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e048d5c8104e5474a88136209876269e, type: 3}
   m_Name: Level_2
   m_EditorClassIdentifier: 
-  sentence: "Nh\u01B0ng sau c\xE1nh g\xE0, / t\xF4i th\u1EA5y th\u1EADt {m\u1EC7t
-    m\u1ECFi} v\xE0 {tr\u1ED1ng r\u1ED7ng}."
+  sentence: "Nh\u01B0ng s{a}u {c}\xE1nh g\xE0, / t\xF4i t{h}\u1EA5y th\u1EADt {m}\u1EC7{t}
+    m\u1ECF{i} / v\xE0 t{r}\u1ED1{n}g {r}\u1ED7n{g}."
   typingSpeed: 0.15
   phaseType: 0
-  interchangeableGroups:
-  - "m\xEA\u0323t mo\u0309i, tr\xF4\u0301ng r\xF4\u0303ng"
+  manualMapping:
+  - character: M
+    id: 12
+  - character: T
+    id: 7
+  - character: I
+    id: 5
+  - character: R
+    id: 19
+  - character: N
+    id: 2
+  - character: G
+    id: 40
+  - character: A
+    id: 1
+  - character: C
+    id: 10
+  - character: H
+    id: 3
