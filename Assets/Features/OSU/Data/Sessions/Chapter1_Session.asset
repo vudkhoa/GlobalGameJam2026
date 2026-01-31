@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91a719a580f535349b71d9c45f9ec4ba, type: 3}
+  m_Name: Chapter1_Session
+  m_EditorClassIdentifier: 
+  sessionName: Chapter 1 - Audition
+  defaultAudioClip: {fileID: 8300000, guid: 92575a8fccc2cf643aca8108dd60f315, type: 3}
+  phases:
+  - {fileID: 11400000, guid: 8d27eb5f7f4440f408f34406bfd433fd, type: 2}
+  - {fileID: 11400000, guid: c363edf90001bd94d9a9765d0913d39a, type: 2}
+  - {fileID: 11400000, guid: a6f74a679d0786b4b8393ee070f6c746, type: 2}
