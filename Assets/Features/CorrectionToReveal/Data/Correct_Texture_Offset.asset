@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Correct_Texture_Offset
   m_EditorClassIdentifier: 
   CorrectionMaterial: {fileID: 2100000, guid: 137b1c3edf3d3b44d9c2092a7f9e43ca, type: 2}
-  TargetTexture: {fileID: 2800000, guid: 9553eda5f988062468143f72d7f495f9, type: 3}
+  TargetTexture: {fileID: 2800000, guid: f378183a866cf084f9442fe017c93515, type: 3}
   ShaderProperties:
   - PropertyName: _OffsetX
     DisplayName: Offset X
@@ -27,12 +27,6 @@ MonoBehaviour:
     TargetValue: 0
     MinValue: -0.1
     MaxValue: 0.1
-  - PropertyName: _Opacity
-    DisplayName: Opacity
-    InitialValue: 0.5
-    TargetValue: 0.5
-    MinValue: 0
-    MaxValue: 1
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150

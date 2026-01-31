@@ -31,8 +31,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _ColorMask: 5
-    - _OffsetX: 0.17
-    - _OffsetY: -0.84
+    - _OffsetX: 0
+    - _OffsetY: -0.055373512
     - _Opacity: 0.5
     - _Stencil: 6
     - _StencilComp: 3

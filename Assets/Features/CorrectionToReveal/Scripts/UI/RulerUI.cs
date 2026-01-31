@@ -20,6 +20,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
     private float _minValue;
     private float _maxValue;
     private float _currentValue;
+    private float _virtualValue; // Linear, unbounded value for calculating PingPong
 
     private System.Action<float> _onValueChanged;
 
@@ -31,12 +32,13 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
     [Header("Physics Settings")]
     [SerializeField] private float _pixelsPerUnit = 100f;
     [SerializeField] private float _inertiaDuration = 1.0f; // Duration for inertia tween
-    [SerializeField] private float _snapDuration = 0.3f;    // Duration for snap tween
-    [SerializeField] private Ease _inertiaEase = Ease.OutExpo;
-    [SerializeField] private Ease _snapEase = Ease.OutBack;
+    [SerializeField] private float _snapDuration = 0.5f;    // Increased for smoother snap
+    [SerializeField] private Ease _inertiaEase = Ease.OutCubic; // Smoother natural stop
+    [SerializeField] private Ease _snapEase = Ease.OutQuad;
 
     private Vector2 _lastPosition;
     private Vector2 _velocity;
+    private Vector2 _smoothedVelocity; // Smoothed velocity for better release
     private Tween _physicsTween;
 
     private void Awake()
@@ -68,21 +70,22 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
         _onValueChanged = onValueChanged;
 
         // Initialize Center (Midpoint)
-        _currentValue = (_minValue + _maxValue) / 2f;
+        _currentValue = currentValue;
+        _virtualValue = currentValue; // Start virtual aligned with current
 
         UpdateContainerDimensions();
         if (_handle != null) _handle.anchoredPosition = Vector2.zero;
 
-        // Sync initial value - Wrap it immediately to be safe
-        _currentValue = WrapValue(_currentValue);
-        _onValueChanged?.Invoke(_currentValue);
+        // Sync initial value
+        UpdateValueDirectly(_virtualValue);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         KillTween(); // Stop any running animation immediately
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, eventData.position, eventData.pressEventCamera, out _lastPosition);
-        _velocity = Vector2.zero; // Reset velocity
+        _velocity = Vector2.zero;
+        _smoothedVelocity = Vector2.zero;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -99,11 +102,16 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
         Vector2 delta = localPoint - _lastPosition;
 
-        // Calculate velocity (pixels per second) for inertia
+        // Calculate velocity significantly smoother
         if (Time.deltaTime > 0)
-            _velocity = delta / Time.deltaTime;
+        {
+            Vector2 instantVelocity = delta / Time.deltaTime;
+            // Low-pass filter for velocity to remove jitter (Lerp factor 0.1 - 0.2 works well)
+            _smoothedVelocity = Vector2.Lerp(_smoothedVelocity, instantVelocity, 0.2f);
+        }
 
         _lastPosition = localPoint;
+        _velocity = _smoothedVelocity; // Update main velocity for Release
 
         MoveHandle(delta);
     }
@@ -111,15 +119,17 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
     public void OnEndDrag(PointerEventData eventData)
     {
         // Start Inertia using DOTween
-        float magnitude = _isHorizontal ? _velocity.x : _velocity.y;
+        float magnitude = _isHorizontal ? _smoothedVelocity.x : _smoothedVelocity.y;
 
         // Predict target value based on velocity
-        float predictedChange = (magnitude * 0.2f) / _pixelsPerUnit;
-        float startValue = _currentValue;
-        float targetValueUnwrapped = startValue + predictedChange;
+        float predictedChange = (magnitude * 0.25f) / _pixelsPerUnit; // Tuned factor
 
-        // Tweens the *absolute* usage value, UpdateValueDirectly handles wrapping
-        _physicsTween = DOVirtual.Float(startValue, targetValueUnwrapped, _inertiaDuration, (v) =>
+        // Use Virtual Value for inertia calculation to maintain direction/momentum even across boundaries
+        float startValue = _virtualValue;
+        float targetValueVirtual = startValue + predictedChange;
+
+        // Tweens the virtual value
+        _physicsTween = DOVirtual.Float(startValue, targetValueVirtual, _inertiaDuration, (v) =>
         {
             UpdateValueDirectly(v);
         })
@@ -132,13 +142,11 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
     private void SnapToNearestInteger()
     {
-        float currentDisplayValue = _currentValue;
+        // Snap the VIRTUAL value to nearest integer to keep alignment consistent
+        float currentVirtual = _virtualValue;
+        float targetInt = Mathf.Round(currentVirtual);
 
-        // Find nearest INT
-        float targetInt = Mathf.Round(currentDisplayValue);
-
-        // Tween to snap
-        _physicsTween = DOVirtual.Float(currentDisplayValue, targetInt, _snapDuration, (v) =>
+        _physicsTween = DOVirtual.Float(currentVirtual, targetInt, _snapDuration, (v) =>
         {
             UpdateValueDirectly(v);
         })
@@ -168,32 +176,42 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
             valueChange = moveY / _pixelsPerUnit;
         }
 
-        float newValue = _currentValue + valueChange;
-        UpdateValueDirectly(newValue);
+        // Apply change to linear virtual value
+        _virtualValue += valueChange;
+
+        UpdateValueDirectly(_virtualValue);
     }
 
-    private void UpdateValueDirectly(float newValue)
+    private void UpdateValueDirectly(float newVirtualValue)
     {
-        // LOOP VALUE Logic:
-        // Ensure the value wraps around Min/Max
-        _currentValue = WrapValue(newValue);
+        // Update stored virtual value (critical for Tween updates)
+        _virtualValue = newVirtualValue;
 
-        // Notify Shader
-        _onValueChanged?.Invoke(_currentValue);
+        // 1. Calculate Shader Value (PingPong -> Smooth Oscillation)
+        float shaderValue = CalculatePingPongValue(_virtualValue);
+        _onValueChanged?.Invoke(shaderValue);
 
-        // Update Visuals based on (Wrapped) Value
+        // 2. Calculate Visual Value (Repeat -> Continuous Slide Loop)
+        // This ensures the handle visually loops from End to Start, maintaining slide direction
+        _currentValue = CalculateLoopValue(_virtualValue); // Update _currentValue for correct Visual Positioning
         UpdateVisuals();
     }
 
-    // Wraps logic between Min and Max
-    private float WrapValue(float v)
+    // PingPong logic for Shader (0 -> 1 -> 0)
+    private float CalculatePingPongValue(float v)
     {
         float range = _maxValue - _minValue;
         if (range <= 0) return _minValue;
 
-        // Use Mathf.Repeat to loop 
-        // Note: Repeat(t, length) loops t between 0 and length
-        // We shift by minValue to loop between minValue and maxValue
+        return _minValue + Mathf.PingPong(v - _minValue, range);
+    }
+
+    // Repeat logic for Visuals (0 -> 1 -> 0 -> 1)
+    private float CalculateLoopValue(float v)
+    {
+        float range = _maxValue - _minValue;
+        if (range <= 0) return _minValue;
+
         return _minValue + Mathf.Repeat(v - _minValue, range);
     }
 

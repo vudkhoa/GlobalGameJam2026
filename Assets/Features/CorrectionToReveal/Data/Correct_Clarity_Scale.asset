@@ -13,13 +13,20 @@ MonoBehaviour:
   m_Name: Correct_Clarity_Scale
   m_EditorClassIdentifier: 
   CorrectionMaterial: {fileID: 2100000, guid: 31d6b39cc7f01d346ad0cbd574c2a904, type: 2}
-  TargetTexture: {fileID: 2800000, guid: 9553eda5f988062468143f72d7f495f9, type: 3}
-  InitialBlurAmount: 5
-  InitialHorizontalScale: 1.5
-  TargetBlurAmount: 0
-  TargetHorizontalScale: 1
+  TargetTexture: {fileID: 2800000, guid: f378183a866cf084f9442fe017c93515, type: 3}
+  ShaderProperties:
+  - PropertyName: _BlurAmount
+    DisplayName: "Blur Amount (\u0110\u1ED9 m\u1EDD)"
+    InitialValue: 0
+    TargetValue: 0
+    MinValue: 0
+    MaxValue: 10
+  - PropertyName: _HorizontalScale
+    DisplayName: Horizontal Scale (Scale ngang)
+    InitialValue: 1
+    TargetValue: 1
+    MinValue: 1
+    MaxValue: 3
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150
-  BlurPropertyName: _BlurAmount
-  ScalePropertyName: _HorizontalScale
