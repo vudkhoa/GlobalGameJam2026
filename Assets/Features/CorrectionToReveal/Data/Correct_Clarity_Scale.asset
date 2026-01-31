@@ -27,6 +27,6 @@ MonoBehaviour:
     TargetValue: 1
     MinValue: 1
     MaxValue: 3
-  Tolerance: 0.1
+  Tolerance: 0.15
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150
