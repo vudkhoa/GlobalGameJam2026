@@ -27,7 +27,6 @@ public class AuditionSessionData : ScriptableObject
     {
         if (phases == null || phases.Count == 0)
         {
-            Debug.LogWarning($"[{name}] No phases assigned!");
             return;
         }
 
@@ -49,8 +48,6 @@ public class AuditionSessionData : ScriptableObject
                 }
             }
         }
-
-        Debug.Log($"[{name}] {phases.Count} phases | {totalBeats} total beats | {totalDuration:F1}s duration");
     }
 #endif
 }

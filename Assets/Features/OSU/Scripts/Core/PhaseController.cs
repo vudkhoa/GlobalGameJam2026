@@ -35,15 +35,12 @@ public class PhaseController
 
         if (_phases.Count == 0)
         {
-            Debug.LogError("[PhaseController] No phases provided!");
             return;
         }
 
         _currentPhaseIndex = -1;
         _beatsCompletedInPhase = 0;
         CurrentState = GameState.Idle;
-
-        Debug.Log($"[PhaseController] Initialized with {_phases.Count} phases");
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -54,7 +51,6 @@ public class PhaseController
     {
         if (_phases.Count == 0)
         {
-            Debug.LogError("[PhaseController] No phases to start!");
             return;
         }
 
@@ -66,7 +62,6 @@ public class PhaseController
     {
         if (phaseIndex >= _phases.Count)
         {
-            Debug.LogError($"[PhaseController] Invalid phase index: {phaseIndex}");
             return;
         }
 
@@ -78,8 +73,6 @@ public class PhaseController
 
         // Generate beats using BeatGenerator
         _currentPhaseBeats = BeatGenerator.GenerateBeats(phase, _currentPhaseStartTime);
-
-        Debug.Log($"[PhaseController] Starting {phase.phaseName} ({_currentPhaseBeats.Count} beats, duration: {phase.TotalDuration:F1}s)");
 
         OnPhaseStarted?.Invoke(phase);
     }
@@ -123,7 +116,6 @@ public class PhaseController
     {
         if (CurrentState != GameState.PausingPhase)
         {
-            Debug.LogWarning("[PhaseController] Not in pausing state!");
             return;
         }
 

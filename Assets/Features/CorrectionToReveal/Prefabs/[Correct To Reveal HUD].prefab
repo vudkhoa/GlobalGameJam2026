@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 125966500933652925}
   - component: {fileID: 8519304762065470814}
   - component: {fileID: 316190992854433447}
+  - component: {fileID: 6933502182684174895}
   m_Layer: 5
   m_Name: Game_Correction
   m_TagString: Untagged
@@ -224,9 +225,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50d265ef84961434ca34a83a61e30b65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _settings: {fileID: 11400000, guid: fa30eceffd2bfe448829b1591fec6510, type: 2}
+  _levels:
+  - {fileID: 11400000, guid: fa30eceffd2bfe448829b1591fec6510, type: 2}
+  - {fileID: 11400000, guid: 7a5ec131293f3274f9664affb47e536b, type: 2}
   _rulerContainer: {fileID: 3232815133378201940}
-  _targetRenderer: {fileID: 0}
+  _revealImage: {fileID: 5110966108879127855}
 --- !u!114 &316190992854433447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,6 +243,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _installer: {fileID: 8519304762065470814}
+--- !u!114 &6933502182684174895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5006260023295861163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 877abe336ff8b8e479ab034b469fbfa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startDuration: 0.8
+  _completeDuration: 1
+  _entranceEase: 27
+  _exitEase: 26
+  _successEase: 24
 --- !u!1 &8893405034422183421
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,7 +320,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

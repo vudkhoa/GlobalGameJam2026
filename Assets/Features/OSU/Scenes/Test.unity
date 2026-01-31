@@ -154,6 +154,9 @@ PrefabInstance:
     - target: {fileID: 4341731253316910922, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
       propertyPath: m_IsActive
       value: 1
+    - target: {fileID: 1000982195253438568, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6870832910432840868, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
       propertyPath: m_Pivot.x
@@ -422,10 +425,6 @@ PrefabInstance:
     - target: {fileID: 2412171804578337831, guid: 8940deda9c2cad34f992fe3931133bc5, type: 3}
       propertyPath: m_Name
       value: '[Correct To Reveal HUD]'
-      objectReference: {fileID: 0}
-    - target: {fileID: 2412171804578337831, guid: 8940deda9c2cad34f992fe3931133bc5, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3010161776254445775, guid: 8940deda9c2cad34f992fe3931133bc5, type: 3}
       propertyPath: m_Pivot.x
