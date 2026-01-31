@@ -62,6 +62,8 @@ public class PuzzleController : MonoBehaviour
 
     private UniTaskCompletionSource<bool> _levelCompletionSource;
 
+    public event Action OnLevelCompleted;
+
     // ========================================================================
     // 1. KHỞI TẠO & FSM
     // ========================================================================
@@ -80,14 +82,7 @@ public class PuzzleController : MonoBehaviour
 
     public void SignalLevelCompleted()
     {
-        if (_levelCompletionSource != null)
-        {
-            bool result = _levelCompletionSource.TrySetResult(true);
-        }
-        else
-        {
-            Debug.LogError("[LỖI NGHIÊM TRỌNG] _levelCompletionSource đang NULL! Task sẽ bị kẹt vĩnh viễn.");
-        }
+        OnLevelCompleted?.Invoke();
     }
 
     void Update() => _currentState?.Update();
@@ -108,14 +103,20 @@ public class PuzzleController : MonoBehaviour
     public void LoadLevelDataOnly(int index)
     {
         CurrentLevelIndex = index;
-        LoadLevelRaw(index); 
+        LoadLevelRaw(index);
     }
 
-    public async UniTask RunLevelAndWaitAsync()
+    // public async UniTask RunLevelAndWaitAsync()
+    // {
+    //     _levelCompletionSource = new UniTaskCompletionSource<bool>();
+    //     SwitchState(new StatePlaying(this));
+    //     await _levelCompletionSource.Task;
+    // }
+    
+    public void StartLevel(int levelIndex)
     {
-        _levelCompletionSource = new UniTaskCompletionSource<bool>();
+        LoadLevelDataOnly(levelIndex);
         SwitchState(new StatePlaying(this));
-        await _levelCompletionSource.Task;
     }
 
     public void LoadLevelRaw(int index)

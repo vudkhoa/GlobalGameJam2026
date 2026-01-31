@@ -6,13 +6,29 @@ public class IntroTask : BaseTask
     [Header("References")]
     [SerializeField] private ChapterFlowManager _flowManager;
 
-    public override async UniTask Execute()
+    public override  UniTask Execute()
     {
         if (_flowManager == null)
         {
-            return;
+            doneTask = true;
+            return UniTask.CompletedTask;
         }
-        await _flowManager.PlayIntroOnlyAsync();
+
+        _flowManager.OnIntroCompleted += HandleIntroFinished;
+        _flowManager.PlayIntroOnlyAsync().Forget();
+        return UniTask.CompletedTask;
+    }
+
+    private void HandleIntroFinished()
+    {
+        _flowManager.OnIntroCompleted -= HandleIntroFinished;
         this.doneTask = true;
+    }
+    private void OnDisable()
+    {
+        if (_flowManager != null)
+        {
+            _flowManager.OnIntroCompleted -= HandleIntroFinished;
+        }
     }
 }
