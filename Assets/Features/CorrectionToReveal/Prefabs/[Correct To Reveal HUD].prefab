@@ -396,10 +396,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startDuration: 2
-  _completeDuration: 2
-  _entranceEase: 27
-  _exitEase: 26
+  _completeDuration: 1.8
+  _entranceEase: 9
+  _exitEase: 10
   _successEase: 24
+  _shaderAnimationDuration: 2
+  _shaderEase: 4
 --- !u!114 &8452003034348551588
 MonoBehaviour:
   m_ObjectHideFlags: 0

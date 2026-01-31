@@ -34,6 +34,8 @@ public class CorrectionInstaller : MonoBehaviour
 
     private CorrectionAnimationManager _animationManager;
     public CorrectionAnimationManager AnimationManager => _animationManager;
+    public List<ShaderParameter> CurrentShaderParameters => _shaderParameters;
+    public Material CurrentMaterial => _currentMaterialInstance;
 
     public CorrectionLogicHandler LogicHandler => _logicHandler;
     public RulerSpawner RulerSpawner => _rulerSpawner;
