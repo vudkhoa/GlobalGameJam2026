@@ -20,7 +20,7 @@ MonoBehaviour:
     InitialValue: 5
     TargetValue: 0
     MinValue: 0
-    MaxValue: 10
+    MaxValue: 5
   - PropertyName: _HorizontalScale
     DisplayName: Horizontal Scale (Scale ngang)
     InitialValue: 3

@@ -20,19 +20,19 @@ MonoBehaviour:
     InitialValue: 3
     TargetValue: 0
     MinValue: 0
-    MaxValue: 10
+    MaxValue: 3
   - PropertyName: _ShadowDistortion
     DisplayName: "Shadow Distortion (Bi\u1EBFn d\u1EA1ng)"
-    InitialValue: 10
+    InitialValue: 5
     TargetValue: 0
     MinValue: 0
-    MaxValue: 10
+    MaxValue: 5
   - PropertyName: _VignetteStrength
     DisplayName: "Vignette (Vi\u1EC1n t\u1ED1i)"
     InitialValue: 3
     TargetValue: 0
     MinValue: 0
-    MaxValue: 10
+    MaxValue: 3
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150
