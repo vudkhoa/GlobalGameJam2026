@@ -8,7 +8,7 @@ Shader "Custom/ClarityScale"
         _BlurAmount ("Blur Amount (Độ mờ)", Range(0, 10)) = 0.0
         
         // Parameter 2: Scale theo phương ngang
-        _HorizontalScale ("Horizontal Scale (Scale ngang)", Range(0.1, 3)) = 1.0
+        _HorizontalScale ("Horizontal Scale (Scale ngang)", Range(1, 3)) = 1.0
     }
     
     SubShader

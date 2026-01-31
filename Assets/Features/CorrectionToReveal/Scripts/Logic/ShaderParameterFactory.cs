@@ -30,7 +30,7 @@ public static class ShaderParameterFactory
         parameters.Add(new ShaderParameter(
             propertyName: "_HorizontalScale",
             displayName: "Horizontal Scale (Scale ngang)",
-            minValue: 0.1f,
+            minValue: 1f,
             maxValue: 3f,
             currentValue: settings.InitialHorizontalScale,
             targetValue: settings.TargetHorizontalScale

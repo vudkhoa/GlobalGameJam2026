@@ -20,7 +20,7 @@ public class CorrectionSettings : ScriptableObject
     public float InitialBlurAmount = 5.0f;
 
     [Tooltip("Initial horizontal scale (distorted)")]
-    [Range(0.1f, 3f)]
+    [Range(1f, 3f)]
     public float InitialHorizontalScale = 1.5f;
 
     [Header("Target Values")]
@@ -29,7 +29,7 @@ public class CorrectionSettings : ScriptableObject
     public float TargetBlurAmount = 0.0f;
 
     [Tooltip("Target horizontal scale (correct)")]
-    [Range(0.1f, 3f)]
+    [Range(1f, 3f)]
     public float TargetHorizontalScale = 1.0f;
 
     [Header("Game Rules")]
