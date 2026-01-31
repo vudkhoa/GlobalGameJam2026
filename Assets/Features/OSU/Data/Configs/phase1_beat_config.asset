@@ -18,4 +18,4 @@ MonoBehaviour:
   outerRingColor: {r: 1, g: 1, b: 1, a: 1}
   innerRingColor: {r: 1, g: 0.5, b: 0, a: 1}
   ringAlpha: 0.8
-  shrinkDuration: 1.5
+  shrinkDuration: 2.5
