@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52443b241dfaf4e44998aaa42797e110, type: 3}
+  m_Name: ZigZag_Trajectory
+  m_EditorClassIdentifier: 
+  trajectoryName: Trajectory
+  boundaryRadius: 100
+  normalizeToRadius: 0
+  beatCount: 10
+  beatInterval: 1
+  beatSize: {x: 100, y: 100}
+  direction: 0
+  amplitude: 50
+  zigzagCount: 3
+  totalLength: 200
+  pattern: 0

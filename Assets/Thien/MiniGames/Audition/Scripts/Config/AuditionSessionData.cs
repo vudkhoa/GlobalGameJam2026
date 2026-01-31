@@ -37,10 +37,16 @@ public class AuditionSessionData : ScriptableObject
 
         foreach (var phase in phases)
         {
-            if (phase != null && phase.trajectoryConfig != null)
+            if (phase != null && phase.trajectoryConfigs != null)
             {
                 totalDuration += phase.TotalDuration + phase.pauseDuration;
-                totalBeats += phase.trajectoryConfig.beatCount;
+
+                // Count beats from all trajectory configs
+                foreach (var trajectory in phase.trajectoryConfigs)
+                {
+                    if (trajectory != null)
+                        totalBeats += trajectory.beatCount;
+                }
             }
         }
 

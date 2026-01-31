@@ -13,8 +13,8 @@ public class PhaseData : ScriptableObject
     public BeatConfig beatConfig;
 
     [Header("Trajectory")]
-    [Tooltip("Trajectory config cho phase này (REQUIRED)")]
-    public TrajectoryConfig trajectoryConfig;
+    [Tooltip("Danh sách trajectory configs cho phase này (play tuần tự)")]
+    public TrajectoryConfig[] trajectoryConfigs;
 
     [Header("Phase Transition")]
     [Range(0f, 10f)]
@@ -22,9 +22,22 @@ public class PhaseData : ScriptableObject
 
     public string animationTrigger = "";
 
-    public float TotalDuration => trajectoryConfig != null
-        ? trajectoryConfig.beatCount * trajectoryConfig.beatInterval
-        : 0f;
+    public float TotalDuration
+    {
+        get
+        {
+            if (trajectoryConfigs == null || trajectoryConfigs.Length == 0)
+                return 0f;
+
+            float total = 0f;
+            foreach (var config in trajectoryConfigs)
+            {
+                if (config != null)
+                    total += config.beatCount * config.beatInterval;
+            }
+            return total;
+        }
+    }
 
 #if UNITY_EDITOR
     private void OnValidate()
