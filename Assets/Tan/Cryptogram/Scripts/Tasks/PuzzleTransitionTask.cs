@@ -8,9 +8,14 @@ public class PuzzleTransitionTask : BaseTask
 
     public override async UniTask Execute()
     {
-        await UniTask.Delay((int)(_delaySeconds * 1000));
-        await _controller.AnimateLevelExitAsync();
-        await UniTask.Delay((int)(_delaySeconds * 1000));
-        await _controller.AnimateLevelEnterAsync();
+        if (_controller != null)
+        {
+            await UniTask.Delay((int)(_delaySeconds * 1000));
+            await _controller.AnimateLevelExitAsync();
+            await UniTask.Delay((int)(_delaySeconds * 1000));
+            await _controller.AnimateLevelEnterAsync();
+        }
+
+        this.doneTask = true;
     }
 }

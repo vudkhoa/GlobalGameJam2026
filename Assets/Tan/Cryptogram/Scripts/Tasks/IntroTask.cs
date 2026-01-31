@@ -13,5 +13,6 @@ public class IntroTask : BaseTask
             return;
         }
         await _flowManager.PlayIntroOnlyAsync();
+        this.doneTask = true;
     }
 }

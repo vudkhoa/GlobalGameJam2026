@@ -19,5 +19,7 @@ public class PuzzleLevelTask : BaseTask
         _controller.LoadLevelDataOnly(LevelIndex);
 
         await _controller.RunLevelAndWaitAsync();
+
+        this.doneTask = true;
     }
 }

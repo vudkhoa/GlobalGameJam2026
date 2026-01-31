@@ -12,5 +12,7 @@ public class ThirdChapterTask : BaseTask
             if (task == null) continue;
             await task.Execute();
         }
+        this.doneTask = true;
+    
     }
 }
