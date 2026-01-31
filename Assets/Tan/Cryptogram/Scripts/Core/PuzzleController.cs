@@ -509,6 +509,6 @@ public class PuzzleController : MonoBehaviour
         PlayerDecision decision = (choiceIndex == 0) ? PlayerDecision.Denial : PlayerDecision.Acceptance;
         Debug.Log($"Chosen ending: {decision}");
         choiceView.gameObject.SetActive(false);
-        // if (flowManager != null) flowManager.TriggerOutro(decision);
+        if (flowManager != null) flowManager.TriggerOutro(decision);
     }
 }

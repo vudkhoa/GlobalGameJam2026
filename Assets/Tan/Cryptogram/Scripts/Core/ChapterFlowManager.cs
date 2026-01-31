@@ -39,10 +39,31 @@ public class ChapterFlowManager : MonoBehaviour
     public TextMeshProUGUI quoteText;
     [TextArea] public string finalQuote;
 
-    // Start có thể đổi thành async UniTaskVoid trong Unity
-    async UniTaskVoid Start()
+    private UniTaskCompletionSource<bool> _chapterCompletionSource;
+
+    // async UniTaskVoid Start()
+    // {
+    //     var token = this.GetCancellationTokenOnDestroy();
+
+    //     SetupInitialState();
+
+    //     if (skipIntro)
+    //     {
+    //         SkipIntroSequence();
+    //     }
+    //     else
+    //     {
+    //         await PlayIntroSequence(token);
+    //     }
+
+    //     puzzleController.StartGameManually();
+    // }
+
+    public async UniTask RunChapterSequence()
     {
         var token = this.GetCancellationTokenOnDestroy();
+        
+        _chapterCompletionSource = new UniTaskCompletionSource<bool>();
 
         SetupInitialState();
 
@@ -56,6 +77,8 @@ public class ChapterFlowManager : MonoBehaviour
         }
 
         puzzleController.StartGameManually();
+
+        await _chapterCompletionSource.Task;
     }
 
     void SkipIntroSequence()
@@ -133,12 +156,17 @@ public class ChapterFlowManager : MonoBehaviour
         
         await UniTask.Delay(500, cancellationToken: token);
 
+        var rightPanelCG = rightPanelRect.GetComponent<CanvasGroup>();
+        if (rightPanelCG == null) rightPanelCG = rightPanelRect.gameObject.AddComponent<CanvasGroup>();
+
+        rightPanelCG.alpha = 0f;
+        rightPanelRect.gameObject.SetActive(true);
 
         var seqPhase2 = DOTween.Sequence();
         
-        seqPhase2.Join(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
-        
-        seqPhase2.Join(rightPanelRect.DOAnchorPosX(targetRightPanelPosX, 1.5f).SetEase(Ease.InOutBack));
+        seqPhase2.Append(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
+
+        seqPhase2.Append(rightPanelCG.DOFade(1f, 1.0f).SetEase(Ease.Linear));
 
         await seqPhase2.ToUniTask(cancellationToken: token);
 
@@ -182,6 +210,8 @@ public class ChapterFlowManager : MonoBehaviour
         await UniTask.Delay(4000, cancellationToken: token);
 
         Debug.Log("--- THE END ---");
+
+        _chapterCompletionSource.TrySetResult(true);
         // SceneManager.LoadScene("MainMenu");
     }
 }
