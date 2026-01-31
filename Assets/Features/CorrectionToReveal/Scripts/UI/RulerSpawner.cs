@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -82,5 +83,19 @@ public class RulerSpawner
     public IReadOnlyList<RulerUI> GetRulers()
     {
         return _spawnedRulers.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Enable or disable interaction for all spawned rulers
+    /// </summary>
+    public void SetRulersInteractable(bool interactable)
+    {
+        foreach (var ruler in _spawnedRulers)
+        {
+            if (ruler != null)
+            {
+                ruler.SetInteractable(interactable);
+            }
+        }
     }
 }

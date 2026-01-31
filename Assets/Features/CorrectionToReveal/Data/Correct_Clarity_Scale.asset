@@ -17,13 +17,13 @@ MonoBehaviour:
   ShaderProperties:
   - PropertyName: _BlurAmount
     DisplayName: "Blur Amount (\u0110\u1ED9 m\u1EDD)"
-    InitialValue: 0
-    TargetValue: 1
+    InitialValue: 10
+    TargetValue: 0
     MinValue: 0
     MaxValue: 10
   - PropertyName: _HorizontalScale
     DisplayName: Horizontal Scale (Scale ngang)
-    InitialValue: 1
+    InitialValue: 3
     TargetValue: 1
     MinValue: 1
     MaxValue: 3

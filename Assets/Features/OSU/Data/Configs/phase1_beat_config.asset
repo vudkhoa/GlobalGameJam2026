@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: phase1_beat_config
   m_EditorClassIdentifier: 
   outerRingSize: 200
-  innerRingStartSize: 300
-  ringThickness: 10
+  innerRingStartSize: 600
+  ringThickness: 20
   outerRingColor: {r: 1, g: 1, b: 1, a: 1}
   innerRingColor: {r: 1, g: 0.5, b: 0, a: 1}
   ringAlpha: 0.8
-  shrinkDuration: 1.5
+  shrinkDuration: 2.5

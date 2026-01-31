@@ -18,6 +18,9 @@ public class GameLoopOSU : MonoBehaviour
     [Header("Components")]
     [SerializeField] private BeatSpawner _beatSpawner;
 
+    [Header("UI References")]
+    [SerializeField] private JudgementDisplay _judgementDisplay;
+    [SerializeField] private ComboDisplay _comboDisplay;
 
     // Injected services
     private GameTimeService _timeService;
@@ -38,6 +41,17 @@ public class GameLoopOSU : MonoBehaviour
             Debug.LogError("[GameLoopOSU] GameInstallerOSU is not assigned in the Inspector!");
             enabled = false;
             return;
+        }
+
+        // Validate UI references
+        if (_judgementDisplay == null)
+        {
+            Debug.LogWarning("[GameLoopOSU] JudgementDisplay is not assigned! UI feedback will not be displayed.");
+        }
+
+        if (_comboDisplay == null)
+        {
+            Debug.LogWarning("[GameLoopOSU] ComboDisplay is not assigned! Combo UI will not be displayed.");
         }
 
         // Explicitly ensure installer has initialized its services
@@ -81,6 +95,12 @@ public class GameLoopOSU : MonoBehaviour
 
         // Update spawner with current time
         _beatSpawner.UpdateSpawning(_timeService.CurrentTime);
+
+        // ✅ UPDATE COMBO DISPLAY
+        if (_comboDisplay != null)
+        {
+            _comboDisplay.UpdateCombo(_scoreService.GetCurrentCombo());
+        }
     }
 
     private async UniTask StartGame()
@@ -132,15 +152,25 @@ public class GameLoopOSU : MonoBehaviour
 
         Debug.Log($"[GameLoopOSU] Phase {phaseIndex + 1} Ended: {phase.phaseName} | Score: {phaseScore}");
 
-        // Pause
-        if (phase.pauseDuration > 0f)
+        // ✅ CHECK IF MORE PHASES EXIST
+        if (_phaseController.CurrentPhaseIndex < _phaseController.TotalPhases - 1)
         {
-            Debug.Log($"[GameLoopOSU] Pausing for {phase.pauseDuration}s...");
-            await UniTask.Delay((int)(phase.pauseDuration * 1000));
-        }
+            // More phases available - pause and start next
+            if (phase.pauseDuration > 0f)
+            {
+                Debug.Log($"[GameLoopOSU] Pausing for {phase.pauseDuration}s before next phase...");
+                await UniTask.Delay((int)(phase.pauseDuration * 1000));
+            }
 
-        // Start next phase
-        _phaseController.StartNextPhase();
+            // Start next phase
+            _phaseController.StartNextPhase();
+        }
+        else
+        {
+            // No more phases - game will end
+            // OnAllPhasesCompleted will be called by PhaseController
+            Debug.Log($"[GameLoopOSU] No more phases. Waiting for completion event...");
+        }
     }
 
     private void OnAllPhasesCompleted()
@@ -193,6 +223,13 @@ public class GameLoopOSU : MonoBehaviour
         int score = _scoreService.RecordJudgement(judgement);
 
         FeedbackData feedback = _evaluator.GetFeedback(judgement);
+
+        // ✅ DISPLAY JUDGEMENT UI
+        if (_judgementDisplay != null)
+        {
+            _judgementDisplay.Show(feedback);
+        }
+
         beat.PlayHitFeedback();
 
         _phaseController.OnBeatCompleted();
@@ -206,6 +243,12 @@ public class GameLoopOSU : MonoBehaviour
 
         // Update combo display (combo broken)
         FeedbackData feedback = _evaluator.GetFeedback(JudgementType.Miss);
+
+        // ✅ DISPLAY MISS UI
+        if (_judgementDisplay != null)
+        {
+            _judgementDisplay.Show(feedback);
+        }
 
         beat.PlayMissFeedback();
 

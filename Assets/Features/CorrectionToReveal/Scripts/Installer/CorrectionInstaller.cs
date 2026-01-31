@@ -22,11 +22,12 @@ public class CorrectionInstaller : MonoBehaviour
     private RulerSpawner _rulerSpawner;
 
     public CorrectionLogicHandler LogicHandler => _logicHandler;
+    public RulerSpawner RulerSpawner => _rulerSpawner;
 
     // Shader parameters (dynamically created)
     private List<ShaderParameter> _shaderParameters;
 
-    private void Start()
+    private void OnEnable()
     {
         InstallDependencies();
         SetupGame();

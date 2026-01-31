@@ -13,7 +13,7 @@ public class ShaderParameter
     public float MaxValue;
     public float CurrentValue;
     public float TargetValue;
-    
+
     public ShaderParameter(string propertyName, string displayName, float minValue, float maxValue, float currentValue, float targetValue)
     {
         PropertyName = propertyName;
@@ -23,15 +23,19 @@ public class ShaderParameter
         CurrentValue = currentValue;
         TargetValue = targetValue;
     }
-    
+
     /// <summary>
     /// Check if current value is close to target
     /// </summary>
     public bool IsCorrect(float tolerance)
     {
+        Debug.Log("[ShaderParameter] Checking Parameter: " + PropertyName);
+        Debug.Log("[ShaderParameter] Checking Current Value: " + CurrentValue);
+        Debug.Log("[ShaderParameter] Checking TargetValue Value: " + TargetValue);
+        Debug.Log("[ShaderParameter] IsCorrect: " + Mathf.Abs(CurrentValue - TargetValue) + " <= " + tolerance);
         return Mathf.Abs(CurrentValue - TargetValue) <= tolerance;
     }
-    
+
     /// <summary>
     /// Get progress towards target (0-1)
     /// </summary>
