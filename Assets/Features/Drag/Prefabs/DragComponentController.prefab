@@ -437,6 +437,7 @@ MonoBehaviour:
   matrixSize: {x: 3, y: 3}
   dragComponentSize: {x: 0, y: 0}
   offset: {x: 50, y: 50}
+  rectTransform: {fileID: 5777156581373339437}
   awaitDuration: 6.5
   moveSpeed: 10
   winMoveDuration: 0.85
