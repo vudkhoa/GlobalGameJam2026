@@ -190,6 +190,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   doneTask: 0
+  anim: {fileID: 0}
+  dur: 0
 --- !u!1 &584100947
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,7 +443,7 @@ MonoBehaviour:
     loadType: 1
   - rect: {fileID: 5417642671742490400}
     chapterScreenManager: {fileID: 1739554913}
-    loadType: 1
+    loadType: 5
   - rect: {fileID: 4103466426175364170}
     chapterScreenManager: {fileID: 8329894174586597202}
     loadType: 2
@@ -569,18 +571,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transitionDuration: 0.5
   uiScreens:
-  - rect: {fileID: 1863195798}
-    chapterScreenManager: {fileID: 1863195799}
-    loadType: 2
-  - rect: {fileID: 584100948}
-    chapterScreenManager: {fileID: 584100949}
-    loadType: 2
   - rect: {fileID: 4639994411144007587}
     chapterScreenManager: {fileID: 5445262304637697802}
-    loadType: 2
+    loadType: 5
+  - rect: {fileID: 1863195798}
+    chapterScreenManager: {fileID: 1863195799}
+    loadType: 5
+  - rect: {fileID: 584100948}
+    chapterScreenManager: {fileID: 584100949}
+    loadType: 5
   - rect: {fileID: 488847201}
     chapterScreenManager: {fileID: 488847202}
-    loadType: 2
+    loadType: 5
   startingScreenIndex: 0
 --- !u!1001 &1119928659
 PrefabInstance:
@@ -1057,6 +1059,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   doneTask: 0
+  anim: {fileID: 7071675640295448548}
+  dur: 2
 --- !u!114 &952689720059360220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1643,6 +1647,7 @@ GameObject:
   - component: {fileID: 5417642671742490400}
   - component: {fileID: 2696813981192870046}
   - component: {fileID: 1739554913}
+  - component: {fileID: 5417642671742490401}
   m_Layer: 5
   m_Name: DragComponentController
   m_TagString: Untagged
@@ -1660,6 +1665,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7071675640295448547}
   - component: {fileID: 699625682346751107}
+  - component: {fileID: 7071675640295448549}
+  - component: {fileID: 7071675640295448548}
+  - component: {fileID: 7071675640295448550}
+  - component: {fileID: 7071675640295448551}
   m_Layer: 5
   m_Name: Frame1AnimationTask
   m_TagString: Untagged
@@ -1735,6 +1744,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &5417642671742490401
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4986553821968212904}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &5445262304637697801
 GameObject:
   m_ObjectHideFlags: 0
@@ -1971,6 +1992,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6266385924025395150}
   - component: {fileID: 6280613386312122951}
+  - component: {fileID: 6280613386312122952}
+  - component: {fileID: 6280613386312122954}
+  - component: {fileID: 6280613386312122953}
   m_Layer: 5
   m_Name: Frame3AnimationTask
   m_TagString: Untagged
@@ -1991,6 +2015,81 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   doneTask: 0
+  anim: {fileID: 6280613386312122952}
+  dur: 3
+--- !u!114 &6280613386312122952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6280613386312122950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c10d422b52559da41aa9676770a8fc65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationSteps: []
+  updateType: 0
+  timeScaleIndependent: 0
+  autoplayMode: 2
+  startPaused: 0
+  playbackSpeed: 1
+  playType: 0
+  loops: 0
+  loopType: 0
+  autoKill: 1
+  onStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onFinishedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onProgressEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  progress: -1
+  references:
+    version: 2
+    RefIds: []
+--- !u!114 &6280613386312122953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6280613386312122950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &6280613386312122954
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6280613386312122950}
+  m_CullTransparentMesh: 1
 --- !u!1 &6355145550044331416
 GameObject:
   m_ObjectHideFlags: 0
@@ -2114,8 +2213,8 @@ RectTransform:
   m_GameObject: {fileID: 4997368063009778422}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4639994411144007587}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2124,6 +2223,170 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7071675640295448548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4997368063009778422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c10d422b52559da41aa9676770a8fc65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationSteps:
+  - rid: 1198173721810960498
+  - rid: 1198173721810960495
+  - rid: 1198173721810960510
+  updateType: 0
+  timeScaleIndependent: 0
+  autoplayMode: 2
+  startPaused: 0
+  playbackSpeed: 1
+  playType: 0
+  loops: 0
+  loopType: 0
+  autoKill: 1
+  onStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onFinishedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onProgressEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  progress: -1
+  references:
+    version: 2
+    RefIds:
+    - rid: 1198173721810960495
+      type: {class: DOTweenAnimationStep, ns: BrunoMikoski.AnimationSequencer, asm: BrunoMikoski.AnimationSequencer}
+      data:
+        delay: 0.25
+        flowType: 1
+        target: {fileID: 4997368063009778422}
+        duration: 0.75
+        loopCount: 0
+        loopType: 0
+        actions:
+        - rid: 1198173721810960497
+    - rid: 1198173721810960497
+      type: {class: FadeCanvasGroupDOTweenAction, ns: BrunoMikoski.AnimationSequencer, asm: BrunoMikoski.AnimationSequencer}
+      data:
+        direction: 0
+        ease:
+          ease: 7
+          curve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        isRelative: 0
+        alpha: 1
+    - rid: 1198173721810960498
+      type: {class: DOTweenAnimationStep, ns: BrunoMikoski.AnimationSequencer, asm: BrunoMikoski.AnimationSequencer}
+      data:
+        delay: 0
+        flowType: 0
+        target: {fileID: 4997368063009778422}
+        duration: 1
+        loopCount: 0
+        loopType: 0
+        actions:
+        - rid: 1198173721810960499
+    - rid: 1198173721810960499
+      type: {class: ScaleDOTweenAction, ns: BrunoMikoski.AnimationSequencer, asm: BrunoMikoski.AnimationSequencer}
+      data:
+        direction: 0
+        ease:
+          ease: 7
+          curve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        isRelative: 0
+        scale: {x: 1, y: 1, z: 1}
+        axisConstraint: 0
+    - rid: 1198173721810960510
+      type: {class: DOTweenAnimationStep, ns: BrunoMikoski.AnimationSequencer, asm: BrunoMikoski.AnimationSequencer}
+      data:
+        delay: 1
+        flowType: 1
+        target: {fileID: 4997368063009778422}
+        duration: 1
+        loopCount: 0
+        loopType: 0
+        actions:
+        - rid: 1198173721810960511
+    - rid: 1198173721810960511
+      type: {class: FadeCanvasGroupDOTweenAction, ns: BrunoMikoski.AnimationSequencer, asm: BrunoMikoski.AnimationSequencer}
+      data:
+        direction: 0
+        ease:
+          ease: 7
+          curve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        isRelative: 0
+        alpha: 0
+--- !u!114 &7071675640295448549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4997368063009778422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &7071675640295448550
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4997368063009778422}
+  m_CullTransparentMesh: 1
+--- !u!225 &7071675640295448551
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4997368063009778422}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!224 &7216479135138226356
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2231,6 +2494,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4103466426175364170}
   - component: {fileID: 8329894174586597202}
+  - component: {fileID: 8329894174586597203}
+  - component: {fileID: 8329894174586597205}
+  - component: {fileID: 8329894174586597204}
   m_Layer: 5
   m_Name: Frame2AnimationTask
   m_TagString: Untagged
@@ -2251,6 +2517,81 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   doneTask: 0
+  anim: {fileID: 8329894174586597203}
+  dur: 3
+--- !u!114 &8329894174586597203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8329894174586597201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c10d422b52559da41aa9676770a8fc65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationSteps: []
+  updateType: 0
+  timeScaleIndependent: 0
+  autoplayMode: 2
+  startPaused: 0
+  playbackSpeed: 1
+  playType: 0
+  loops: 0
+  loopType: 0
+  autoKill: 1
+  onStartEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onFinishedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onProgressEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  progress: -1
+  references:
+    version: 2
+    RefIds: []
+--- !u!114 &8329894174586597204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8329894174586597201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &8329894174586597205
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8329894174586597201}
+  m_CullTransparentMesh: 1
 --- !u!114 &8708304215904434932
 MonoBehaviour:
   m_ObjectHideFlags: 0
