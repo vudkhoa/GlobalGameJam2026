@@ -167,7 +167,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 0%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -200,7 +200,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 3
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -321,6 +321,7 @@ GameObject:
   - component: {fileID: 8519304762065470814}
   - component: {fileID: 316190992854433447}
   - component: {fileID: 6933502182684174895}
+  - component: {fileID: 8452003034348551588}
   m_Layer: 5
   m_Name: Game_Correction
   m_TagString: Untagged
@@ -367,6 +368,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7a5ec131293f3274f9664affb47e536b, type: 2}
   _rulerContainer: {fileID: 3232815133378201940}
   _revealImage: {fileID: 5110966108879127855}
+  _uiManager: {fileID: 8452003034348551588}
 --- !u!114 &316190992854433447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -393,10 +395,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startDuration: 2
-  _completeDuration: 2
+  _completeDuration: 3
   _entranceEase: 27
   _exitEase: 26
   _successEase: 24
+--- !u!114 &8452003034348551588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5006260023295861163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85fd8e9586f1308458ad6d16b8e4019f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _progressText: {fileID: 7852107684135705508}
+  _valueAnimationDuration: 0.5
+  _punchScale: 0.5
+  _punchDuration: 0.5
+  _hideDuration: 0.3
+  _hideDelay: 0.5
+  _entranceDuration: 0.5
+  _entranceEase: 27
 --- !u!1 &8893405034422183421
 GameObject:
   m_ObjectHideFlags: 0
