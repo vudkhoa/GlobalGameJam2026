@@ -405,6 +405,12 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
 
     public void OnDrag(PointerEventData eventData)
     {
+        // Không cho tương tác nếu đã Win
+        if (_controller != null && _controller.HasWon)
+        {
+            return;
+        }
+
         if (_isMoving || rectTransform == null)
         {
             return;
@@ -417,6 +423,12 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        // Không cho tương tác nếu đã Win
+        if (_controller != null && _controller.HasWon)
+        {
+            return;
+        }
+
         if (rectTransform == null)
         {
             return;
@@ -445,10 +457,42 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        // Không cho tương tác nếu đã Win
+        if (_controller != null && _controller.HasWon)
+        {
+            return;
+        }
+
         isPointDown = false;
         if (_isMoving)
         {
             return;
+        }
+    }
+
+    /// <summary>
+    /// Hủy tất cả DOTween đang chạy (move và shake)
+    /// </summary>
+    public void KillAllTweens()
+    {
+        if (_moveTween != null)
+        {
+            _moveTween.Kill();
+            _moveTween = null;
+        }
+
+        if (_shakeTween != null)
+        {
+            _shakeTween.Kill();
+            _shakeTween = null;
+        }
+
+        _isMoving = false;
+
+        // Reset rotation về 0
+        if (rectTransform != null)
+        {
+            rectTransform.rotation = Quaternion.identity;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class DragComponentController : MonoSingleton<DragComponentController>
@@ -225,6 +226,94 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     }
 
     /// <summary>
+    /// Di chuyển tất cả component đến vị trí đúng (sát nhau theo avgWidth và avgHeight)
+    /// Giữ nguyên component ở giữa matrix, chỉ di chuyển các component khác về sát nó
+    /// </summary>
+    private void MoveAllComponentsToCorrectPositions()
+    {
+        if (dragComponenets == null || positions == null || dragComponenets.Length == 0)
+        {
+            return;
+        }
+
+        if (dragComponenets.Length != positions.Count)
+        {
+            return;
+        }
+
+        // Tìm vị trí giữa matrix
+        int centerRow = matrixSize.x / 2;
+        int centerCol = matrixSize.y / 2;
+        int centerIndex = centerRow * matrixSize.y + centerCol;
+
+        if (centerIndex >= dragComponenets.Length || dragComponenets[centerIndex] == null)
+        {
+            return;
+        }
+
+        RectTransform centerRect = dragComponenets[centerIndex].GetComponent<RectTransform>();
+        if (centerRect == null)
+        {
+            return;
+        }
+
+        // Lấy vị trí hiện tại của component ở giữa (giữ nguyên)
+        Vector2 centerCurrentPos = centerRect.anchoredPosition;
+
+        // Hủy tất cả DOTween đang chạy trước khi di chuyển về vị trí đúng
+        for (int i = 0; i < dragComponenets.Length; i++)
+        {
+            if (dragComponenets[i] != null)
+            {
+                dragComponenets[i].KillAllTweens();
+            }
+        }
+
+        // Di chuyển từng component đến vị trí đúng trong matrix (trừ component ở giữa)
+        for (int row = 0; row < matrixSize.x; row++)
+        {
+            for (int col = 0; col < matrixSize.y; col++)
+            {
+                int index = row * matrixSize.y + col;
+                
+                // Bỏ qua component ở giữa (giữ nguyên vị trí)
+                if (index == centerIndex)
+                {
+                    continue;
+                }
+                
+                if (index >= dragComponenets.Length || dragComponenets[index] == null)
+                {
+                    continue;
+                }
+
+                RectTransform rectTransform = dragComponenets[index].GetComponent<RectTransform>();
+                if (rectTransform == null)
+                {
+                    continue;
+                }
+
+                // Tính vị trí đúng dựa trên vị trí hiện tại của component ở giữa
+                int rowOffset = row - centerRow;
+                int colOffset = col - centerCol;
+                
+                Vector2 targetPos = new Vector2(
+                    centerCurrentPos.x + (avgWidth * colOffset),
+                    centerCurrentPos.y - (avgHeight * rowOffset)
+                );
+                
+                // Tính khoảng cách và thời gian di chuyển
+                float distance = Vector2.Distance(rectTransform.anchoredPosition, targetPos);
+                float duration = distance / moveSpeed;
+
+                // Di chuyển đến vị trí đúng
+                rectTransform.DOAnchorPos(targetPos, duration)
+                    .SetEase(Ease.OutQuad);
+            }
+        }
+    }
+
+    /// <summary>
     /// Checks if all components are in correct positions based on matrixSize
     /// Checks neighbors: distance should not exceed avg + offset
     /// </summary>
@@ -320,6 +409,8 @@ public class DragComponentController : MonoSingleton<DragComponentController>
         {
             _hasWon = true;
             Debug.Log("Win");
+            // Di chuyển tất cả component đến vị trí đúng (sát nhau)
+            MoveAllComponentsToCorrectPositions();
         }
         else if (!allCorrect)
         {
