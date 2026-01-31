@@ -63,7 +63,6 @@ public class UIScreenManager : MonoSingleton<UIScreenManager>
         curIndex++;
 
         LoadUIScreen(uiScreens[curIndex]);
-        Debug.Log("CurIndex: " + startingScreenIndex);
     }
 
     public void LoadUIScreen(UIScreenTransition uIScreen)
