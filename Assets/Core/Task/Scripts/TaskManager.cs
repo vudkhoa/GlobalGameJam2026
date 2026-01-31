@@ -11,7 +11,7 @@ public class TaskManager : MonoBehaviour
     {
         foreach (var task in _tasks)
         {
-            await task.Execute();
+            await task.Execute(); 
         }
     }
 }

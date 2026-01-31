@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
@@ -49,6 +50,7 @@ public class DragComponentController : MonoSingleton<DragComponentController>
 
     private async void Awake()
     {
+        _hasWon = false;
         rectTransform = gameObject.GetComponent<RectTransform>();
         InitPictures();
     }
@@ -310,6 +312,7 @@ public class DragComponentController : MonoSingleton<DragComponentController>
                     .SetEase(Ease.OutQuad);
             }
         }
+        AwaitingWinAnim();
     }
 
     /// <summary>
@@ -318,6 +321,8 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     /// </summary>
     private void Update()
     {
+        if (_hasWon) return;
+
         if (dragComponenets == null || positions == null || dragComponenets.Length == 0)
         {
             return;
@@ -406,14 +411,18 @@ public class DragComponentController : MonoSingleton<DragComponentController>
 
         if (allCorrect && !_hasWon)
         {
-            _hasWon = true;
-            Debug.Log("Win");
-            // Di chuyển tất cả component đến vị trí đúng (sát nhau)
             MoveAllComponentsToCorrectPositions();
+            _hasWon = true;
+
         }
         else if (!allCorrect)
         {
             _hasWon = false;
         }
+    }
+
+    private void AwaitingWinAnim()
+    {
+        gameObject.GetComponent<LogicTask>().ExecuteAsyncTask(winMoveDuration + 0.15f);
     }
 }
