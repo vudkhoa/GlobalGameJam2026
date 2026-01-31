@@ -176,28 +176,32 @@ public class PuzzleController : MonoBehaviour
         PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
 
         // Kiểm tra đúng từ không
-        if (targetSlot.requiredWord == content)
+        if (CheckMatch(targetSlot.currentText, content, currentData))
         {
             // --- CASE A: GLITCH LEVEL (Màn cuối) ---
             if (currentData.phaseType == PuzzlePhase.Glitch)
             {
                 // 1. Vẫn cho bay vào bình thường
-                targetSlot.AnimateFill(PuzzlePhase.Normal);
+                targetSlot.AnimateFill(PuzzlePhase.Glitch);
                 btnView.Disappear();
 
                 // 2. Chạy logic Glitch bất đồng bộ
-                HandleGlitchEffect(targetSlot).Forget();
+                if (_activeSlots.All(s => s.IsFilled))
+                {
+                    HandleGlitchEffect(targetSlot).Forget();
+                }
             }
             // --- CASE B: NORMAL LEVEL ---
             else
             {
+                targetSlot.FillWord(content);
                 targetSlot.AnimateFill(PuzzlePhase.Normal);
                 btnView.Disappear();
 
                 // Check Win
                 if (_activeSlots.All(s => s.IsFilled))
                 {
-                    if (_currentState is StatePlaying playingState) 
+                    if (_currentState is StatePlaying playingState)
                         playingState.OnLevelCleared();
                 }
             }
@@ -207,6 +211,43 @@ public class PuzzleController : MonoBehaviour
             // Sai từ -> Rung nút báo lỗi
             btnView.ShakeError();
         }
+    }
+    
+    bool CheckMatch(string requiredWord, string inputWord, PuzzleLevelData data)
+    {
+        string cleanRequired = CleanString(requiredWord);
+        string cleanInput = CleanString(inputWord);
+
+        // Trường hợp 1: Đúng y chang từ gốc (VD: Cười == Cười)
+        if (cleanRequired == cleanInput) return true;
+
+        // Trường hợp 2: Kiểm tra trong danh sách tráo đổi
+        if (data.interchangeableGroups != null && data.interchangeableGroups.Count > 0)
+        {
+            foreach (string groupLine in data.interchangeableGroups)
+            {
+                // Tách danh sách, chuẩn hóa từng từ trong danh sách luôn
+                var groupWords = groupLine.Split(',')
+                    .Select(w => CleanString(w))
+                    .ToList();
+
+                // Kiểm tra xem CẢ 2 từ có nằm trong nhóm này không
+                bool hasRequired = groupWords.Contains(cleanRequired);
+                bool hasInput = groupWords.Contains(cleanInput);
+
+                if (hasRequired && hasInput)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    string CleanString(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return "";
+        return raw.Trim().ToLower().Normalize(System.Text.NormalizationForm.FormC);
     }
 
     // Xử lý hiệu ứng Glitch (Màn cuối)
@@ -301,6 +342,8 @@ public class PuzzleController : MonoBehaviour
         // {
         //     GameManager.Instance.SaveDecision(decision);
         // }
+
+        Debug.Log($"Chosen ending: {decision}");
 
         // Tắt bảng chọn
         choiceView.gameObject.SetActive(false);

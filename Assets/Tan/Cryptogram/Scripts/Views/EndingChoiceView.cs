@@ -33,16 +33,23 @@ public class EndingChoiceView : MonoBehaviour
             onChosen?.Invoke(1);
         });
 
-        // Animation hiện lên
-        // canvasGroup.DOFade(1f, 0.5f);
-        container.DOScale(1f, 0.5f).SetEase(Ease.OutBack).SetDelay(0.2f);
+        canvasGroup.DOKill();
+        container.DOKill();
+
+        canvasGroup.alpha = 1f;            // Đưa về trong suốt
+        container.localScale = Vector3.zero; // Đưa về bé tí
+
+        // Hiện dần lên
+        canvasGroup.DOFade(1f, 0.5f);
+        
+        // // 0.2 giây sau thì bung ra
+        // container.DOScale(1f, 0.5f).SetEase(Ease.OutBack).SetDelay(0.2f);
     }
 
     void DisableButtons()
     {
         btnDenial.interactable = false;
         btnAcceptance.interactable = false;
-        // Fade out nhẹ bảng chọn nếu muốn
         canvasGroup.DOFade(0f, 0.5f);
     }
 }

@@ -9,12 +9,24 @@ public class ChapterFlowManager : MonoBehaviour
 {
     [Header("1. INTRO CONFIG")]
     public List<Image> introSlides;
-    public Image finalIntroImage;
-    public RectTransform targetFrame; // Khung tranh ở LeftPanel
+    [Tooltip("Kéo cái Gameobject 'FinalImageMask' vừa tạo vào đây")]
+    public RectTransform finalImageMaskRect; 
+    [Tooltip("Kéo cái ảnh con bên trong Mask vào đây để Fade")]
+    public Image finalImageContent; 
+
+    [Tooltip("Kéo cái khung tranh ở LeftPanel vào đây (Đích đến bên trái)")]
+    public RectTransform targetFrameLeft;
+    
+    [Tooltip("Kích thước hình vuông mong muốn (ví dụ 500, 500)")]
+    public Vector2 targetSquareSize = new Vector2(500, 500);
     public float slideDuration = 3f;
 
     [Header("2. GAMEPLAY REFS")]
     public CanvasGroup gameplayCanvasGroup;
+    [Tooltip("Kéo cái RightPanel (Puzzle) vào đây")]
+    public RectTransform rightPanelRect;
+    [Tooltip("Vị trí X cuối cùng bên phải của Puzzle (ví dụ 400)")]
+    public float targetRightPanelPosX = 400f;
     public PuzzleController puzzleController;
 
     [Header("3. OUTRO CONFIG")]
@@ -49,7 +61,7 @@ public class ChapterFlowManager : MonoBehaviour
         blackScreen.alpha = 0;
         quoteText.DOFade(0f, 0f).Complete();
         foreach(var img in introSlides) img.gameObject.SetActive(false);
-        finalIntroImage.gameObject.SetActive(false);
+        // finalIntroImage.gameObject.SetActive(false);
     }
 
     // --- LOGIC INTRO ---
@@ -72,44 +84,52 @@ public class ChapterFlowManager : MonoBehaviour
         }
 
         // B. Ảnh cuối xuất hiện
-        finalIntroImage.gameObject.SetActive(true);
-        await finalIntroImage.DOFade(1f, 1f).From(0f).WithCancellation(token);
+        gameplayCanvasGroup.alpha = 1; 
+        rightPanelRect.anchoredPosition = Vector2.zero; // Nằm giữa
+
+        // 2. Bật Mask lên (nó đang stretch full màn hình)
+        finalImageMaskRect.gameObject.SetActive(true);
+        finalImageContent.DOFade(1f, 1f).From(0f).WithCancellation(token);
         await UniTask.Delay(1500, cancellationToken: token);
 
-        // C. HIỆU ỨNG "BAY VÀO KHUNG" (Chạy song song)
-        // Dùng UniTask.WhenAll để chờ cả Move, Size, và Fade Gameplay cùng xong
-        RectTransform finalRect = finalIntroImage.rectTransform;
+        // C. GIAI ĐOẠN 1: BIẾN HÌNH THÀNH VUÔNG Ở GIỮA
+        Vector2 startSize = finalImageMaskRect.rect.size;
+        // Trước khi tween kích thước, phải đổi Anchor về giữa để nó co lại vào tâm
+        finalImageMaskRect.anchorMin = new Vector2(0.5f, 0.5f);
+        finalImageMaskRect.anchorMax = new Vector2(0.5f, 0.5f);
+        finalImageMaskRect.pivot = new Vector2(0.5f, 0.5f);
+        // (Mẹo: Khi đổi anchor từ stretch về center, sizeDelta nó sẽ tự tính ra kích thước màn hình hiện tại, không cần set lại)
+        finalImageMaskRect.sizeDelta = startSize;
+
+        var seqPhase1 = DOTween.Sequence();
+        // Thu nhỏ Mask thành hình vuông (Ảnh bên trong sẽ bị cắt, không bị méo)
+        seqPhase1.Join(finalImageMaskRect.DOSizeDelta(targetSquareSize, 1.5f).SetEase(Ease.InOutExpo));
+        // Đảm bảo nó nằm đúng giữa (phòng hờ)
+        seqPhase1.Join(finalImageMaskRect.DOAnchorPos(Vector2.zero, 1.5f).SetEase(Ease.InOutExpo));
+
+        await seqPhase1.ToUniTask(cancellationToken: token);
         
-        // Lưu lại vị trí và kích thước hiện tại (đang full màn)
-        Vector2 currentSize = finalRect.rect.size;
-        Vector3 currentPos = finalRect.position;
+        // Dừng lại 1 chút ở giữa cho kịch tính
+        await UniTask.Delay(500, cancellationToken: token);
 
-        // Đổi Anchor về giữa (0.5, 0.5)
-        finalRect.anchorMin = new Vector2(0.5f, 0.5f);
-        finalRect.anchorMax = new Vector2(0.5f, 0.5f);
-        finalRect.pivot = new Vector2(0.5f, 0.5f);
 
-        // Gán lại kích thước cũ để hình không bị giật (Snap)
-        finalRect.sizeDelta = currentSize;
-        finalRect.position = currentPos;
-
-        // BƯỚC 2: Thực hiện Tween bay và thu nhỏ
-        var seq = DOTween.Sequence();
+        // D. GIAI ĐOẠN 2: TÁCH ĐÔI (THE SPLIT)
+        var seqPhase2 = DOTween.Sequence();
         
-        // Bay đến vị trí khung
-        seq.Join(finalRect.DOMove(targetFrame.position, 1.5f).SetEase(Ease.InOutExpo));
+        // 1. Ảnh lướt sang trái (vào vị trí khung tranh)
+        seqPhase2.Join(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
         
-        // Thu nhỏ bằng kích thước khung (Bây giờ nó sẽ hoạt động vì Anchor đã là Center)
-        seq.Join(finalRect.DOSizeDelta(targetFrame.rect.size, 1.5f).SetEase(Ease.InOutExpo));
+        // 2. Puzzle lướt sang phải (từ giữa ra vị trí đích)
+        // Dùng DOAnchorPosX vì nó trượt ngang trong Canvas
+        seqPhase2.Join(rightPanelRect.DOAnchorPosX(targetRightPanelPosX, 1.5f).SetEase(Ease.InOutBack));
+
+        await seqPhase2.ToUniTask(cancellationToken: token);
+
+        // E. HOÀN TẤT
+        // Gắn cái Mask vào làm con của khung tranh bên trái luôn cho gọn
+        finalImageMaskRect.SetParent(targetFrameLeft);
+        finalImageMaskRect.anchoredPosition = Vector2.zero;
         
-        // Hiện Gameplay
-        seq.Join(gameplayCanvasGroup.DOFade(1f, 1.5f));
-
-        await seq.ToUniTask(cancellationToken: token);
-
-        // D. Gắn ảnh vào khung luôn
-        finalIntroImage.transform.SetParent(targetFrame);
-        finalIntroImage.rectTransform.anchoredPosition = Vector2.zero;
         gameplayCanvasGroup.blocksRaycasts = true;
     }
 
