@@ -14,9 +14,6 @@ public class CorrectionInstaller : MonoBehaviour
     [Header("UI")]
     [SerializeField] private Transform _rulerContainer;
 
-    [Header("Rendering")]
-    [SerializeField] private Renderer _targetRenderer;
-
     // Dependencies
     private CorrectionData _data;
     private CorrectionValidator _validator;
@@ -24,10 +21,13 @@ public class CorrectionInstaller : MonoBehaviour
     private CorrectionLogicHandler _logicHandler;
     private RulerSpawner _rulerSpawner;
 
+    public CorrectionLogicHandler LogicHandler => _logicHandler;
+    public RulerSpawner RulerSpawner => _rulerSpawner;
+
     // Shader parameters (dynamically created)
     private List<ShaderParameter> _shaderParameters;
 
-    private void Start()
+    private void OnEnable()
     {
         InstallDependencies();
         SetupGame();
@@ -57,29 +57,14 @@ public class CorrectionInstaller : MonoBehaviour
         // Create validator
         _validator = new CorrectionValidator(_data);
 
-        // Get material from renderer or settings
-        Material material = GetMaterial();
-        if (material == null)
-        {
-            Debug.LogError("Material not found!");
-            return;
-        }
-
-        // Apply texture to material if provided
-        if (_settings.TargetTexture != null)
-        {
-            material.mainTexture = _settings.TargetTexture;
-        }
-
         // Create shader applier (simplified constructor)
-        _shaderApplier = new ShaderParameterApplier(material);
+        _shaderApplier = new ShaderParameterApplier(_settings.CorrectionMaterial);
 
         // Create logic handler
         _logicHandler = new CorrectionLogicHandler(_data, _validator, _shaderApplier);
 
         // Subscribe to events
         _logicHandler.OnCorrectionComplete += OnCorrectionComplete;
-        _logicHandler.OnProgressChanged += OnProgressChanged;
 
         // Create ruler spawner
         _rulerSpawner = new RulerSpawner(
@@ -87,21 +72,6 @@ public class CorrectionInstaller : MonoBehaviour
             _rulerContainer,
             _settings.RulerSpacing
         );
-    }
-
-    /// <summary>
-    /// Get material from renderer or settings
-    /// </summary>
-    private Material GetMaterial()
-    {
-        if (_targetRenderer != null)
-        {
-            // Create instance to avoid modifying shared material
-            _targetRenderer.material = new Material(_settings.CorrectionMaterial);
-            return _targetRenderer.material;
-        }
-
-        return _settings.CorrectionMaterial;
     }
 
     /// <summary>
@@ -164,20 +134,12 @@ public class CorrectionInstaller : MonoBehaviour
         Debug.Log("Correction Complete!");
     }
 
-    /// <summary>
-    /// Called when progress changes
-    /// </summary>
-    private void OnProgressChanged(float progress)
-    {
-    }
-
     private void OnDestroy()
     {
         // Unsubscribe from events
         if (_logicHandler != null)
         {
             _logicHandler.OnCorrectionComplete -= OnCorrectionComplete;
-            _logicHandler.OnProgressChanged -= OnProgressChanged;
         }
     }
 }

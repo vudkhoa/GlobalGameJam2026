@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 599c42623ea944c449a58c6e83f0a8b1, type: 3}
+  m_Name: BeatSprite_3
+  m_EditorClassIdentifier: 
+  outerRingSprite: {fileID: -2724262833470232853, guid: 43fab05266135704191815d82ffeb104, type: 3}
+  innerRingSprite: {fileID: 6622316888709034011, guid: 1b91382c65e050a44a2a95ae49ea7852, type: 3}
+  hitEffectSprite: {fileID: -5457043266224959566, guid: aec4efb38b8139540a34a4bd59d6bf63, type: 3}

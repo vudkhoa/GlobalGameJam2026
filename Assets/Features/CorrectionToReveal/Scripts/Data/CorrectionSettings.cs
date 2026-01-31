@@ -1,4 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 /// <summary>
 /// ScriptableObject settings for Correction mini-game
@@ -7,6 +13,19 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CorrectionSettings", menuName = "CorrectionToReveal/Settings")]
 public class CorrectionSettings : ScriptableObject
 {
+    [System.Serializable]
+    public struct ShaderPropertySettings
+    {
+        public string PropertyName;
+        public string DisplayName;
+        [Range(-10f, 10f)]
+        public float InitialValue;
+        [Range(-10f, 10f)]
+        public float TargetValue;
+        public float MinValue;
+        public float MaxValue;
+    }
+
     [Header("Shader Settings")]
     [Tooltip("Material with ClarityScale shader")]
     public Material CorrectionMaterial;
@@ -14,23 +33,9 @@ public class CorrectionSettings : ScriptableObject
     [Tooltip("Texture to apply correction to")]
     public Texture2D TargetTexture;
 
-    [Header("Initial Values")]
-    [Tooltip("Initial blur amount (distorted)")]
-    [Range(0f, 10f)]
-    public float InitialBlurAmount = 5.0f;
-
-    [Tooltip("Initial horizontal scale (distorted)")]
-    [Range(1f, 3f)]
-    public float InitialHorizontalScale = 1.5f;
-
-    [Header("Target Values")]
-    [Tooltip("Target blur amount (correct)")]
-    [Range(0f, 10f)]
-    public float TargetBlurAmount = 0.0f;
-
-    [Tooltip("Target horizontal scale (correct)")]
-    [Range(1f, 3f)]
-    public float TargetHorizontalScale = 1.0f;
+    [Header("Dynamic Shader Config")]
+    [Tooltip("Auto-populated list of shader properties")]
+    public List<ShaderPropertySettings> ShaderProperties = new List<ShaderPropertySettings>();
 
     [Header("Game Rules")]
     [Tooltip("Tolerance for winning condition")]
@@ -44,7 +49,81 @@ public class CorrectionSettings : ScriptableObject
     [Tooltip("Spacing between rulers")]
     public float RulerSpacing = 150f;
 
-    [Header("Shader Property Names")]
-    public string BlurPropertyName = "_BlurAmount";
-    public string ScalePropertyName = "_HorizontalScale";
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (CorrectionMaterial != null && CorrectionMaterial.shader != null)
+        {
+            RefreshShaderProperties(CorrectionMaterial.shader);
+        }
+    }
+
+    private void RefreshShaderProperties(Shader shader)
+    {
+        // Dictionary to track existing settings to preserve values
+        var existingSettings = new Dictionary<string, ShaderPropertySettings>();
+        foreach (var prop in ShaderProperties)
+        {
+            if (!string.IsNullOrEmpty(prop.PropertyName))
+                existingSettings[prop.PropertyName] = prop;
+        }
+
+        var newProperties = new List<ShaderPropertySettings>();
+        int propertyCount = ShaderUtil.GetPropertyCount(shader);
+
+        for (int i = 0; i < propertyCount; i++)
+        {
+            ShaderUtil.ShaderPropertyType type = ShaderUtil.GetPropertyType(shader, i);
+
+            // Only care about Float and Range properties for rulers
+            if (type == ShaderUtil.ShaderPropertyType.Float || type == ShaderUtil.ShaderPropertyType.Range)
+            {
+                // Skip hidden properties
+                if (ShaderUtil.IsShaderPropertyHidden(shader, i))
+                    continue;
+
+                string propName = ShaderUtil.GetPropertyName(shader, i);
+                string displayName = ShaderUtil.GetPropertyDescription(shader, i);
+
+                // Get Range limits if available
+                float defMin = 0f;
+                float defMax = 10f; // Default fallback
+                float defVal = 0f;
+
+                if (type == ShaderUtil.ShaderPropertyType.Range)
+                {
+                    defMin = ShaderUtil.GetRangeLimits(shader, i, 1); // 1 = min (defmin)
+                    defMax = ShaderUtil.GetRangeLimits(shader, i, 2); // 2 = max (defmax)
+                    defVal = ShaderUtil.GetRangeLimits(shader, i, 0); // 0 = default value
+                }
+
+                // If exists, use existing values, otherwise init defaults
+                if (existingSettings.TryGetValue(propName, out var existing))
+                {
+                    // Update display name in case it changed in shader, but keep values
+                    existing.DisplayName = displayName;
+                    // Update limits if shader defines new limits? 
+                    // Usually we trust the config, but if shader is source of truth for limits:
+                    // existing.MinValue = defMin;
+                    // existing.MaxValue = defMax;
+                    newProperties.Add(existing);
+                }
+                else
+                {
+                    newProperties.Add(new ShaderPropertySettings
+                    {
+                        PropertyName = propName,
+                        DisplayName = displayName,
+                        InitialValue = defVal,
+                        TargetValue = defVal,
+                        MinValue = defMin,
+                        MaxValue = defMax
+                    });
+                }
+            }
+        }
+
+        ShaderProperties = newProperties;
+    }
+#endif
 }

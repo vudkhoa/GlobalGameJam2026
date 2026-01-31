@@ -2,55 +2,54 @@
 using UnityEngine;
 
 /// <summary>
-/// SRP: Generate beats from phase data
-/// Responsibility: Create beat list with random positions
+/// SRP: Generate beat data from phase config
+/// Responsibility: Convert PhaseData → List<BeatData>
 /// </summary>
 public static class BeatGenerator
 {
-    /// <summary>
-    /// Generate beats for a phase using multiple trajectory configurations
-    /// </summary>
     public static List<BeatData> GenerateBeats(PhaseData phase, float phaseStartTime)
     {
+        List<BeatData> beats = new List<BeatData>();
+
         if (phase.trajectoryConfigs == null || phase.trajectoryConfigs.Length == 0)
         {
-            Debug.LogError($"[BeatGenerator] Phase '{phase.phaseName}' has no trajectory configs!");
-            return new List<BeatData>();
+            Debug.LogWarning($"[BeatGenerator] Phase '{phase.phaseName}' has no trajectory configs!");
+            return beats;
         }
 
-        List<BeatData> beats = new List<BeatData>();
         float currentTime = phaseStartTime;
 
-        // Loop through all trajectory configs in this phase
-        foreach (var trajectory in phase.trajectoryConfigs)
+        foreach (var trajectoryConfig in phase.trajectoryConfigs)
         {
-            if (trajectory == null)
+            if (trajectoryConfig == null)
             {
-                Debug.LogWarning($"[BeatGenerator] Null trajectory config in phase '{phase.phaseName}', skipping...");
+                Debug.LogWarning($"[BeatGenerator] Null trajectory config in phase '{phase.phaseName}'");
                 continue;
             }
 
             // Generate beats for this trajectory
-            for (int i = 0; i < trajectory.beatCount; i++)
+            for (int i = 0; i < trajectoryConfig.beatCount; i++)
             {
-                float time = currentTime + (i * trajectory.beatInterval);
+                float t = trajectoryConfig.beatCount > 1
+                    ? i / (float)(trajectoryConfig.beatCount - 1)
+                    : 0.5f;
 
-                // Get position from trajectory
-                float t = trajectory.beatCount > 1 ? (float)i / (trajectory.beatCount - 1) : 0.5f;
-                Vector2 position = trajectory.EvaluatePosition(t, i, trajectory.beatCount);
+                Vector2 position = trajectoryConfig.EvaluatePosition(t, i, trajectoryConfig.beatCount);
 
-                beats.Add(new BeatData
+                BeatData beat = new BeatData
                 {
-                    time = time,
+                    time = currentTime,
                     position = position,
-                    size = trajectory.beatSize
-                });
-            }
+                    size = trajectoryConfig.beatSize,
+                    spriteSet = trajectoryConfig.beatSpriteSet // ✅ NEW: Pass sprite set
+                };
 
-            // Move time forward for next trajectory
-            currentTime += trajectory.beatCount * trajectory.beatInterval;
+                beats.Add(beat);
+                currentTime += trajectoryConfig.beatInterval;
+            }
         }
 
+        Debug.Log($"[BeatGenerator] Generated {beats.Count} beats for phase '{phase.phaseName}'");
         return beats;
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -35,7 +36,7 @@ public class CorrectionLogicHandler
     {
         _data.UpdateParameter(propertyName, value);
         _shaderApplier.ApplyParameter(propertyName, value);
-        CheckCompletion();
+        CheckCompletion().Forget();
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public class CorrectionLogicHandler
     /// <summary>
     /// Check if correction is complete and trigger events
     /// </summary>
-    private void CheckCompletion()
+    private async UniTask CheckCompletion()
     {
         float progress = _validator.GetProgress();
         OnProgressChanged?.Invoke(progress);
@@ -58,6 +59,7 @@ public class CorrectionLogicHandler
         if (!_isComplete && _validator.IsCorrect())
         {
             _isComplete = true;
+
             OnCorrectionComplete?.Invoke();
         }
     }
