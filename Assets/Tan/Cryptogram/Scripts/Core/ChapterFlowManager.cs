@@ -138,14 +138,15 @@ public class ChapterFlowManager : MonoBehaviour
         {
             Debug.Log("--- STARTING DAY/NIGHT CYCLE ---");
             await dayNightController.PlayDayNightCycleAsync(token);
-            
+
             // Optional: Fade out the Day/Night scene before showing slides
             // For example, if DayNightController is on a specific CanvasGroup:
             // await dayNightController.GetComponent<CanvasGroup>().DOFade(0, 1f).ToUniTask(cancellationToken: token);
-            
+
             // Or simply deactivate it if it overlays the slides
             dayNightController.gameObject.SetActive(false);
         }
+        dayNightController.gameObject.SetActive(false);
         foreach (var img in introSlides)
         {
             img.gameObject.SetActive(true);
