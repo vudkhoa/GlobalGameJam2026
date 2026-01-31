@@ -39,37 +39,44 @@ public class ChapterFlowManager : MonoBehaviour
     public TextMeshProUGUI quoteText;
     [TextArea] public string finalQuote;
 
-    private UniTaskCompletionSource<bool> _chapterCompletionSource;
+    private UniTaskCompletionSource<bool> _puzzleCompletionSource;
 
     public async UniTask PlayIntroOnlyAsync()
     {
         var token = this.GetCancellationTokenOnDestroy();
         SetupInitialState();
-        
+
         await PlayIntroSequence(token);
     }
 
-    public async UniTask RunChapterSequence()
+    public async UniTask RunPuzzleAndWaitAsync()
     {
-        var token = this.GetCancellationTokenOnDestroy();
-        
-        _chapterCompletionSource = new UniTaskCompletionSource<bool>();
-
-        SetupInitialState();
-
-        if (skipIntro)
-        {
-            SkipIntroSequence();
-        }
-        else
-        {
-            await PlayIntroSequence(token);
-        }
-
+        _puzzleCompletionSource = new UniTaskCompletionSource<bool>();
         puzzleController.StartGameManually();
-
-        await _chapterCompletionSource.Task;
+        await _puzzleCompletionSource.Task;
     }
+
+    // public async UniTask RunChapterSequence()
+    // {
+    //     var token = this.GetCancellationTokenOnDestroy();
+        
+    //     _chapterCompletionSource = new UniTaskCompletionSource<bool>();
+
+    //     SetupInitialState();
+
+    //     if (skipIntro)
+    //     {
+    //         SkipIntroSequence();
+    //     }
+    //     else
+    //     {
+    //         await PlayIntroSequence(token);
+    //     }
+
+    //     puzzleController.StartGameManually();
+
+    //     await _chapterCompletionSource.Task;
+    // }
 
     void SkipIntroSequence()
     {
@@ -167,12 +174,14 @@ public class ChapterFlowManager : MonoBehaviour
     }
 
     // --- LOGIC OUTRO ---
-    public void TriggerOutro(PlayerDecision decision)
+    public async UniTask TriggerOutro(PlayerDecision decision)
     {
-        PlayOutroSequence(decision, this.GetCancellationTokenOnDestroy()).Forget();
+        var token = this.GetCancellationTokenOnDestroy();
+        // Chuyển việc gọi hàm nội bộ thành await trực tiếp
+        await PlayOutroSequence(decision, token);
     }
 
-    async UniTaskVoid PlayOutroSequence(PlayerDecision decision, System.Threading.CancellationToken token)
+    async UniTask PlayOutroSequence(PlayerDecision decision, System.Threading.CancellationToken token)
     {
         // 1. Tắt Gameplay
         await gameplayCanvasGroup.DOFade(0f, 1f).WithCancellation(token);
@@ -201,7 +210,7 @@ public class ChapterFlowManager : MonoBehaviour
 
         Debug.Log("--- THE END ---");
 
-        _chapterCompletionSource.TrySetResult(true);
+        // _puzzleCompletionSource?.TrySetResult(true);
         // SceneManager.LoadScene("MainMenu");
     }
 }

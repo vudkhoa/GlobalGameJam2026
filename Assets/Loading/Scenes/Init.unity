@@ -222,10 +222,10 @@ RectTransform:
   - {fileID: 1119928660}
   m_Father: {fileID: 1086168253}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &584100949
 MonoBehaviour:
@@ -544,8 +544,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 584100948}
   - {fileID: 1863195798}
+  - {fileID: 584100948}
   - {fileID: 4639994411144007587}
   - {fileID: 488847201}
   m_Father: {fileID: 0}
@@ -569,11 +569,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transitionDuration: 0.5
   uiScreens:
-  - rect: {fileID: 584100948}
-    chapterScreenManager: {fileID: 584100949}
-    loadType: 2
   - rect: {fileID: 1863195798}
     chapterScreenManager: {fileID: 1863195799}
+    loadType: 2
+  - rect: {fileID: 584100948}
+    chapterScreenManager: {fileID: 584100949}
     loadType: 2
   - rect: {fileID: 4639994411144007587}
     chapterScreenManager: {fileID: 5445262304637697802}
@@ -630,6 +630,42 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.00012207031
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351552215006702269, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3663526004924400106, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
       propertyPath: '_tasks.Array.data[0]'
       value: 
@@ -638,6 +674,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: C3
       objectReference: {fileID: 0}
+    - target: {fileID: 7669216391912006220, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 31230342261995550, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
     - {fileID: 587437088857652906, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
@@ -645,8 +685,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
---- !u!4 &1119928660 stripped
-Transform:
+--- !u!224 &1119928660 stripped
+RectTransform:
   m_CorrespondingSourceObject: {fileID: 2364188343288430924, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
   m_PrefabInstance: {fileID: 1119928659}
   m_PrefabAsset: {fileID: 0}

@@ -80,9 +80,17 @@ public class PuzzleController : MonoBehaviour
 
     public void SignalLevelCompleted()
     {
+        Debug.Log("[DEBUG] SignalLevelCompleted được gọi!"); // Log 1
+
         if (_levelCompletionSource != null)
         {
-            _levelCompletionSource.TrySetResult(true);
+            Debug.Log("[DEBUG] Đang mở khóa Task..."); // Log 2
+            bool result = _levelCompletionSource.TrySetResult(true);
+            Debug.Log($"[DEBUG] Kết quả mở khóa: {result}"); // Log 3
+        }
+        else
+        {
+            Debug.LogError("[LỖI NGHIÊM TRỌNG] _levelCompletionSource đang NULL! Task sẽ bị kẹt vĩnh viễn.");
         }
     }
 
@@ -525,16 +533,17 @@ public class PuzzleController : MonoBehaviour
         if (choiceView != null) choiceView.Setup(OnFinalDecisionMade);
     }
 
-    private void OnFinalDecisionMade(int choiceIndex)
+    private async void OnFinalDecisionMade(int choiceIndex)
     {
         PlayerDecision decision = (choiceIndex == 0) ? PlayerDecision.Denial : PlayerDecision.Acceptance;
         Debug.Log($"Chosen ending: {decision}");
-        if (_levelCompletionSource != null)
-        {
-            _levelCompletionSource.TrySetResult(true);
-        }
+
         choiceView.gameObject.SetActive(false);
-        if (flowManager != null) flowManager.TriggerOutro(decision);
-        
+
+        if (flowManager != null) 
+        {
+            await flowManager.TriggerOutro(decision);
+        }
+        SignalLevelCompleted(); 
     }
 }
