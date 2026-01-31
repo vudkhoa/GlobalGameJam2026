@@ -77,9 +77,19 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
 
     private void HandleCorrectionComplete()
     {
-        // When correction is complete, end the game immediately
-        if (_isGameActive)
+        if (!_isGameActive) return;
+
+        // Try to advance to next level using the Installer
+        if (_installer != null && _installer.AdvanceLevel())
         {
+            Debug.Log("[GameLoopCTR] Level Complete! Advancing to next level...");
+
+            // Re-initialize game state for the new level (Enable rulers, etc.)
+            StartGame();
+        }
+        else
+        {
+            // No more levels - Game Over
             EndGame();
         }
     }

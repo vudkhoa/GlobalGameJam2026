@@ -224,7 +224,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50d265ef84961434ca34a83a61e30b65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _settings: {fileID: 11400000, guid: 7a5ec131293f3274f9664affb47e536b, type: 2}
+  _levels:
+  - {fileID: 11400000, guid: fa30eceffd2bfe448829b1591fec6510, type: 2}
+  - {fileID: 11400000, guid: 7a5ec131293f3274f9664affb47e536b, type: 2}
   _rulerContainer: {fileID: 3232815133378201940}
   _revealImage: {fileID: 5110966108879127855}
 --- !u!114 &316190992854433447
@@ -300,7 +302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
