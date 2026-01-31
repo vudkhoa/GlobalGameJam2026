@@ -215,3 +215,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _outerRing: {fileID: 390664589193874159}
   _innerRing: {fileID: 4459795485952580698}
+  _hitEffectImage: {fileID: 0}
+  _defaultOuterSprite: {fileID: -5122814667194785740, guid: 0e71dd35c3988ff4d8bd712ede8b65de, type: 3}
+  _defaultInnerSprite: {fileID: 6622316888709034011, guid: 1b91382c65e050a44a2a95ae49ea7852, type: 3}
