@@ -17,22 +17,22 @@ MonoBehaviour:
   ShaderProperties:
   - PropertyName: _Darkness
     DisplayName: "Darkness (\u0110\u1ED9 t\u1ED1i)"
-    InitialValue: -2
+    InitialValue: 3
     TargetValue: 0
     MinValue: 0
-    MaxValue: 1
+    MaxValue: 10
   - PropertyName: _ShadowDistortion
     DisplayName: "Shadow Distortion (Bi\u1EBFn d\u1EA1ng)"
-    InitialValue: 2
+    InitialValue: 10
     TargetValue: 0
     MinValue: 0
-    MaxValue: 1
+    MaxValue: 10
   - PropertyName: _VignetteStrength
     DisplayName: "Vignette (Vi\u1EC1n t\u1ED1i)"
-    InitialValue: -3
+    InitialValue: 3
     TargetValue: 0
     MinValue: 0
-    MaxValue: 1
+    MaxValue: 10
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150
