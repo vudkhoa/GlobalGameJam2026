@@ -13,9 +13,12 @@ public class JudgementEvaluator
         _config = config;
     }
 
-    public JudgementType Evaluate(float currentSize, float targetSize)
+    public JudgementType Evaluate(Vector2 currentSize, Vector2 targetSize)
     {
-        float difference = Mathf.Abs(currentSize - targetSize);
+        // Calculate difference for both x and y, then average
+        float diffX = Mathf.Abs(currentSize.x - targetSize.x);
+        float diffY = Mathf.Abs(currentSize.y - targetSize.y);
+        float difference = (diffX + diffY) * 0.5f;
 
         if (difference <= _config.perfectThreshold)
             return JudgementType.Perfect;

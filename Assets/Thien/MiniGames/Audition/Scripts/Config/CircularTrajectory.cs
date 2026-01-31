@@ -77,14 +77,5 @@ public class CircularTrajectory : TrajectoryConfig
         string direction = clockwise ? "CW" : "CCW";
         trajectoryName = $"Circular {radius:F0}u ({arcLength:F0}° {direction})";
     }
-
-    public override void DrawGizmos(int sampleCount = 20)
-    {
-        base.DrawGizmos(sampleCount);
-
-        // Draw center
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(centerOffset, 5f);
-    }
 #endif
 }

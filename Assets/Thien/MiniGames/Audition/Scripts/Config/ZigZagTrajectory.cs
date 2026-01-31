@@ -91,12 +91,5 @@ public class ZigZagTrajectory : TrajectoryConfig
         string patternName = pattern == ZigZagPattern.Sharp ? "Sharp" : "Smooth";
         trajectoryName = $"ZigZag {zigzagCount}x ({patternName})";
     }
-
-    public override void DrawGizmos(int sampleCount = 20)
-    {
-        // Use more samples for zigzag to show pattern clearly
-        int adjustedSampleCount = Mathf.Max(sampleCount, zigzagCount * 8);
-        base.DrawGizmos(adjustedSampleCount);
-    }
 #endif
 }

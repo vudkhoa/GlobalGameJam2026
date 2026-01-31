@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Trajectory
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear ((-1000.00, 0.00) \u2192 (1000.00, 0.00))"
+  trajectoryName: "Linear 0\xB0 (size=100, gap=40, total=1360)"
   boundaryRadius: 500
   normalizeToRadius: 0
-  startPoint: {x: -1000, y: 0}
-  endPoint: {x: 1000, y: 0}
-  useAngle: 0
+  beatCount: 10
+  beatInterval: 1
+  beatSize: {x: 100, y: 100}
   angle: 0
-  length: 200
+  gap: 40

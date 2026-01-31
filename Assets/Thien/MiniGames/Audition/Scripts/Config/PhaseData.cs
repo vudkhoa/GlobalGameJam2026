@@ -12,22 +12,9 @@ public class PhaseData : ScriptableObject
     [Tooltip("BeatConfig cho phase này (null = dùng default)")]
     public BeatConfig beatConfig;
 
-    [Header("Beat Settings")]
-    [Range(1, 100)]
-    public int beatCount = 10;
-
-    [Range(0.3f, 3f)]
-    public float beatInterval = 1f;
-
-    [Header("Beat Position")]
-    [Tooltip("Trajectory config cho phase này (null = random)")]
+    [Header("Trajectory")]
+    [Tooltip("Trajectory config cho phase này (REQUIRED)")]
     public TrajectoryConfig trajectoryConfig;
-
-    [Range(0f, 500f)]
-    public float positionRadius = 100f;
-
-    [Tooltip("Random seed (chỉ dùng khi trajectoryConfig = null)")]
-    public int randomSeed = 0;
 
     [Header("Phase Transition")]
     [Range(0f, 10f)]
@@ -35,16 +22,14 @@ public class PhaseData : ScriptableObject
 
     public string animationTrigger = "";
 
-    public float TotalDuration => beatCount * beatInterval;
+    public float TotalDuration => trajectoryConfig != null
+        ? trajectoryConfig.beatCount * trajectoryConfig.beatInterval
+        : 0f;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (beatCount <= 0)
-            beatCount = 1;
-
-        if (beatInterval <= 0f)
-            beatInterval = 0.5f;
+        // Validation moved to TrajectoryConfig
     }
 #endif
 }

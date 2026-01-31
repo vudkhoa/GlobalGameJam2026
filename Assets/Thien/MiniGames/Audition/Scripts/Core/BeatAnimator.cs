@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System;
 using DG.Tweening;
-using System;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// SRP: Handle beat visual animations
@@ -15,12 +15,12 @@ public class BeatAnimator : MonoBehaviour
     // PUBLIC API
     // ═══════════════════════════════════════════════════════════
 
-    public void StartShrink(Image ring, float startSize, float targetSize, float duration, Action onComplete)
+    public void StartShrink(Image ring, Vector2 startSize, Vector2 targetSize, float duration, Action onComplete)
     {
-        ring.rectTransform.sizeDelta = Vector2.one * startSize;
+        ring.rectTransform.sizeDelta = startSize;
 
         _shrinkTweener = ring.rectTransform
-            .DOSizeDelta(Vector2.one * targetSize, duration)
+            .DOSizeDelta(targetSize, duration)
             .SetEase(Ease.InOutCubic)
             .OnComplete(() => onComplete?.Invoke());
     }

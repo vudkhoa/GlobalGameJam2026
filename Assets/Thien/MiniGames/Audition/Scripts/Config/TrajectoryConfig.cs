@@ -17,6 +17,18 @@ public abstract class TrajectoryConfig : ScriptableObject
     [Tooltip("Có scale trajectory về boundaryRadius không")]
     public bool normalizeToRadius = false;
 
+    [Header("Beat Settings")]
+    [Tooltip("Số lượng beat trong trajectory")]
+    [Range(1, 100)]
+    public int beatCount = 10;
+
+    [Tooltip("Khoảng thời gian giữa các beat (giây)")]
+    [Range(0.3f, 3f)]
+    public float beatInterval = 1f;
+
+    [Tooltip("Kích thước của beat (sizeDelta của RectTransform)")]
+    public Vector2 beatSize = new Vector2(100f, 100f);
+
     /// <summary>
     /// Evaluate vị trí beat tại thời điểm t trong trajectory
     /// </summary>
@@ -33,49 +45,10 @@ public abstract class TrajectoryConfig : ScriptableObject
     protected virtual void OnValidate()
     {
         boundaryRadius = Mathf.Max(0f, boundaryRadius);
-    }
-
-    /// <summary>
-    /// Preview trajectory trong Scene view (optional)
-    /// </summary>
-    public virtual void DrawGizmos(int sampleCount = 20)
-    {
-        if (sampleCount <= 1) return;
-
-        Vector2 prevPos = EvaluatePosition(0f, 0, sampleCount);
-
-        for (int i = 1; i < sampleCount; i++)
-        {
-            float t = (float)i / (sampleCount - 1);
-            Vector2 currentPos = EvaluatePosition(t, i, sampleCount);
-
-            Gizmos.color = Color.Lerp(Color.green, Color.red, t);
-            Gizmos.DrawLine(prevPos, currentPos);
-
-            prevPos = currentPos;
-        }
-
-        // Draw boundary
-        Gizmos.color = Color.yellow;
-        DrawCircle(Vector2.zero, boundaryRadius, 32);
-    }
-
-    private void DrawCircle(Vector2 center, float radius, int segments)
-    {
-        float angleStep = 360f / segments;
-        Vector2 prevPoint = center + new Vector2(radius, 0);
-
-        for (int i = 1; i <= segments; i++)
-        {
-            float angle = i * angleStep * Mathf.Deg2Rad;
-            Vector2 newPoint = center + new Vector2(
-                Mathf.Cos(angle) * radius,
-                Mathf.Sin(angle) * radius
-            );
-
-            Gizmos.DrawLine(prevPoint, newPoint);
-            prevPoint = newPoint;
-        }
+        beatCount = Mathf.Max(1, beatCount);
+        beatInterval = Mathf.Max(0.3f, beatInterval);
+        beatSize.x = Mathf.Max(10f, beatSize.x);
+        beatSize.y = Mathf.Max(10f, beatSize.y);
     }
 #endif
 }

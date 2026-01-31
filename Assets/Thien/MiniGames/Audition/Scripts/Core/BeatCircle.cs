@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems; // ✅ ADD THIS
-using System;
+using UnityEngine.UI;
 
 /// <summary>
 /// SRP: Represent a single beat circle (Poolable)
@@ -20,8 +20,8 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler // ✅ Implement i
     private bool _hasBeenHit = false;
 
     public bool IsActive { get; private set; }
-    public float CurrentSize => _innerRing.rectTransform.sizeDelta.x;
-    public float TargetSize => _config.outerRingSize;
+    public Vector2 CurrentSize => _innerRing.rectTransform.sizeDelta;
+    public Vector2 TargetSize => _data.size;
 
     public event Action<BeatCircle> OnTapped;
     public event Action<BeatCircle> OnMissed;
@@ -55,10 +55,16 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler // ✅ Implement i
         IsActive = true;
         _hasBeenHit = false;
 
+        // Calculate start and target sizes based on beat size
+        Vector2 beatSize = _data.size;
+        float sizeRatio = config.innerRingStartSize / config.outerRingSize;
+        Vector2 innerStartSize = beatSize * sizeRatio;
+        Vector2 targetSize = beatSize;
+
         _animator.StartShrink(
             _innerRing,
-            config.innerRingStartSize,
-            config.outerRingSize,
+            innerStartSize,
+            targetSize,
             config.shrinkDuration,
             OnAnimationComplete
         );
@@ -66,12 +72,19 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler // ✅ Implement i
 
     private void SetupVisuals()
     {
-        _outerRing.rectTransform.sizeDelta = Vector2.one * _config.outerRingSize;
+        // ✅ Use size from BeatData (from trajectory config)
+        Vector2 beatSize = _data.size;
+
+        // Set outer ring size
+        _outerRing.rectTransform.sizeDelta = beatSize;
         Color outerColor = _config.outerRingColor;
         outerColor.a = _config.ringAlpha;
         _outerRing.color = outerColor;
 
-        _innerRing.rectTransform.sizeDelta = Vector2.one * _config.innerRingStartSize;
+        // Set inner ring size (start larger, will shrink to outer size)
+        // Scale inner ring start size proportionally to beat size
+        float sizeRatio = _config.innerRingStartSize / _config.outerRingSize;
+        _innerRing.rectTransform.sizeDelta = beatSize * sizeRatio;
         Color innerColor = _config.innerRingColor;
         innerColor.a = _config.ringAlpha;
         _innerRing.color = innerColor;
