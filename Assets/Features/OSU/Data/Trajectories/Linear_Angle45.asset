@@ -18,5 +18,13 @@ MonoBehaviour:
   beatCount: 3
   beatInterval: 1.2
   beatSize: {x: 100, y: 100}
+  beatSpriteSet: {fileID: 11400000, guid: 5237840110b2d10469f5b476c2ee0271, type: 2}
+  connectorToNext:
+    connectorSprite: {fileID: 0}
+    spriteSize: {x: 50, y: 10}
+    connectorColor: {r: 1, g: 1, b: 1, a: 1}
+    spawnSpeed: 20
+    fadeInDuration: 0.2
+    overlapFactor: 0.3
   angle: 0
   gap: 40
