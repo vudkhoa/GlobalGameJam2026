@@ -175,7 +175,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &59220607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,7 +191,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ReferenceResolution: {x: 2400, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
@@ -590,11 +590,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc7dcb7af2e6bb459adf7ae58177f0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _beatConfig: {fileID: 11400000, guid: 92498d49d530e994a9cdd83094994507, type: 2}
+  _defaultbeatConfig: {fileID: 0}
   _judgementConfig: {fileID: 11400000, guid: 1b649d75e14cca74793e902d7faa8252, type: 2}
   _sessionData: {fileID: 11400000, guid: cc63e0fa1594580479bf3618d48748b4, type: 2}
   _beatSpawner: {fileID: 67976582}
-  _inputHandler: {fileID: 1017143543}
   _audioSource: {fileID: 757391794}
   _animator: {fileID: 0}
   _comboDisplay: {fileID: 659908368}

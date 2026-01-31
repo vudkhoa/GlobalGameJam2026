@@ -8,13 +8,13 @@ using UnityEngine;
 public static class BeatGenerator
 {
     /// <summary>
-    /// Generate beats for a phase with random positions
+    /// Generate beats for a phase with trajectory or random positions
     /// </summary>
     public static List<BeatData> GenerateBeats(PhaseData phase, float phaseStartTime)
     {
         List<BeatData> beats = new List<BeatData>();
 
-        // Initialize random with seed
+        // Initialize random with seed (for fallback random mode)
         Random.State oldState = Random.state;
         if (phase.randomSeed != 0)
         {
@@ -25,7 +25,14 @@ public static class BeatGenerator
         for (int i = 0; i < phase.beatCount; i++)
         {
             float time = phaseStartTime + (i * phase.beatInterval);
-            Vector2 position = GenerateRandomPosition(phase.positionRadius);
+
+            // ✅ Use trajectory if available, fallback to random
+            Vector2 position = GeneratePositionFromTrajectory(
+                phase.trajectoryConfig,
+                i,
+                phase.beatCount,
+                phase.positionRadius
+            );
 
             beats.Add(new BeatData
             {
@@ -38,6 +45,26 @@ public static class BeatGenerator
         Random.state = oldState;
 
         return beats;
+    }
+
+    /// <summary>
+    /// Generate position from trajectory config or fallback to random
+    /// </summary>
+    private static Vector2 GeneratePositionFromTrajectory(
+        TrajectoryConfig trajectory,
+        int index,
+        int totalCount,
+        float fallbackRadius)
+    {
+        // Use trajectory if available
+        if (trajectory != null)
+        {
+            float t = totalCount > 1 ? (float)index / (totalCount - 1) : 0.5f;
+            return trajectory.EvaluatePosition(t, index, totalCount);
+        }
+
+        // Fallback to random (backward compatibility)
+        return GenerateRandomPosition(fallbackRadius);
     }
 
     // Random theo RECTANGLE thay vì CIRCLE

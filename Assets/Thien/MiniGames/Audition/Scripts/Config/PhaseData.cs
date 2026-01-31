@@ -19,9 +19,14 @@ public class PhaseData : ScriptableObject
     [Range(0.3f, 3f)]
     public float beatInterval = 1f;
 
+    [Header("Beat Position")]
+    [Tooltip("Trajectory config cho phase này (null = random)")]
+    public TrajectoryConfig trajectoryConfig;
+
     [Range(0f, 500f)]
     public float positionRadius = 100f;
 
+    [Tooltip("Random seed (chỉ dùng khi trajectoryConfig = null)")]
     public int randomSeed = 0;
 
     [Header("Phase Transition")]
