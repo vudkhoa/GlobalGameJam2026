@@ -24,7 +24,23 @@ public class JudgementDisplay : MonoBehaviour
 
     public void Show(FeedbackData feedback)
     {
-        if (feedback == null || _judgementText == null) return;
+        // ✅ DEBUG: Check if method is called
+        Debug.Log($"[JudgementDisplay] Show() called!");
+
+        if (feedback == null)
+        {
+            Debug.LogError("[JudgementDisplay] FeedbackData is NULL!");
+            return;
+        }
+
+        if (_judgementText == null)
+        {
+            Debug.LogError("[JudgementDisplay] _judgementText is NULL! Assign TextMeshProUGUI in Inspector!");
+            return;
+        }
+
+        // ✅ DEBUG: Log feedback data
+        Debug.Log($"[JudgementDisplay] Text: {feedback.text}, Color: {feedback.color}, Duration: {feedback.displayDuration}");
 
         // Kill existing animation
         _displaySequence?.Kill();
@@ -33,6 +49,9 @@ public class JudgementDisplay : MonoBehaviour
         _judgementText.text = feedback.text;
         _judgementText.color = feedback.color;
         _judgementText.gameObject.SetActive(true);
+
+        // ✅ DEBUG: Confirm text is active
+        Debug.Log($"[JudgementDisplay] Text active: {_judgementText.gameObject.activeSelf}");
 
         // Reset transform
         _judgementText.transform.localScale = _startScale;
@@ -55,6 +74,8 @@ public class JudgementDisplay : MonoBehaviour
             Color c = feedback.color;
             c.a = 1f;
             _judgementText.color = c;
+
+            Debug.Log("[JudgementDisplay] Animation complete");
         });
     }
 

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
-  m_Name: Linear_Horizontal
+  m_Name: Linear_Vertical
   m_EditorClassIdentifier: 
   trajectoryName: "Linear 0\xB0 (size=100, gap=40, total=660)"
   boundaryRadius: 500

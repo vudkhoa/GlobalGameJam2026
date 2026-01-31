@@ -150,7 +150,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _judgementText: {fileID: 7052380095135319016}
-  _canvasGroup: {fileID: 0}
   _startScale: {x: 1.5, y: 1.5, z: 1.5}
   _scaleInDuration: 0.1
 --- !u!1 &3384393666888694860
@@ -463,7 +462,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &1008669456617362702
 MonoBehaviour:
   m_ObjectHideFlags: 0
