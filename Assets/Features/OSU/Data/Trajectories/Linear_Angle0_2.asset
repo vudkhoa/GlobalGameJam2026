@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
-  m_Name: Linear_Angle45
+  m_Name: Linear_Angle0_2
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 45\xB0 (size=141, gap=50, total=1099)"
+  trajectoryName: "Linear 0\xB0 (size=100, gap=60, total=580)"
   boundaryRadius: 300
   normalizeToRadius: 0
-  beatCount: 6
-  beatInterval: 1.2
+  beatCount: 4
+  beatInterval: 1
   beatSize: {x: 100, y: 100}
-  beatSpriteSet: {fileID: 11400000, guid: 5237840110b2d10469f5b476c2ee0271, type: 2}
+  beatSpriteSet: {fileID: 11400000, guid: b459a75e690deb944a62f801e5ada8d5, type: 2}
   connectorToNext:
     connectorSprite: {fileID: 0}
     spriteSize: {x: 50, y: 10}
@@ -26,5 +26,5 @@ MonoBehaviour:
     spawnSpeed: 20
     fadeInDuration: 0.2
     overlapFactor: 0.3
-  angle: 45
-  gap: 50
+  angle: 0
+  gap: 60

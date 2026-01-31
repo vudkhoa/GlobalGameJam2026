@@ -12,17 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b78445f80d7cc49a46b2aae9fd8d7e, type: 3}
   m_Name: Wave_Circular
   m_EditorClassIdentifier: 
-  trajectoryName: Wave Right (amp=100, freq=1,0, len=1450)
+  trajectoryName: Wave Right (amp=150, freq=1.8, len=1360)
   boundaryRadius: 100
   normalizeToRadius: 0
   beatCount: 10
-  beatInterval: 0.5
+  beatInterval: 1.5
   beatSize: {x: 100, y: 100}
+  beatSpriteSet: {fileID: 0}
+  connectorToNext:
+    connectorSprite: {fileID: 0}
+    spriteSize: {x: 50, y: 10}
+    connectorColor: {r: 1, g: 1, b: 1, a: 1}
+    spawnSpeed: 20
+    fadeInDuration: 0.2
+    overlapFactor: 0.3
   moveRight: 1
-  gap: 50
-  waveAmplitude: 100
-  waveFrequency: 1
-  minY: -200
-  maxY: 200
+  gap: 40
+  waveAmplitude: 150
+  waveFrequency: 1.8
+  minY: -150
+  maxY: 150
   pathSeed: 0
   randomness: 0.5

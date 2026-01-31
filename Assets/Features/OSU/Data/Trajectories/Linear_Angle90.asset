@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Angle90
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 0\xB0 (size=100, gap=40, total=520)"
+  trajectoryName: "Linear 90\xB0 (size=100, gap=70, total=610)"
   boundaryRadius: 300
   normalizeToRadius: 0
   beatCount: 4
@@ -26,5 +26,5 @@ MonoBehaviour:
     spawnSpeed: 20
     fadeInDuration: 0.2
     overlapFactor: 0.3
-  angle: 0
-  gap: 40
+  angle: 90
+  gap: 70
