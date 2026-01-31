@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -8,9 +9,9 @@ using UnityEngine;
 /// </summary>
 public class CorrectionLogicHandler
 {
-    private readonly CorrectionData _data;
-    private readonly CorrectionValidator _validator;
-    private readonly ShaderParameterApplier _shaderApplier;
+    private CorrectionData _data;
+    private CorrectionValidator _validator;
+    private ShaderParameterApplier _shaderApplier;
 
     public event Action OnCorrectionComplete;
     public event Action<float> OnProgressChanged;
@@ -29,13 +30,25 @@ public class CorrectionLogicHandler
     }
 
     /// <summary>
+    /// Load new level mechanics (Swaps dependencies)
+    /// </summary>
+    public void LoadLevel(CorrectionData data, CorrectionValidator validator, ShaderParameterApplier applier)
+    {
+        _data = data;
+        _validator = validator;
+        _shaderApplier = applier;
+        _isComplete = false;
+        Initialize();
+    }
+
+    /// <summary>
     /// Update any shader parameter by property name
     /// </summary>
     public void UpdateParameter(string propertyName, float value)
     {
         _data.UpdateParameter(propertyName, value);
         _shaderApplier.ApplyParameter(propertyName, value);
-        CheckCompletion();
+        CheckCompletion().Forget();
     }
 
     /// <summary>
@@ -50,18 +63,16 @@ public class CorrectionLogicHandler
     /// <summary>
     /// Check if correction is complete and trigger events
     /// </summary>
-    private void CheckCompletion()
+    private async UniTask CheckCompletion()
     {
         float progress = _validator.GetProgress();
         OnProgressChanged?.Invoke(progress);
 
-        Debug.Log("Checking completion: " + progress);
-
         if (!_isComplete && _validator.IsCorrect())
         {
             _isComplete = true;
+
             OnCorrectionComplete?.Invoke();
-            Debug.Log("Correction Complete!");
         }
     }
 

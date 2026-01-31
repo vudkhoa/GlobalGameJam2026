@@ -25,7 +25,6 @@ public class MaskRenderer
         Shader brushShader = Shader.Find("Hidden/CircularBrush");
         if (brushShader == null)
         {
-            Debug.LogError("CircularBrush shader not found! Falling back to Internal-Colored");
             brushShader = Shader.Find("Hidden/Internal-Colored");
         }
         _brushMaterial = new Material(brushShader);

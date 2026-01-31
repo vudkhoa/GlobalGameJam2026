@@ -57,7 +57,6 @@ public class ScratchInstaller : MonoBehaviour
         Canvas canvas = _scratchArea.GetComponentInParent<Canvas>();
         if (canvas == null)
         {
-            Debug.LogWarning("No Canvas found! Using Camera.main");
             return Camera.main;
         }
 
@@ -153,7 +152,6 @@ public class ScratchInstaller : MonoBehaviour
         Shader shader = Shader.Find("Custom/ScratchReveal");
         if (shader == null)
         {
-            Debug.LogError("Shader 'Custom/ScratchReveal' not found!");
             return;
         }
 

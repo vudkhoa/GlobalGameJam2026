@@ -23,6 +23,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
     private float _virtualValue; // Linear, unbounded value for calculating PingPong
 
     private System.Action<float> _onValueChanged;
+    private bool _isInteractable = true;
 
     // Cache for performance
     private float _containerWidth;
@@ -84,8 +85,18 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
         UpdateValueDirectly(_virtualValue);
     }
 
+    public void SetInteractable(bool state)
+    {
+        _isInteractable = state;
+        if (!_isInteractable)
+        {
+            KillTween();
+        }
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!_isInteractable) return;
         KillTween(); // Stop any running animation immediately
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, eventData.position, eventData.pressEventCamera, out _lastPosition);
         _velocity = Vector2.zero;
@@ -94,6 +105,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!_isInteractable) return;
         KillTween();
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, eventData.position, eventData.pressEventCamera, out _lastPosition);
         _dragAccumulator = 0f; // Reset accumulator on new drag
@@ -101,6 +113,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!_isInteractable) return;
         if (_container == null || _handle == null) return;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, eventData.position, eventData.pressEventCamera, out Vector2 localPoint);
@@ -123,6 +136,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (!_isInteractable) return;
         // Start Inertia
         float magnitude = _isHorizontal ? _smoothedVelocity.x : _smoothedVelocity.y;
 
@@ -205,6 +219,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
         // Apply Rounding to Nearest 0.1f as requested (Polish)
         // This ensures the logic always operates on clean 0.1 increments
         shaderValue = Mathf.Round(shaderValue * 10f) / 10f;
+        shaderValue = Mathf.Clamp(shaderValue, _minValue, _maxValue); // Safety Clamp
 
         _onValueChanged?.Invoke(shaderValue);
 

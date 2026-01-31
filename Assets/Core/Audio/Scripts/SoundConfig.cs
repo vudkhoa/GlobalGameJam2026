@@ -31,7 +31,6 @@ public class SoundConfig : ScriptableObject
                 return mapping.audioClip;
         }
 
-        Debug.LogWarning($"[SoundConfig] No AudioClip found for {type}");
         return null;
     }
 

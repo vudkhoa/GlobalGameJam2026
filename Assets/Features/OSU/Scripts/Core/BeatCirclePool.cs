@@ -46,7 +46,6 @@ public class BeatCirclePool : MonoBehaviour
 
         if (beatCircle == null)
         {
-            Debug.LogError("[BeatCirclePool] Prefab missing BeatCircle component!");
             Destroy(obj);
             return null;
         }
@@ -111,8 +110,6 @@ public class BeatCirclePool : MonoBehaviour
         {
             _pool.Release(temp[i]);
         }
-
-        Debug.Log($"[BeatCirclePool] Pre-warmed with {count} objects");
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -126,7 +123,7 @@ public class BeatCirclePool : MonoBehaviour
     [ContextMenu("Log Pool Stats")]
     private void LogPoolStats()
     {
-        Debug.Log($"[BeatCirclePool] Active: {CountActive} | Inactive: {CountInactive} | Total: {CountAll}");
+        // Pool stats logging removed for production
     }
 
     // ═══════════════════════════════════════════════════════════

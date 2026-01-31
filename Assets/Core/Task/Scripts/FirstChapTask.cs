@@ -2,9 +2,8 @@ using Cysharp.Threading.Tasks;
 
 public class FirstChapTask : BaseTask
 {
-    public override UniTask<bool> Execute()
+    public override async UniTask Execute()
     {
-
-        return UniTask.FromResult(true);
+        await UniTask.Yield();
     }
 }

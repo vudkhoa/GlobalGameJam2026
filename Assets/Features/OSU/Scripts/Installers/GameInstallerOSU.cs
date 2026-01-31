@@ -70,12 +70,9 @@ public class GameInstallerOSU : MonoBehaviour
 
         // Initialize phase controller
         _phaseController.Initialize(_sessionData.phases);
-
-        Debug.Log("[GameInstallerOSU] Services installed and ready");
     }
 
     private void OnDestroy()
     {
-        Debug.Log("[GameInstallerOSU] Destroyed");
     }
 }

@@ -38,20 +38,8 @@ public class GameLoopOSU : MonoBehaviour
         // Validate installer is assigned
         if (_installer == null)
         {
-            Debug.LogError("[GameLoopOSU] GameInstallerOSU is not assigned in the Inspector!");
             enabled = false;
             return;
-        }
-
-        // Validate UI references
-        if (_judgementDisplay == null)
-        {
-            Debug.LogWarning("[GameLoopOSU] JudgementDisplay is not assigned! UI feedback will not be displayed.");
-        }
-
-        if (_comboDisplay == null)
-        {
-            Debug.LogWarning("[GameLoopOSU] ComboDisplay is not assigned! Combo UI will not be displayed.");
         }
 
         // Explicitly ensure installer has initialized its services
@@ -60,8 +48,6 @@ public class GameLoopOSU : MonoBehaviour
 
         // Now inject services
         EnsureServicesInitialized();
-
-        Debug.Log("[GameLoopOSU] Services injected from GameInstallerOSU");
     }
 
     private void EnsureServicesInitialized()
@@ -75,8 +61,6 @@ public class GameLoopOSU : MonoBehaviour
         // Validate all services are available
         if (_timeService == null || _scoreService == null || _evaluator == null || _phaseController == null)
         {
-            Debug.LogError("[GameLoopOSU] One or more services from GameInstallerOSU are null! " +
-                          "Make sure GameInstallerOSU.Awake() has run and initialized services.");
             enabled = false;
         }
     }
@@ -152,14 +136,10 @@ public class GameLoopOSU : MonoBehaviour
 
         // Start first phase
         _phaseController.StartFirstPhase();
-
-        Debug.Log("[GameLoopOSU] Game Started");
     }
 
     private void OnPhaseStarted(PhaseData phase)
     {
-        Debug.Log($"[GameLoopOSU] Phase Started: {phase.phaseName}");
-
         // Get BeatConfig for this phase
         BeatConfig beatConfigForPhase = phase.beatConfig != null
             ? phase.beatConfig
@@ -180,15 +160,12 @@ public class GameLoopOSU : MonoBehaviour
         int phaseScore = _scoreService.GetTotalScore();
         _scoreService.RecordPhaseScore(phaseIndex, phaseScore);
 
-        Debug.Log($"[GameLoopOSU] Phase {phaseIndex + 1} Ended: {phase.phaseName} | Score: {phaseScore}");
-
         // ✅ CHECK IF MORE PHASES EXIST
         if (_phaseController.CurrentPhaseIndex < _phaseController.TotalPhases - 1)
         {
             // More phases available - pause and start next
             if (phase.pauseDuration > 0f)
             {
-                Debug.Log($"[GameLoopOSU] Pausing for {phase.pauseDuration}s before next phase...");
                 await UniTask.Delay((int)(phase.pauseDuration * 1000));
             }
 
@@ -210,15 +187,6 @@ public class GameLoopOSU : MonoBehaviour
         // Get total score
         int totalScore = _scoreService.GetTotalScore();
         List<int> phaseScores = _scoreService.GetAllPhaseScores();
-
-        // Log final results
-        Debug.Log("═══════════════════════════════════════════════════════");
-        Debug.Log($"[GameLoopOSU] GAME COMPLETED!");
-        Debug.Log($"[GameLoopOSU] Phase Scores: {string.Join(", ", phaseScores)}");
-        Debug.Log($"[GameLoopOSU] TOTAL SCORE: {totalScore}");
-        Debug.Log($"[GameLoopOSU] Accuracy: {_scoreService.GetAccuracy():F2}%");
-        Debug.Log($"[GameLoopOSU] Max Combo: {_scoreService.GetMaxCombo()}");
-        Debug.Log("═══════════════════════════════════════════════════════");
 
         // Log statistics (if ScoreServiceOSU)
         if (_scoreService is ScoreServiceOSU osuService)

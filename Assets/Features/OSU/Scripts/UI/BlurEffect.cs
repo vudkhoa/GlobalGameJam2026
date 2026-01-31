@@ -25,7 +25,6 @@ public class BlurEffect : MonoBehaviour
     {
         if (_blurImage == null)
         {
-            Debug.LogError("[BlurEffect] Blur Image not assigned!");
             return;
         }
 

@@ -5,13 +5,13 @@ public class TaskManager : MonoBehaviour
 {
     [SerializeField] private BaseTask[] _tasks;
 
-    private void Start() => ExecuteTasksAsync().Forget();
+    private void OnEnable() => ExecuteTasksAsync().Forget();
 
     private async UniTask ExecuteTasksAsync()
     {
         foreach (var task in _tasks)
         {
-            await task.Execute();
+            await task.Execute(); 
         }
     }
 }

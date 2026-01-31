@@ -20,15 +20,12 @@ public class BeatSpawner : MonoBehaviour
     public void UpdateBeatConfig(BeatConfig beatConfig)
     {
         _beatConfig = beatConfig;
-        Debug.Log($"[BeatSpawner] Updated BeatConfig: {beatConfig.name}");
     }
 
     public void SetBeats(List<BeatData> beats)
     {
         _currentBeats = beats;
         _currentBeatIndex = 0;
-
-        Debug.Log($"[BeatSpawner] Set {beats.Count} beats");
     }
 
     public void UpdateSpawning(float gameTime)
@@ -57,7 +54,6 @@ public class BeatSpawner : MonoBehaviour
 
         if (beatCircle == null)
         {
-            Debug.LogError("[BeatSpawner] Failed to get BeatCircle from pool!");
             return;
         }
 
