@@ -11,16 +11,18 @@ public class UIScreenManager : MonoSingleton<UIScreenManager>
 
     private RectTransform _currentScreen;
     private Dictionary<string, RectTransform> _uiScreens = new();
+    private int curIndex;
 
     private void Start()
     {
         CacheScreens();
 
+        curIndex = startingScreenIndex;
         _currentScreen = uiScreens[startingScreenIndex].rect;
         _currentScreen.gameObject.SetActive(true);
     }
 
-    private void Update()
+    /*private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -46,7 +48,7 @@ public class UIScreenManager : MonoSingleton<UIScreenManager>
         {
             LoadUIScreen(uiScreens[6]);
         }
-    }
+    }*/
 
     private void CacheScreens()
     {
@@ -54,6 +56,14 @@ public class UIScreenManager : MonoSingleton<UIScreenManager>
         {
             child.rect.gameObject.SetActive(false);
         }
+    }
+
+    public void LoadNextUIScene()
+    {
+        curIndex++;
+
+        LoadUIScreen(uiScreens[curIndex]);
+        Debug.Log("CurIndex: " + startingScreenIndex);
     }
 
     public void LoadUIScreen(UIScreenTransition uIScreen)

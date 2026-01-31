@@ -407,8 +407,8 @@ public class DragComponentController : MonoSingleton<DragComponentController>
         if (allCorrect && !_hasWon)
         {
             _hasWon = true;
-            Debug.Log("Win");
-            // Di chuyển tất cả component đến vị trí đúng (sát nhau)
+
+            UIScreenManager.Instance.LoadNextUIScene();
             MoveAllComponentsToCorrectPositions();
         }
         else if (!allCorrect)
