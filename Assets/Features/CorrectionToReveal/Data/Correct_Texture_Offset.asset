@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1de3483d80d5128498fc859a66bb66b2, type: 3}
+  m_Name: Correct_Texture_Offset
+  m_EditorClassIdentifier: 
+  CorrectionMaterial: {fileID: 2100000, guid: 137b1c3edf3d3b44d9c2092a7f9e43ca, type: 2}
+  TargetTexture: {fileID: 2800000, guid: f378183a866cf084f9442fe017c93515, type: 3}
+  ShaderProperties:
+  - PropertyName: _OffsetX
+    DisplayName: Offset X
+    InitialValue: 0
+    TargetValue: 0
+    MinValue: -0.1
+    MaxValue: 0.1
+  - PropertyName: _OffsetY
+    DisplayName: Offset Y
+    InitialValue: 0
+    TargetValue: 0
+    MinValue: -0.1
+    MaxValue: 0.1
+  Tolerance: 0.1
+  RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
+  RulerSpacing: 150

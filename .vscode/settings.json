@@ -66,5 +66,8 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj",
     },
-    "dotnet.defaultSolution": "GlobalGameJam2026.sln"
+    "dotnet.defaultSolution": "GlobalGameJam2026.sln",
+    "cSpell.words": [
+        "Behaviour"
+    ]
 }
