@@ -15,3 +15,5 @@ public struct BeatData
     // ✅ Sprite set for this beat (passed from trajectory config)
     public BeatSpriteSet spriteSet; // Reference to sprite set (can be null to use default)
 }
+
+
