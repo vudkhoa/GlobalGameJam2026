@@ -29,12 +29,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BlurAmount: 0
+    - _BlurAmount: 10
     - _Brightness: 0.47
     - _Clarity: 0
     - _ColorMask: 15
     - _Contrast: 2.48
-    - _HorizontalScale: 1
+    - _HorizontalScale: 2.3
     - _Saturation: 1.1
     - _SketchFrequency: 26.8
     - _SketchIntensity: 0
