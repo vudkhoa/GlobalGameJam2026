@@ -30,7 +30,11 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
     private bool _isHorizontal;
 
     [Header("Physics Settings")]
-    [SerializeField] private float _pixelsPerUnit = 100f;
+    [SerializeField] private float _dragPixelSteps = 40f; // Pixels required to move 1 step
+    [SerializeField] private float _valueStep = 0.1f;     // Value change per step
+    [SerializeField] private float _pixelsPerUnit = 100f; // Kept for reference/inertia, but logic overrides
+
+    private float _dragAccumulator; // Accumulates drag delta
     [SerializeField] private float _inertiaDuration = 1.0f; // Duration for inertia tween
     [SerializeField] private float _snapDuration = 0.5f;    // Increased for smoother snap
     [SerializeField] private Ease _inertiaEase = Ease.OutCubic; // Smoother natural stop
@@ -92,6 +96,7 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
     {
         KillTween();
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, eventData.position, eventData.pressEventCamera, out _lastPosition);
+        _dragAccumulator = 0f; // Reset accumulator on new drag
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -118,35 +123,40 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // Start Inertia using DOTween
+        // Start Inertia
         float magnitude = _isHorizontal ? _smoothedVelocity.x : _smoothedVelocity.y;
 
         // Predict target value based on velocity
-        float predictedChange = (magnitude * 0.25f) / _pixelsPerUnit; // Tuned factor
+        // Derived sensitivity from steps: 
+        float derivedPixelsPerUnit = _dragPixelSteps / _valueStep;
+        float predictedChange = (magnitude * 0.25f) / derivedPixelsPerUnit;
 
-        // Use Virtual Value for inertia calculation to maintain direction/momentum even across boundaries
         float startValue = _virtualValue;
         float targetValueVirtual = startValue + predictedChange;
 
         // Tweens the virtual value
         _physicsTween = DOVirtual.Float(startValue, targetValueVirtual, _inertiaDuration, (v) =>
         {
+            // During inertia, we likely want smooth movement, OR stepped?
+            // User requested "slide theo step". 
+            // We will let tween update smoothly but 'UpdateValueDirectly' handles the rounding for logic.
             UpdateValueDirectly(v);
         })
         .SetEase(_inertiaEase)
         .OnComplete(() =>
         {
-            SnapToNearestInteger();
+            SnapToNearestStep();
         });
     }
 
-    private void SnapToNearestInteger()
+    private void SnapToNearestStep()
     {
-        // Snap the VIRTUAL value to nearest integer to keep alignment consistent
+        // Snap to nearest 0.1 step
         float currentVirtual = _virtualValue;
-        float targetInt = Mathf.Round(currentVirtual);
+        float steps = Mathf.Round(currentVirtual / _valueStep);
+        float targetStep = steps * _valueStep;
 
-        _physicsTween = DOVirtual.Float(currentVirtual, targetInt, _snapDuration, (v) =>
+        _physicsTween = DOVirtual.Float(currentVirtual, targetStep, _snapDuration, (v) =>
         {
             UpdateValueDirectly(v);
         })
@@ -163,27 +173,26 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
     private void MoveHandle(Vector2 pixelDelta)
     {
-        float valueChange = 0f;
+        float move = _isHorizontal ? pixelDelta.x : pixelDelta.y;
+        _dragAccumulator += move;
 
-        if (_isHorizontal)
+        // Check if we crossed the step threshold
+        if (Mathf.Abs(_dragAccumulator) >= _dragPixelSteps)
         {
-            float moveX = pixelDelta.x;
-            valueChange = moveX / _pixelsPerUnit;
-        }
-        else
-        {
-            float moveY = pixelDelta.y;
-            valueChange = moveY / _pixelsPerUnit;
-        }
+            // How many steps?
+            int steps = (int)(_dragAccumulator / _dragPixelSteps);
+            if (steps != 0)
+            {
+                float valueChange = steps * _valueStep;
+                _virtualValue += valueChange;
 
-        // Apply change to linear virtual value
-        _virtualValue += valueChange;
+                // Reduce accumulator by the consumed steps
+                _dragAccumulator -= steps * _dragPixelSteps;
 
-        UpdateValueDirectly(_virtualValue);
+                UpdateValueDirectly(_virtualValue);
+            }
+        }
     }
-
-    [Header("Gameplay Assist")]
-    [SerializeField] private float _magnetThreshold = 0.1f;
 
     private void UpdateValueDirectly(float newVirtualValue)
     {
@@ -193,15 +202,9 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
         // 1. Calculate Shader Value (PingPong -> Smooth Oscillation)
         float shaderValue = CalculatePingPongValue(_virtualValue);
 
-        // Ensure threshold is valid (fallback if 0 due to serialization)
-        float threshold = _magnetThreshold > 0.001f ? _magnetThreshold : 0.1f;
-
-        // Apply Magnetic Snap to nearest integer
-        float nearestInt = Mathf.Round(shaderValue);
-        if (Mathf.Abs(shaderValue - nearestInt) <= threshold)
-        {
-            shaderValue = nearestInt;
-        }
+        // Apply Rounding to Nearest 0.1f as requested (Polish)
+        // This ensures the logic always operates on clean 0.1 increments
+        shaderValue = Mathf.Round(shaderValue * 10f) / 10f;
 
         _onValueChanged?.Invoke(shaderValue);
 
