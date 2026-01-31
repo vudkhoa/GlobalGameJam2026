@@ -255,8 +255,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877abe336ff8b8e479ab034b469fbfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startDuration: 0.8
-  _completeDuration: 1
+  _startDuration: 2
+  _completeDuration: 2
   _entranceEase: 27
   _exitEase: 26
   _successEase: 24

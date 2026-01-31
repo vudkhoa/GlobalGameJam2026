@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7030716305601260074}
   - component: {fileID: 62211068460291688}
-  - component: {fileID: 7869742417368313662}
   m_Layer: 5
   m_Name: correction_container
   m_TagString: Untagged
@@ -49,24 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50d265ef84961434ca34a83a61e30b65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _settings: {fileID: 11400000, guid: 7a5ec131293f3274f9664affb47e536b, type: 2}
-  _uiController: {fileID: 7869742417368313662}
-  _targetRenderer: {fileID: 0}
---- !u!114 &7869742417368313662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8022323740846479231}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 544bae40437caef4ebd8d414aecfb3a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  _levels: []
   _rulerContainer: {fileID: 0}
-  _progressText: {fileID: 0}
-  _feedbackText: {fileID: 0}
-  _progressBar: {fileID: 0}
-  _startMessage: Adjust the rulers to correct the image!
-  _completeMessage: Perfect! Image corrected!
+  _revealImage: {fileID: 0}
