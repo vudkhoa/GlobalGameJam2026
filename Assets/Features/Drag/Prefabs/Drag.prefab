@@ -641,6 +641,7 @@ MonoBehaviour:
   matrixSize: {x: 3, y: 3}
   dragComponentSize: {x: 0, y: 0}
   offset: {x: 50, y: 50}
+  chapterScreenManager: {fileID: 0}
   rectTransform: {fileID: 5417642672366528632}
   awaitDuration: 6.5
   moveSpeed: 10
@@ -773,7 +774,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &3991342507487611210
 MonoBehaviour:
   m_ObjectHideFlags: 0

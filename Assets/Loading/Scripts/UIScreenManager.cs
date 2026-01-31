@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIScreenManager : MonoSingleton<UIScreenManager>
+public class UIScreenManager : MonoBehaviour
 {
     [SerializeField] private float transitionDuration = 0.5f;
     [SerializeField] private List<UIScreenTransition> uiScreens = new();
@@ -20,6 +20,16 @@ public class UIScreenManager : MonoSingleton<UIScreenManager>
         curIndex = startingScreenIndex;
         _currentScreen = uiScreens[startingScreenIndex].rect;
         _currentScreen.gameObject.SetActive(true);
+        ExcuteTask();
+    }
+
+    private async void ExcuteTask()
+    {
+        foreach (var uiScreen in uiScreens)
+        {
+            await uiScreen.chapterScreenManager.Execute();
+        }
+        LoadNextUIScene();
     }
 
     /*private void Update()
@@ -298,5 +308,6 @@ public enum LoadType
 public class UIScreenTransition
 {
     public RectTransform rect;
+    public BaseTask chapterScreenManager;
     public LoadType loadType;
 }

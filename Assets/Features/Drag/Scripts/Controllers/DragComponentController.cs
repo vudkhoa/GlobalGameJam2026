@@ -421,9 +421,8 @@ public class DragComponentController : MonoSingleton<DragComponentController>
         }
     }
 
-    private async void AwaitingWinAnim()
+    private void AwaitingWinAnim()
     {
-        await UniTask.WaitForSeconds(winMoveDuration + 0.15f);
-        UIScreenManager.Instance.LoadNextUIScene();
+        gameObject.GetComponent<LogicTask>().ExecuteAsyncTask(winMoveDuration + 0.15f);
     }
 }
