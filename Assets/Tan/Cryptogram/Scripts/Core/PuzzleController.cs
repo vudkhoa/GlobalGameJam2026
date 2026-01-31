@@ -80,13 +80,9 @@ public class PuzzleController : MonoBehaviour
 
     public void SignalLevelCompleted()
     {
-        Debug.Log("[DEBUG] SignalLevelCompleted được gọi!"); // Log 1
-
         if (_levelCompletionSource != null)
         {
-            Debug.Log("[DEBUG] Đang mở khóa Task..."); // Log 2
             bool result = _levelCompletionSource.TrySetResult(true);
-            Debug.Log($"[DEBUG] Kết quả mở khóa: {result}"); // Log 3
         }
         else
         {
@@ -128,9 +124,17 @@ public class PuzzleController : MonoBehaviour
 
         PuzzleLevelData levelData = storyLevels[index];
 
-        // A. RESET DATA
-        foreach (Transform t in journalContainer) Destroy(t.gameObject);
-        foreach (Transform t in wordPoolContainer) Destroy(t.gameObject);
+        foreach (Transform t in journalContainer) 
+        {
+            t.DOKill();
+            Destroy(t.gameObject);
+        }
+        
+        foreach (Transform t in wordPoolContainer) 
+        {
+            t.DOKill();
+            Destroy(t.gameObject);
+        }
         _activeSlots.Clear();
         _charToNumberMap.Clear();
         _uniqueHiddenChars.Clear();
@@ -180,11 +184,11 @@ public class PuzzleController : MonoBehaviour
 
         BuildFullKeyboard();
 
-        journalContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
-        wordPoolContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
+        // journalContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
+        // wordPoolContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
 
-        // LayoutRebuilder.ForceRebuildLayoutImmediate(journalContainer as RectTransform);
-        // LayoutRebuilder.ForceRebuildLayoutImmediate(wordPoolContainer as RectTransform);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(journalContainer as RectTransform);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(wordPoolContainer as RectTransform);
 
         var firstEmptySlot = _activeSlots.FirstOrDefault(s => !s.IsFilled);
         if (firstEmptySlot != null)
@@ -195,8 +199,6 @@ public class PuzzleController : MonoBehaviour
         {
             Debug.LogError("Không tìm thấy ô trống nào để Focus!");
         }
-
-        Debug.Log($"Loaded Level {index} Cryptogram Mode.");
     }
 
     private void GenerateJournalUI(string sentence)
@@ -318,8 +320,6 @@ public class PuzzleController : MonoBehaviour
     public void OnKeyboardKeyPressed(string letter, WordOptionView btnView)
     {
         // LOG 1: Kiểm tra xem hàm có được gọi không
-        Debug.Log($"[Controller] Received input: {letter}. Checking conditions...");
-
         if (_currentState == null)
         {
             Debug.LogError("LỖI: _currentState đang NULL! Bạn đã gọi StartGameManually chưa?");
@@ -381,14 +381,23 @@ public class PuzzleController : MonoBehaviour
     {
         if (_activeSlots.Count == 0 || _focusedSlot == null) return;
 
-        // Tìm index của ô hiện tại trong danh sách Active Slots
         int currentIndex = _activeSlots.IndexOf(_focusedSlot);
         if (currentIndex == -1) return;
 
-        // Tính index mới (vòng tròn)
-        int newIndex = (currentIndex + direction + _activeSlots.Count) % _activeSlots.Count;
-        
-        SetCurrentFocus(_activeSlots[newIndex]);
+        for (int i = 1; i < _activeSlots.Count; i++)
+        {
+            int checkIndex = (currentIndex + (direction * i)) % _activeSlots.Count;
+            if (checkIndex < 0) checkIndex += _activeSlots.Count;
+
+            var candidateSlot = _activeSlots[checkIndex];
+
+            // Nếu tìm thấy ô chưa điền -> Chọn ngay và thoát
+            if (!candidateSlot.IsFilled)
+            {
+                SetCurrentFocus(candidateSlot);
+                return;
+            }
+        }
     }
 
     void NavigateToNextEmptySlot()
@@ -404,6 +413,8 @@ public class PuzzleController : MonoBehaviour
     
     void SetCurrentFocus(JournalSlotView slot)
     {
+        if (slot == null || slot.IsFilled) 
+            return;
         // Bỏ focus ô cũ
         if (_focusedSlot != null)
             _focusedSlot.SetFocus(false);
@@ -445,17 +456,26 @@ public class PuzzleController : MonoBehaviour
     {
         if (_activeSlots.All(s => s.IsFilled))
         {
-            PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
+            HandleLevelCompleteSequence().Forget();
+        }
+    }
+    
+    private async UniTaskVoid HandleLevelCompleteSequence()
+    {
+        var token = this.GetCancellationTokenOnDestroy();
+        PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
 
-            if (currentData.phaseType == PuzzlePhase.Glitch)
+        await UniTask.Delay(500, cancellationToken: token);
+
+        if (currentData.phaseType == PuzzlePhase.Glitch)
+        {
+            HandleGlitchEffect(_activeSlots.Last()).Forget();
+        }
+        else
+        {
+            if (_currentState is StatePlaying playingState)
             {
-                var lastSlot = _activeSlots.Last(); 
-                HandleGlitchEffect(lastSlot).Forget();
-            }
-            else
-            {
-                if (_currentState is StatePlaying playingState)
-                    playingState.OnLevelCleared();
+                playingState.OnLevelCleared();
             }
         }
     }

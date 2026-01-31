@@ -12,9 +12,10 @@ public class ChapterFlowManager : MonoBehaviour
     [Header("1. INTRO CONFIG")]
     public List<Image> introSlides;
     [Tooltip("Kéo cái Gameobject 'FinalImageMask' vừa tạo vào đây")]
-    public RectTransform finalImageMaskRect; 
+    public RectTransform finalImageMaskRect;
     [Tooltip("Kéo cái ảnh con bên trong Mask vào đây để Fade")]
-    public Image finalImageContent; 
+    public Image finalImageContent;
+    public HandWritingAnimation handImage;
 
     [Tooltip("Kéo cái khung tranh ở LeftPanel vào đây (Đích đến bên trái)")]
     public RectTransform targetFrameLeft;
@@ -145,6 +146,7 @@ public class ChapterFlowManager : MonoBehaviour
         finalImageMaskRect.sizeDelta = startSize;
 
         var seqPhase1 = DOTween.Sequence();
+        seqPhase1.Append(finalImageContent.transform.DOScale(0.78f, 1.0f).SetEase(Ease.InOutBack));
         seqPhase1.Join(finalImageMaskRect.DOSizeDelta(targetSquareSize, 1.5f).SetEase(Ease.InOutExpo));
         // Đảm bảo nó nằm đúng giữa (phòng hờ)
         seqPhase1.Join(finalImageMaskRect.DOAnchorPos(Vector2.zero, 1.5f).SetEase(Ease.InOutExpo));
@@ -161,6 +163,7 @@ public class ChapterFlowManager : MonoBehaviour
 
         var seqPhase2 = DOTween.Sequence();
         
+        
         seqPhase2.Append(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
 
         seqPhase2.Append(rightPanelCG.DOFade(1f, 1.0f).SetEase(Ease.Linear));
@@ -169,8 +172,10 @@ public class ChapterFlowManager : MonoBehaviour
 
         finalImageMaskRect.SetParent(targetFrameLeft);
         finalImageMaskRect.anchoredPosition = Vector2.zero;
-        
+
         gameplayCanvasGroup.blocksRaycasts = true;
+
+        handImage.StartWriting();
     }
 
     // --- LOGIC OUTRO ---
@@ -178,6 +183,7 @@ public class ChapterFlowManager : MonoBehaviour
     {
         var token = this.GetCancellationTokenOnDestroy();
         // Chuyển việc gọi hàm nội bộ thành await trực tiếp
+        handImage.StopWriting();
         await PlayOutroSequence(decision, token);
     }
 

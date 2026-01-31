@@ -10,11 +10,21 @@ public class EndingChoiceView : MonoBehaviour
     public Button btnDenial;
     public Button btnAcceptance;
 
+    [Header("Animation Settings")]
+    public float animDuration = 0.5f;
+    public float delayBetweenButtons = 0.15f;
+
     public void Setup(Action<int> onChosen)
     {
         gameObject.SetActive(true);
         canvasGroup.alpha = 0f;
+        canvasGroup.DOKill();
         container.localScale = Vector3.zero;
+
+        btnDenial.transform.localScale = Vector3.zero;
+        btnAcceptance.transform.localScale = Vector3.zero;
+        btnDenial.transform.DOKill();
+        btnAcceptance.transform.DOKill();
 
         // Reset nút
         btnDenial.interactable = true;
@@ -36,11 +46,19 @@ public class EndingChoiceView : MonoBehaviour
         canvasGroup.DOKill();
         container.DOKill();
 
-        canvasGroup.alpha = 1f;            // Đưa về trong suốt
-        container.localScale = Vector3.zero; // Đưa về bé tí
+        canvasGroup.alpha = 1f;           
+        container.localScale = Vector3.zero; 
 
-        // Hiện dần lên
-        canvasGroup.DOFade(1f, 0.5f);
+        canvasGroup.DOFade(1f, animDuration).SetLink(gameObject);
+
+        btnDenial.transform.DOScale(1f, animDuration)
+            .SetEase(Ease.OutBack)
+            .SetLink(btnDenial.gameObject);
+
+        btnAcceptance.transform.DOScale(1f, animDuration)
+            .SetEase(Ease.OutBack)
+            .SetDelay(delayBetweenButtons) 
+            .SetLink(btnAcceptance.gameObject);
         
         // // 0.2 giây sau thì bung ra
         // container.DOScale(1f, 0.5f).SetEase(Ease.OutBack).SetDelay(0.2f);
