@@ -226,7 +226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _settings: {fileID: 11400000, guid: fa30eceffd2bfe448829b1591fec6510, type: 2}
   _rulerContainer: {fileID: 3232815133378201940}
-  _targetRenderer: {fileID: 0}
+  _revealImage: {fileID: 5110966108879127855}
 --- !u!114 &316190992854433447
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Main installer for Correction mini-game
@@ -13,6 +14,7 @@ public class CorrectionInstaller : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private Transform _rulerContainer;
+    [SerializeField] private Image _revealImage;
 
     // Dependencies
     private CorrectionData _data;
@@ -45,6 +47,32 @@ public class CorrectionInstaller : MonoBehaviour
             return;
         }
 
+        // Setup Visuals (Material & Texture)
+        // We use a local material reference which might be an instance or the asset
+        Material workingMaterial = _settings.CorrectionMaterial;
+
+        if (_revealImage != null)
+        {
+            // Instantiate material to prevent modifying the asset in Editor
+            if (_settings.CorrectionMaterial != null)
+            {
+                workingMaterial = new Material(_settings.CorrectionMaterial);
+                _revealImage.material = workingMaterial;
+            }
+
+            // Create and assign Sprite if Texture is provided
+            if (_settings.TargetTexture != null)
+            {
+                Texture2D tex = _settings.TargetTexture;
+                Rect rect = new Rect(0, 0, tex.width, tex.height);
+                _revealImage.sprite = Sprite.Create(tex, rect, new Vector2(0.5f, 0.5f));
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[CorrectionInstaller] _revealImage is not assigned!");
+        }
+
         // Create shader parameters from factory (SINGLE SOURCE OF TRUTH)
         _shaderParameters = ShaderParameterFactory.CreateAllParameters(_settings);
 
@@ -57,8 +85,8 @@ public class CorrectionInstaller : MonoBehaviour
         // Create validator
         _validator = new CorrectionValidator(_data);
 
-        // Create shader applier (simplified constructor)
-        _shaderApplier = new ShaderParameterApplier(_settings.CorrectionMaterial);
+        // Create shader applier (simplified constructor) - Use Working Material
+        _shaderApplier = new ShaderParameterApplier(workingMaterial);
 
         // Create logic handler
         _logicHandler = new CorrectionLogicHandler(_data, _validator, _shaderApplier);
