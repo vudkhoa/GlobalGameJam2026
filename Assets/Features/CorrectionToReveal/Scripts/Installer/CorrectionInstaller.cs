@@ -1,142 +1,185 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Main installer for Correction mini-game
-/// Dependency Injection container
-/// Automatically spawns rulers based on shader parameters
+/// Manages Multi-Level Progression and Resource Lifecycle
 /// </summary>
 public class CorrectionInstaller : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private CorrectionSettings _settings;
+    [Header("Level Config")]
+    [Tooltip("List of all levels (CorrectionSettings) to play in sequence")]
+    [SerializeField] private List<CorrectionSettings> _levels = new List<CorrectionSettings>();
 
     [Header("UI")]
     [SerializeField] private Transform _rulerContainer;
+    [SerializeField] private Image _revealImage;
 
     // Dependencies
+    private CorrectionLogicHandler _logicHandler;
+    private RulerSpawner _rulerSpawner;
+
+    // Current State
+    private int _currentLevelIndex = 0;
+
+    // Transient Level Data (Cleaned up/Recreated per level)
+    private Material _currentMaterialInstance;
     private CorrectionData _data;
     private CorrectionValidator _validator;
     private ShaderParameterApplier _shaderApplier;
-    private CorrectionLogicHandler _logicHandler;
-    private RulerSpawner _rulerSpawner;
+    private List<ShaderParameter> _shaderParameters;
 
     public CorrectionLogicHandler LogicHandler => _logicHandler;
     public RulerSpawner RulerSpawner => _rulerSpawner;
 
-    // Shader parameters (dynamically created)
-    private List<ShaderParameter> _shaderParameters;
-
     private void OnEnable()
     {
         InstallDependencies();
-        SetupGame();
     }
 
-    /// <summary>
-    /// Install all dependencies (Dependency Injection)
-    /// </summary>
     private void InstallDependencies()
     {
-        // Validate settings
-        if (_settings == null)
+        // 1. Initialize persistent systems (Ruler Spawner)
+        // We use the first level's prefab as the base for pooling (Assuming consistent prefabs)
+        GameObject rulerPrefab = (_levels.Count > 0 && _levels[0] != null) ? _levels[0].RulerPrefab : null;
+        float defaultSpacing = (_levels.Count > 0 && _levels[0] != null) ? _levels[0].RulerSpacing : 150f;
+
+        if (_rulerSpawner == null)
         {
-            Debug.LogError("CorrectionSettings is not assigned!");
-            return;
+            _rulerSpawner = new RulerSpawner(rulerPrefab, _rulerContainer, defaultSpacing);
         }
 
-        // Create shader parameters from factory (SINGLE SOURCE OF TRUTH)
-        _shaderParameters = ShaderParameterFactory.CreateAllParameters(_settings);
+        // 2. Load the first level
+        if (_levels.Count > 0)
+        {
+            LoadLevel(0);
+        }
+        else
+        {
+            Debug.LogError("[CorrectionInstaller] No levels configured!");
+        }
+    }
 
-        Debug.Log($"[CorrectionInstaller] Created {_shaderParameters.Count} shader parameters");
+    /// <summary>
+    /// Advance to the next level
+    /// Returns true if successful, false if all levels are complete
+    /// </summary>
+    public bool AdvanceLevel()
+    {
+        int nextIndex = _currentLevelIndex + 1;
+        if (nextIndex < _levels.Count)
+        {
+            LoadLevel(nextIndex);
+            return true;
+        }
+        return false;
+    }
 
-        // Create data and initialize with parameters
+    /// <summary>
+    /// Load a specific level by index
+    /// Handles cleanup and transition
+    /// </summary>
+    private void LoadLevel(int index)
+    {
+        if (index < 0 || index >= _levels.Count) return;
+        CorrectionSettings settings = _levels[index];
+        if (settings == null) return;
+
+        _currentLevelIndex = index;
+        Debug.Log($"[CorrectionInstaller] Loading Level {_currentLevelIndex + 1}/{_levels.Count}: {settings.name}");
+
+        // 1. Cleanup Old Visuals (Prevent Memory Leaks)
+        CleanupGeneratesAssets();
+
+        // 2. Setup New Visuals
+        SetupVisuals(settings);
+
+        // 3. Create Shader Parameters (Data)
+        _shaderParameters = ShaderParameterFactory.CreateAllParameters(settings);
+
+        // 4. Create Logic Components
         _data = new CorrectionData();
-        _data.Initialize(_shaderParameters, _settings.Tolerance);
+        _data.Initialize(_shaderParameters, settings.Tolerance);
 
-        // Create validator
         _validator = new CorrectionValidator(_data);
 
-        // Create shader applier (simplified constructor)
-        _shaderApplier = new ShaderParameterApplier(_settings.CorrectionMaterial);
+        // Use the INSTANCE material for the applier so we modify the visible visual only
+        _shaderApplier = new ShaderParameterApplier(_currentMaterialInstance);
 
-        // Create logic handler
-        _logicHandler = new CorrectionLogicHandler(_data, _validator, _shaderApplier);
-
-        // Subscribe to events
-        _logicHandler.OnCorrectionComplete += OnCorrectionComplete;
-
-        // Create ruler spawner
-        _rulerSpawner = new RulerSpawner(
-            _settings.RulerPrefab,
-            _rulerContainer,
-            _settings.RulerSpacing
-        );
-    }
-
-    /// <summary>
-    /// Setup game - spawn rulers and initialize
-    /// </summary>
-    private void SetupGame()
-    {
-        if (_logicHandler == null || _rulerSpawner == null)
+        // 5. Initialize or Update Logic Handler
+        if (_logicHandler == null)
         {
-            Debug.LogError("Dependencies not installed!");
-            return;
+            _logicHandler = new CorrectionLogicHandler(_data, _validator, _shaderApplier);
+            _logicHandler.OnCorrectionComplete += OnCorrectionComplete;
+        }
+        else
+        {
+            // Transfer logic handler to new data context
+            _logicHandler.LoadLevel(_data, _validator, _shaderApplier);
         }
 
-        // Initialize logic
-        _logicHandler.Initialize();
-
-        // Spawn rulers dynamically based on parameters
-        SpawnRulersDynamically();
+        // 6. Setup Rulers (Reuse objects)
+        if (_rulerSpawner != null)
+        {
+            _rulerSpawner.SetSpacing(settings.RulerSpacing);
+            _rulerSpawner.RepopulateRulers(_shaderParameters, OnParameterChanged);
+        }
     }
 
-    /// <summary>
-    /// ⭐ DYNAMIC RULER SPAWNING ⭐
-    /// Automatically spawns rulers based on shader parameters
-    /// This is the KEY feature - no hard-coding needed!
-    /// </summary>
-    private void SpawnRulersDynamically()
+    private void SetupVisuals(CorrectionSettings settings)
     {
-        Debug.Log($"[CorrectionInstaller] Spawning {_shaderParameters.Count} rulers...");
+        if (_revealImage == null) return;
 
-        foreach (var param in _shaderParameters)
+        // Instantiate Material
+        if (settings.CorrectionMaterial != null)
         {
-            // Spawn a ruler for each parameter
-            _rulerSpawner.SpawnRuler(
-                label: param.DisplayName,
-                minValue: param.MinValue,
-                maxValue: param.MaxValue,
-                currentValue: param.CurrentValue,
-                onValueChanged: (value) => OnParameterChanged(param.PropertyName, value)
-            );
-
-            Debug.Log($"[CorrectionInstaller] Spawned ruler for: {param.DisplayName} ({param.PropertyName})");
+            _currentMaterialInstance = new Material(settings.CorrectionMaterial);
+            _revealImage.material = _currentMaterialInstance;
         }
 
-        Debug.Log($"[CorrectionInstaller] ✅ Successfully spawned {_shaderParameters.Count} rulers!");
+        // Create Sprite
+        if (settings.TargetTexture != null)
+        {
+            Texture2D tex = settings.TargetTexture;
+            Rect rect = new Rect(0, 0, tex.width, tex.height);
+            _revealImage.sprite = Sprite.Create(tex, rect, Vector2.one * 0.5f);
+        }
     }
 
-    /// <summary>
-    /// Called when any parameter value changes from UI
-    /// </summary>
+    private void CleanupGeneratesAssets()
+    {
+        // Destroy Material Instance
+        if (_currentMaterialInstance != null)
+        {
+            Destroy(_currentMaterialInstance);
+            _currentMaterialInstance = null;
+        }
+
+        // Destroy Sprite Instance
+        if (_revealImage != null && _revealImage.sprite != null)
+        {
+            Destroy(_revealImage.sprite);
+            _revealImage.sprite = null;
+        }
+    }
+
     private void OnParameterChanged(string propertyName, float value)
     {
-        _logicHandler.UpdateParameter(propertyName, value);
+        if (_logicHandler != null)
+        {
+            _logicHandler.UpdateParameter(propertyName, value);
+        }
     }
 
-    /// <summary>
-    /// Called when correction is complete
-    /// </summary>
     private void OnCorrectionComplete()
     {
-        Debug.Log("Correction Complete!");
+        Debug.Log($"[CorrectionInstaller] Level {_currentLevelIndex + 1} Complete!");
     }
 
     private void OnDestroy()
     {
-        // Unsubscribe from events
+        CleanupGeneratesAssets();
         if (_logicHandler != null)
         {
             _logicHandler.OnCorrectionComplete -= OnCorrectionComplete;

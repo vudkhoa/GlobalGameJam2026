@@ -9,9 +9,9 @@ using UnityEngine;
 /// </summary>
 public class CorrectionLogicHandler
 {
-    private readonly CorrectionData _data;
-    private readonly CorrectionValidator _validator;
-    private readonly ShaderParameterApplier _shaderApplier;
+    private CorrectionData _data;
+    private CorrectionValidator _validator;
+    private ShaderParameterApplier _shaderApplier;
 
     public event Action OnCorrectionComplete;
     public event Action<float> OnProgressChanged;
@@ -27,6 +27,18 @@ public class CorrectionLogicHandler
         _validator = validator;
         _shaderApplier = shaderApplier;
         _isComplete = false;
+    }
+
+    /// <summary>
+    /// Load new level mechanics (Swaps dependencies)
+    /// </summary>
+    public void LoadLevel(CorrectionData data, CorrectionValidator validator, ShaderParameterApplier applier)
+    {
+        _data = data;
+        _validator = validator;
+        _shaderApplier = applier;
+        _isComplete = false;
+        Initialize();
     }
 
     /// <summary>
