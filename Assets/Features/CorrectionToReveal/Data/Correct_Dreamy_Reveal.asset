@@ -20,7 +20,7 @@ MonoBehaviour:
     InitialValue: -5
     TargetValue: 0
     MinValue: 0
-    MaxValue: -5
+    MaxValue: 5
   - PropertyName: _DistortionAmount
     DisplayName: Distortion Amount
     InitialValue: 5
