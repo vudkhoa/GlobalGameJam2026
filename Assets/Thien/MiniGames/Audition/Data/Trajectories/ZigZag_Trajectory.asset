@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52443b241dfaf4e44998aaa42797e110, type: 3}
   m_Name: ZigZag_Trajectory
   m_EditorClassIdentifier: 
-  trajectoryName: Trajectory
+  trajectoryName: ZigZag 3x (Sharp, gap=50, total=1450)
   boundaryRadius: 100
   normalizeToRadius: 0
   beatCount: 10
-  beatInterval: 1
+  beatInterval: 0.5
   beatSize: {x: 100, y: 100}
   direction: 0
   amplitude: 50
   zigzagCount: 3
-  totalLength: 200
+  gap: 50
   pattern: 0

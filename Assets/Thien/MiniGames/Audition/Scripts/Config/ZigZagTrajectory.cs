@@ -20,9 +20,9 @@ public class ZigZagTrajectory : TrajectoryConfig
     [Range(1, 20)]
     public int zigzagCount = 3;
 
-    [Tooltip("Độ dài tổng của trajectory")]
-    [Range(0f, 500f)]
-    public float totalLength = 200f;
+    [Tooltip("Khoảng cách giữa các beat (gap)")]
+    [Range(0f, 200f)]
+    public float gap = 50f;
 
     [Header("Pattern")]
     [Tooltip("Kiểu zigzag (Sharp = góc nhọn, Smooth = sin wave)")]
@@ -41,12 +41,23 @@ public class ZigZagTrajectory : TrajectoryConfig
         Vector2 mainDirection = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
         Vector2 perpendicular = new Vector2(-mainDirection.y, mainDirection.x);
 
-        // Progress along main direction
-        float mainProgress = t * totalLength;
+        // Get the size component along the direction
+        float sizeAlongDirection = Mathf.Abs(Mathf.Cos(rad)) * beatSize.x + Mathf.Abs(Mathf.Sin(rad)) * beatSize.y;
 
-        // Calculate zigzag offset
+        // Calculate total length from beatCount, beatSize, and gap
+        float totalLength = (totalCount * sizeAlongDirection) + ((totalCount - 1) * gap);
+
+        // Calculate start position (centered)
+        Vector2 start = -mainDirection * (totalLength * 0.5f);
+
+        // Calculate position for this beat along main direction
+        float offset = index * (sizeAlongDirection + gap);
+        float mainProgress = offset;
+
+        // Calculate zigzag offset based on progress ratio
+        float progressRatio = totalCount > 1 ? (float)index / (totalCount - 1) : 0.5f;
         float zigzagOffset;
-        float zigzagPhase = t * zigzagCount;
+        float zigzagPhase = progressRatio * zigzagCount;
 
         if (pattern == ZigZagPattern.Sharp)
         {
@@ -61,8 +72,7 @@ public class ZigZagTrajectory : TrajectoryConfig
         }
 
         // Combine main direction + zigzag offset
-        Vector2 position = mainDirection * (mainProgress - totalLength * 0.5f)
-                         + perpendicular * zigzagOffset;
+        Vector2 position = start + mainDirection * mainProgress + perpendicular * zigzagOffset;
 
         // Apply boundary radius if needed
         if (normalizeToRadius && boundaryRadius > 0f)
@@ -84,12 +94,17 @@ public class ZigZagTrajectory : TrajectoryConfig
 
         direction = Mathf.Repeat(direction, 360f);
         amplitude = Mathf.Max(0f, amplitude);
-        totalLength = Mathf.Max(0f, totalLength);
+        gap = Mathf.Max(0f, gap);
         zigzagCount = Mathf.Max(1, zigzagCount);
+
+        // Calculate total length for display
+        float rad = direction * Mathf.Deg2Rad;
+        float sizeAlongDirection = Mathf.Abs(Mathf.Cos(rad)) * beatSize.x + Mathf.Abs(Mathf.Sin(rad)) * beatSize.y;
+        float totalLength = (beatCount * sizeAlongDirection) + ((beatCount - 1) * gap);
 
         // Update trajectory name
         string patternName = pattern == ZigZagPattern.Sharp ? "Sharp" : "Smooth";
-        trajectoryName = $"ZigZag {zigzagCount}x ({patternName})";
+        trajectoryName = $"ZigZag {zigzagCount}x ({patternName}, gap={gap:F0}, total={totalLength:F0})";
     }
 #endif
 }

@@ -16,7 +16,7 @@ MonoBehaviour:
   boundaryRadius: 500
   normalizeToRadius: 0
   beatCount: 10
-  beatInterval: 1
+  beatInterval: 0.5
   beatSize: {x: 100, y: 100}
   angle: 0
   gap: 40
