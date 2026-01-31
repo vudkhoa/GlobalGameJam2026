@@ -17,13 +17,13 @@ MonoBehaviour:
   ShaderProperties:
   - PropertyName: _BlurAmount
     DisplayName: Blur Amount
-    InitialValue: -10
+    InitialValue: -5
     TargetValue: 0
     MinValue: 0
     MaxValue: 10
   - PropertyName: _DistortionAmount
     DisplayName: Distortion Amount
-    InitialValue: 10
+    InitialValue: 5
     TargetValue: 0
     MinValue: 0
     MaxValue: 10

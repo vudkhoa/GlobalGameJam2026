@@ -17,7 +17,7 @@ MonoBehaviour:
   ShaderProperties:
   - PropertyName: _BlurAmount
     DisplayName: "Blur Amount (\u0110\u1ED9 m\u1EDD)"
-    InitialValue: 10
+    InitialValue: 5
     TargetValue: 0
     MinValue: 0
     MaxValue: 10

@@ -311,7 +311,7 @@ MonoBehaviour:
   _container: {fileID: 7823490392245008238}
   _handle: {fileID: 4032918638490236301}
   _dragPixelSteps: 80
-  _valueStep: 0.1
+  _valueStep: 0.5
   _pixelsPerUnit: 80
   _inertiaDuration: 0.5
   _snapDuration: 1
