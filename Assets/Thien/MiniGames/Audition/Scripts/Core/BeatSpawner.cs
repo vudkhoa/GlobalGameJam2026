@@ -4,20 +4,17 @@ using UnityEngine;
 
 public class BeatSpawner : MonoBehaviour
 {
+    [Header("Configurations")]
+    [SerializeField] private BeatConfig _beatConfig;
+
     [Header("References")]
     [SerializeField] private BeatCirclePool _beatPool;
     [SerializeField] private Transform _beatContainer;
 
-    private BeatConfig _beatConfig;
     private List<BeatData> _currentBeats;
     private int _currentBeatIndex = 0;
 
     public event Action<BeatCircle> OnBeatSpawned;
-
-    public void Initialize(BeatConfig beatConfig)
-    {
-        _beatConfig = beatConfig;
-    }
 
     // ✅ NEW: Cho phép update BeatConfig runtime
     public void UpdateBeatConfig(BeatConfig beatConfig)
