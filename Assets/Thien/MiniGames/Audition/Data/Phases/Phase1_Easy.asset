@@ -18,5 +18,6 @@ MonoBehaviour:
   trajectoryConfigs:
   - {fileID: 11400000, guid: 6e9e5a27b53eb3b4cb18f406f0301a75, type: 2}
   - {fileID: 11400000, guid: 4d05b8dfd35309c42af5e6ee5f8a40a9, type: 2}
+  - {fileID: 11400000, guid: 52a7f8ed4b1ea4343b6adc63abcc9452, type: 2}
   pauseDuration: 2
   animationTrigger: 
