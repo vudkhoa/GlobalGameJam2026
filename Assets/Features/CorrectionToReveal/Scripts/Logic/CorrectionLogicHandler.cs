@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Main logic handler for correction mini-game
 /// Coordinates between data, validation, and rendering
+/// Works with dynamic shader parameters
 /// </summary>
 public class CorrectionLogicHandler
 {
@@ -28,31 +29,21 @@ public class CorrectionLogicHandler
     }
 
     /// <summary>
-    /// Update blur amount and check for completion
+    /// Update any shader parameter by property name
     /// </summary>
-    public void UpdateBlurAmount(float value)
+    public void UpdateParameter(string propertyName, float value)
     {
-        _data.BlurAmount = value;
-        _shaderApplier.ApplyBlurAmount(value);
+        _data.UpdateParameter(propertyName, value);
+        _shaderApplier.ApplyParameter(propertyName, value);
         CheckCompletion();
     }
 
     /// <summary>
-    /// Update horizontal scale and check for completion
-    /// </summary>
-    public void UpdateHorizontalScale(float value)
-    {
-        _data.HorizontalScale = value;
-        _shaderApplier.ApplyHorizontalScale(value);
-        CheckCompletion();
-    }
-
-    /// <summary>
-    /// Initialize shader with current data values
+    /// Initialize shader with all current parameter values
     /// </summary>
     public void Initialize()
     {
-        _shaderApplier.ApplyAllParameters(_data);
+        _shaderApplier.ApplyAllParameters(_data.Parameters);
         _isComplete = false;
     }
 
@@ -64,10 +55,13 @@ public class CorrectionLogicHandler
         float progress = _validator.GetProgress();
         OnProgressChanged?.Invoke(progress);
 
+        Debug.Log("Checking completion: " + progress);
+
         if (!_isComplete && _validator.IsCorrect())
         {
             _isComplete = true;
             OnCorrectionComplete?.Invoke();
+            Debug.Log("Correction Complete!");
         }
     }
 

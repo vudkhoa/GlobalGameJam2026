@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< Updated upstream:Assets/Features/Drag.meta
-guid: 9c302f873ffe91144acf96e4ca285938
-========
 guid: d5c2ef0d9d0f0f947986952a5ca9dd16
->>>>>>>> Stashed changes:Assets/Features/Drag/Prefabs.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

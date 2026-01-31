@@ -2,52 +2,43 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Factory for creating shader parameters
-/// Makes it easy to extend with more parameters
+/// Factory for creating shader parameters dynamically
+/// Automatically detects and creates parameters from settings
 /// </summary>
 public static class ShaderParameterFactory
 {
     /// <summary>
-    /// Create blur parameter
+    /// Create all shader parameters from settings
+    /// This is the SINGLE SOURCE OF TRUTH for all adjustable parameters
+    /// Add new parameters here to automatically spawn rulers for them
     /// </summary>
-    public static ShaderParameter CreateBlurParameter(float current, float target)
+    public static List<ShaderParameter> CreateAllParameters(CorrectionSettings settings)
     {
-        return new ShaderParameter(
-            propertyName: "_BlurAmount",
-            displayName: "Blur Amount",
-            minValue: 0f,
-            maxValue: 10f,
-            currentValue: current,
-            targetValue: target
-        );
-    }
+        var parameters = new List<ShaderParameter>();
 
-    /// <summary>
-    /// Create horizontal scale parameter
-    /// </summary>
-    public static ShaderParameter CreateHorizontalScaleParameter(float current, float target)
-    {
-        return new ShaderParameter(
-            propertyName: "_HorizontalScale",
-            displayName: "Horizontal Scale",
-            minValue: 0.1f,
-            maxValue: 3f,
-            currentValue: current,
-            targetValue: target
-        );
-    }
+        if (settings == null || settings.ShaderProperties == null)
+            return parameters;
 
-    /// <summary>
-    /// Create all default parameters from settings
-    /// </summary>
-    public static List<ShaderParameter> CreateDefaultParameters(CorrectionSettings settings)
-    {
-        var parameters = new List<ShaderParameter>
+        foreach (var prop in settings.ShaderProperties)
         {
-            CreateBlurParameter(settings.InitialBlurAmount, settings.TargetBlurAmount),
-            CreateHorizontalScaleParameter(settings.InitialHorizontalScale, settings.TargetHorizontalScale)
-        };
+            parameters.Add(new ShaderParameter(
+                propertyName: prop.PropertyName,
+                displayName: prop.DisplayName,
+                minValue: prop.MinValue,
+                maxValue: prop.MaxValue,
+                currentValue: prop.InitialValue,
+                targetValue: prop.TargetValue
+            ));
+        }
 
         return parameters;
+    }
+
+    /// <summary>
+    /// Get the count of adjustable parameters
+    /// </summary>
+    public static int GetParameterCount(CorrectionSettings settings)
+    {
+        return CreateAllParameters(settings).Count;
     }
 }

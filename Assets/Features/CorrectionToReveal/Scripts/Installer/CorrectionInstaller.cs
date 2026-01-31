@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// Main installer for Correction mini-game
 /// Dependency Injection container
-/// Follows Single Responsibility Principle
+/// Automatically spawns rulers based on shader parameters
 /// </summary>
 public class CorrectionInstaller : MonoBehaviour
 {
@@ -11,10 +12,7 @@ public class CorrectionInstaller : MonoBehaviour
     [SerializeField] private CorrectionSettings _settings;
 
     [Header("UI")]
-    [SerializeField] private CorrectionUIController _uiController;
-
-    [Header("Rendering")]
-    [SerializeField] private Renderer _targetRenderer;
+    [SerializeField] private Transform _rulerContainer;
 
     // Dependencies
     private CorrectionData _data;
@@ -22,6 +20,11 @@ public class CorrectionInstaller : MonoBehaviour
     private ShaderParameterApplier _shaderApplier;
     private CorrectionLogicHandler _logicHandler;
     private RulerSpawner _rulerSpawner;
+
+    public CorrectionLogicHandler LogicHandler => _logicHandler;
+
+    // Shader parameters (dynamically created)
+    private List<ShaderParameter> _shaderParameters;
 
     private void Start()
     {
@@ -41,71 +44,33 @@ public class CorrectionInstaller : MonoBehaviour
             return;
         }
 
-        // Create data
-        _data = new CorrectionData
-        {
-            BlurAmount = _settings.InitialBlurAmount,
-            HorizontalScale = _settings.InitialHorizontalScale,
-            TargetBlurAmount = _settings.TargetBlurAmount,
-            TargetHorizontalScale = _settings.TargetHorizontalScale,
-            Tolerance = _settings.Tolerance
-        };
+        // Create shader parameters from factory (SINGLE SOURCE OF TRUTH)
+        _shaderParameters = ShaderParameterFactory.CreateAllParameters(_settings);
+
+        Debug.Log($"[CorrectionInstaller] Created {_shaderParameters.Count} shader parameters");
+
+        // Create data and initialize with parameters
+        _data = new CorrectionData();
+        _data.Initialize(_shaderParameters, _settings.Tolerance);
 
         // Create validator
         _validator = new CorrectionValidator(_data);
 
-        // Get material from renderer or settings
-        Material material = GetMaterial();
-        if (material == null)
-        {
-            Debug.LogError("Material not found!");
-            return;
-        }
-
-        // Apply texture to material if provided
-        if (_settings.TargetTexture != null)
-        {
-            material.mainTexture = _settings.TargetTexture;
-        }
-
-        // Create shader applier
-        _shaderApplier = new ShaderParameterApplier(
-            material,
-            _settings.BlurPropertyName,
-            _settings.ScalePropertyName
-        );
+        // Create shader applier (simplified constructor)
+        _shaderApplier = new ShaderParameterApplier(_settings.CorrectionMaterial);
 
         // Create logic handler
         _logicHandler = new CorrectionLogicHandler(_data, _validator, _shaderApplier);
 
         // Subscribe to events
         _logicHandler.OnCorrectionComplete += OnCorrectionComplete;
-        _logicHandler.OnProgressChanged += OnProgressChanged;
 
         // Create ruler spawner
         _rulerSpawner = new RulerSpawner(
             _settings.RulerPrefab,
-            _uiController.RulerContainer,
+            _rulerContainer,
             _settings.RulerSpacing
         );
-
-        // Initialize UI
-        _uiController.Initialize(_rulerSpawner);
-    }
-
-    /// <summary>
-    /// Get material from renderer or settings
-    /// </summary>
-    private Material GetMaterial()
-    {
-        if (_targetRenderer != null)
-        {
-            // Create instance to avoid modifying shared material
-            _targetRenderer.material = new Material(_settings.CorrectionMaterial);
-            return _targetRenderer.material;
-        }
-
-        return _settings.CorrectionMaterial;
     }
 
     /// <summary>
@@ -122,32 +87,42 @@ public class CorrectionInstaller : MonoBehaviour
         // Initialize logic
         _logicHandler.Initialize();
 
-        // Spawn rulers for each parameter
-        SpawnRulers();
+        // Spawn rulers dynamically based on parameters
+        SpawnRulersDynamically();
     }
 
     /// <summary>
-    /// Spawn ruler UI elements based on shader parameters
+    /// ⭐ DYNAMIC RULER SPAWNING ⭐
+    /// Automatically spawns rulers based on shader parameters
+    /// This is the KEY feature - no hard-coding needed!
     /// </summary>
-    private void SpawnRulers()
+    private void SpawnRulersDynamically()
     {
-        // Ruler 1: Blur Amount
-        _rulerSpawner.SpawnRuler(
-            "Blur Amount",
-            0f,
-            10f,
-            _data.BlurAmount,
-            (value) => _logicHandler.UpdateBlurAmount(value)
-        );
+        Debug.Log($"[CorrectionInstaller] Spawning {_shaderParameters.Count} rulers...");
 
-        // Ruler 2: Horizontal Scale
-        _rulerSpawner.SpawnRuler(
-            "Horizontal Scale",
-            0.1f,
-            3f,
-            _data.HorizontalScale,
-            (value) => _logicHandler.UpdateHorizontalScale(value)
-        );
+        foreach (var param in _shaderParameters)
+        {
+            // Spawn a ruler for each parameter
+            _rulerSpawner.SpawnRuler(
+                label: param.DisplayName,
+                minValue: param.MinValue,
+                maxValue: param.MaxValue,
+                currentValue: param.CurrentValue,
+                onValueChanged: (value) => OnParameterChanged(param.PropertyName, value)
+            );
+
+            Debug.Log($"[CorrectionInstaller] Spawned ruler for: {param.DisplayName} ({param.PropertyName})");
+        }
+
+        Debug.Log($"[CorrectionInstaller] ✅ Successfully spawned {_shaderParameters.Count} rulers!");
+    }
+
+    /// <summary>
+    /// Called when any parameter value changes from UI
+    /// </summary>
+    private void OnParameterChanged(string propertyName, float value)
+    {
+        _logicHandler.UpdateParameter(propertyName, value);
     }
 
     /// <summary>
@@ -156,15 +131,6 @@ public class CorrectionInstaller : MonoBehaviour
     private void OnCorrectionComplete()
     {
         Debug.Log("Correction Complete!");
-        _uiController.ShowCompletion();
-    }
-
-    /// <summary>
-    /// Called when progress changes
-    /// </summary>
-    private void OnProgressChanged(float progress)
-    {
-        _uiController.UpdateProgress(progress);
     }
 
     private void OnDestroy()
@@ -173,10 +139,6 @@ public class CorrectionInstaller : MonoBehaviour
         if (_logicHandler != null)
         {
             _logicHandler.OnCorrectionComplete -= OnCorrectionComplete;
-            _logicHandler.OnProgressChanged -= OnProgressChanged;
         }
-
-        // Clear UI
-        _uiController?.Clear();
     }
 }
