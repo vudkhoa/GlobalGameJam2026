@@ -29,7 +29,7 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         }
         else
         {
-            Debug.LogError("[GameLoopCTR] CorrectionInstaller reference is missing!");
+            // CorrectionInstaller reference is missing
         }
     }
 
@@ -82,8 +82,6 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         // Return 0 as default score
         OnGameCompleted?.Invoke(0);
         GetComponentInParent<BaseTask>()?.CompletedTask();
-
-        Debug.Log("[GameLoopCTR] Game Ended");
     }
 
     private async void HandleCorrectionComplete()
@@ -103,8 +101,6 @@ public class GameLoopCTR : MonoBehaviour, IGameLoop
         // Try to advance to next level using the Installer
         if (_installer != null && _installer.AdvanceLevel())
         {
-            Debug.Log("[GameLoopCTR] Level Complete! Advancing to next level...");
-
             // Restart game loop for new level (This triggers StartGame -> PlayLevelStart)
             StartGame();
         }

@@ -25,7 +25,7 @@ public class ShaderParameterApplier
         }
         else
         {
-            Debug.LogWarning($"Material does not have property: {propertyName}");
+            // Material does not have property
         }
     }
 
@@ -36,7 +36,6 @@ public class ShaderParameterApplier
     {
         if (_material == null)
         {
-            Debug.LogError("Material is null!");
             return;
         }
 

@@ -69,7 +69,6 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     {
         if (matrixSize.x <= 0 || matrixSize.y <= 0)
         {
-            Debug.LogWarning("matrixSize is invalid!");
             return;
         }
 
@@ -117,7 +116,6 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     {
         if (dragComponenets == null || dragComponenets.Length == 0)
         {
-            Debug.LogWarning("dragComponenets array is null or empty!");
             return 0f;
         }
 
@@ -154,7 +152,6 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     {
         if (dragComponenets == null || dragComponenets.Length == 0)
         {
-            Debug.LogWarning("dragComponenets array is null or empty!");
             return 0f;
         }
 
@@ -197,13 +194,11 @@ public class DragComponentController : MonoSingleton<DragComponentController>
 
         if (index1 < 0 || index1 >= dragComponenets.Length || index2 < 0 || index2 >= dragComponenets.Length)
         {
-            Debug.LogWarning($"Invalid indices: {index1}, {index2}");
             return float.MaxValue;
         }
 
         if (dragComponenets[index1] == null || dragComponenets[index2] == null)
         {
-            Debug.LogWarning("One or both components are null!");
             return float.MaxValue;
         }
 
@@ -212,7 +207,6 @@ public class DragComponentController : MonoSingleton<DragComponentController>
 
         if (rectTransform1 == null || rectTransform2 == null)
         {
-            Debug.LogWarning("One or both RectTransforms are null!");
             return float.MaxValue;
         }
 

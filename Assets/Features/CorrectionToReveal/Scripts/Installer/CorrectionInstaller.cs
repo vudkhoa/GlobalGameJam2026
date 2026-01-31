@@ -69,7 +69,7 @@ public class CorrectionInstaller : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[CorrectionInstaller] No levels configured!");
+            // No levels configured
         }
     }
 
@@ -99,7 +99,6 @@ public class CorrectionInstaller : MonoBehaviour
         if (settings == null) return;
 
         _currentLevelIndex = index;
-        Debug.Log($"[CorrectionInstaller] Loading Level {_currentLevelIndex + 1}/{_levels.Count}: {settings.name}");
 
         // 1. Cleanup Old Visuals (Prevent Memory Leaks)
         CleanupGeneratesAssets();
@@ -203,7 +202,6 @@ public class CorrectionInstaller : MonoBehaviour
 
     private void OnCorrectionComplete()
     {
-        Debug.Log($"[CorrectionInstaller] Level {_currentLevelIndex + 1} Complete!");
     }
 
     private void OnDestroy()

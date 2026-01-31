@@ -198,15 +198,6 @@ public class ScoreServiceOSU : IScoreService
 
     public void LogStats()
     {
-        Debug.Log("═══════════════════════════════════════════════════════");
-        Debug.Log($"[ScoreServiceOSU] STATISTICS");
-        Debug.Log($"Total Score: {_totalScore}");
-        Debug.Log($"Max Combo: {_maxCombo}");
-        Debug.Log($"Accuracy: {GetAccuracy():F2}%");
-        Debug.Log($"Perfect: {GetJudgementCount(JudgementType.Perfect)}");
-        Debug.Log($"Good: {GetJudgementCount(JudgementType.Good)}");
-        Debug.Log($"OK: {GetJudgementCount(JudgementType.OK)}");
-        Debug.Log($"Miss: {GetJudgementCount(JudgementType.Miss)}");
-        Debug.Log("═══════════════════════════════════════════════════════");
+        // Statistics logging removed for production
     }
 }
