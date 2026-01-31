@@ -6,18 +6,8 @@ public class StateLevelComplete : PuzzleState
 
     public override async UniTask Enter()
     {
-        // Chờ 1.5 giây (dùng UniTask.Delay)
-        await UniTask.Delay(1500);
-
-        if (_controller.HasMoreLevels())
-        {
-            // Còn màn -> Chuyển cảnh
-            _controller.SwitchState(new StateTransitioning(_controller));
-        }
-        else
-        {
-            // Hết màn -> Chọn kết thúc
-            _controller.SwitchState(new StateEndingChoice(_controller));
-        }
+        await UniTask.Yield();
     }
+
+    public override bool CanInteract() => false;
 }

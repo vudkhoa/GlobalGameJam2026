@@ -14,7 +14,7 @@ public class StatePlaying : PuzzleState
 
     public void OnLevelCleared()
     {
-        // Chuyển sang State chờ (LevelComplete)
         _controller.SwitchState(new StateLevelComplete(_controller));
+        _controller.SignalLevelCompleted();
     }
 }

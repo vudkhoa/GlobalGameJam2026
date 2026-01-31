@@ -41,23 +41,13 @@ public class ChapterFlowManager : MonoBehaviour
 
     private UniTaskCompletionSource<bool> _chapterCompletionSource;
 
-    // async UniTaskVoid Start()
-    // {
-    //     var token = this.GetCancellationTokenOnDestroy();
-
-    //     SetupInitialState();
-
-    //     if (skipIntro)
-    //     {
-    //         SkipIntroSequence();
-    //     }
-    //     else
-    //     {
-    //         await PlayIntroSequence(token);
-    //     }
-
-    //     puzzleController.StartGameManually();
-    // }
+    public async UniTask PlayIntroOnlyAsync()
+    {
+        var token = this.GetCancellationTokenOnDestroy();
+        SetupInitialState();
+        
+        await PlayIntroSequence(token);
+    }
 
     public async UniTask RunChapterSequence()
     {

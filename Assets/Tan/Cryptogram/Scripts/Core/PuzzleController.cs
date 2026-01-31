@@ -60,6 +60,8 @@ public class PuzzleController : MonoBehaviour
     private List<char> _uniqueHiddenChars = new List<char>();
     private JournalSlotView _focusedSlot;
 
+    private UniTaskCompletionSource<bool> _levelCompletionSource;
+
     // ========================================================================
     // 1. KHỞI TẠO & FSM
     // ========================================================================
@@ -76,6 +78,14 @@ public class PuzzleController : MonoBehaviour
         SwitchState(new StatePlaying(this));
     }
 
+    public void SignalLevelCompleted()
+    {
+        if (_levelCompletionSource != null)
+        {
+            _levelCompletionSource.TrySetResult(true);
+        }
+    }
+
     void Update() => _currentState?.Update();
 
     public void SwitchState(PuzzleState newState) => RunStateTransition(newState).Forget();
@@ -90,6 +100,19 @@ public class PuzzleController : MonoBehaviour
     // ========================================================================
     // 2. CORE LOGIC: LOAD LEVEL (CRYPTOGRAM STYLE)
     // ========================================================================
+
+    public void LoadLevelDataOnly(int index)
+    {
+        CurrentLevelIndex = index;
+        LoadLevelRaw(index); 
+    }
+
+    public async UniTask RunLevelAndWaitAsync()
+    {
+        _levelCompletionSource = new UniTaskCompletionSource<bool>();
+        SwitchState(new StatePlaying(this));
+        await _levelCompletionSource.Task;
+    }
 
     public void LoadLevelRaw(int index)
     {
@@ -144,13 +167,16 @@ public class PuzzleController : MonoBehaviour
                 _uniqueHiddenChars.Add(upperC);
             }
         }
-        
+
         GenerateJournalUI(levelData.sentence);
 
         BuildFullKeyboard();
 
-        LayoutRebuilder.ForceRebuildLayoutImmediate(journalContainer as RectTransform);
-        LayoutRebuilder.ForceRebuildLayoutImmediate(wordPoolContainer as RectTransform);
+        journalContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
+        wordPoolContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
+
+        // LayoutRebuilder.ForceRebuildLayoutImmediate(journalContainer as RectTransform);
+        // LayoutRebuilder.ForceRebuildLayoutImmediate(wordPoolContainer as RectTransform);
 
         var firstEmptySlot = _activeSlots.FirstOrDefault(s => !s.IsFilled);
         if (firstEmptySlot != null)
@@ -217,9 +243,7 @@ public class PuzzleController : MonoBehaviour
     {
         GameObject slotObj = Instantiate(journalSlotPrefab, parent);
         JournalSlotView slotView = slotObj.GetComponent<JournalSlotView>();
-        // Giả sử JournalSlotView của bạn đã có hàm SetupLetter như thảo luận trước
         slotView.SetupLetter(content, number, isHidden);
-
         if (isHidden) _activeSlots.Add(slotView);
     }
 
@@ -411,20 +435,17 @@ public class PuzzleController : MonoBehaviour
 
     private void CheckWinCondition()
     {
-        // Nếu tất cả các ô ẩn đã được điền hết
         if (_activeSlots.All(s => s.IsFilled))
         {
             PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
 
             if (currentData.phaseType == PuzzlePhase.Glitch)
             {
-                // Nếu là màn Glitch -> Chạy hiệu ứng kinh dị
                 var lastSlot = _activeSlots.Last(); 
                 HandleGlitchEffect(lastSlot).Forget();
             }
             else
             {
-                // Nếu là màn thường -> Thắng
                 if (_currentState is StatePlaying playingState)
                     playingState.OnLevelCleared();
             }
@@ -508,7 +529,12 @@ public class PuzzleController : MonoBehaviour
     {
         PlayerDecision decision = (choiceIndex == 0) ? PlayerDecision.Denial : PlayerDecision.Acceptance;
         Debug.Log($"Chosen ending: {decision}");
+        if (_levelCompletionSource != null)
+        {
+            _levelCompletionSource.TrySetResult(true);
+        }
         choiceView.gameObject.SetActive(false);
         if (flowManager != null) flowManager.TriggerOutro(decision);
+        
     }
 }

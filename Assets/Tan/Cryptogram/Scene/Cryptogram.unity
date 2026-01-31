@@ -402,12 +402,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d08d5a99c5cabd94cbb15043f9999e9c, type: 2}
   - {fileID: 11400000, guid: e2a57f74484ee5c4491f1736e085fc7c, type: 2}
   - {fileID: 11400000, guid: d368bf04b45c7b54d892957215cc4e1a, type: 2}
+  <CurrentLevelIndex>k__BackingField: 0
   journalContainer: {fileID: 517979210}
   wordPoolContainer: {fileID: 1912304368}
   lineRowPrefab: {fileID: 999716889323441029, guid: c256500458b185149b5e45ed85641139, type: 3}
   journalSlotPrefab: {fileID: 4658952754952145826, guid: 4c0481898415a0f468aadbb3f51fc484, type: 3}
   wordOptionPrefab: {fileID: 6865801012765633517, guid: e298ac9fa9fc6ab449064e138a8ac369, type: 3}
   spacePrefab: {fileID: 8557264914991951504, guid: b48f38099bad8f1449264c6a53128fbb, type: 3}
+  _activeSlots: []
+  _uniqueHiddenChars: []
+  _focusedSlot: {fileID: 0}
 --- !u!4 &109010700
 Transform:
   m_ObjectHideFlags: 0
@@ -1237,7 +1241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tasks:
-  - {fileID: 837095234}
+  - {fileID: 0}
 --- !u!4 &695564118
 Transform:
   m_ObjectHideFlags: 0
