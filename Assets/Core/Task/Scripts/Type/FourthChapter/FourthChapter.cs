@@ -7,10 +7,11 @@ public class FourthChapter : BaseTask
 
     public override async UniTask Execute()
     {
-        foreach (var task in tasks)
+        List<UniTask> taskList = new List<UniTask>();
+        foreach (BaseTask task in tasks)
         {
-            if (task == null) continue;
-            await task.Execute();
+            taskList.Add(UniTask.WaitUntil(() => task.doneTask));
         }
+        await UniTask.WhenAll(taskList);
     }
 }

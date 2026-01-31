@@ -3,15 +3,9 @@ using System.Threading.Tasks;
 
 public class LogicTask : BaseTask
 {
-    public bool doneTask;
-    private void Awake()
+    public override UniTask Execute() 
     {
-        doneTask = false;
-    }
-
-    public override async UniTask Execute() 
-    {
-        await UniTask.WaitUntil(() => doneTask == true);
+        return UniTask.WaitUntil(() => doneTask == true);
     }
 
     public async Task ExecuteAsyncTask(float time)

@@ -25,40 +25,17 @@ public class UIScreenManager : MonoBehaviour
 
     private async void ExcuteTask()
     {
+        int count = 0;
         foreach (var uiScreen in uiScreens)
         {
+            count++;
             await uiScreen.chapterScreenManager.Execute();
+            if (count < uiScreens.Count)
+            {
+                LoadNextUIScene();
+            }
         }
-        LoadNextUIScene();
     }
-
-    /*private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            LoadUIScreen(uiScreens[1]);
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            LoadUIScreen(uiScreens[2]);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            LoadUIScreen(uiScreens[3]);
-        }
-        else if (Input.GetKeyDown(KeyCode.F))
-        {
-            LoadUIScreen(uiScreens[4]);
-        }
-        else if (Input.GetKeyDown(KeyCode.G))
-        {
-            LoadUIScreen(uiScreens[5]);
-        }
-        else if (Input.GetKeyDown(KeyCode.H))
-        {
-            LoadUIScreen(uiScreens[6]);
-        }
-    }*/
 
     private void CacheScreens()
     {
