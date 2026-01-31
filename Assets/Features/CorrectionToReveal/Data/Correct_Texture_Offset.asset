@@ -10,23 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1de3483d80d5128498fc859a66bb66b2, type: 3}
-  m_Name: Correct_Disort
+  m_Name: Correct_Texture_Offset
   m_EditorClassIdentifier: 
-  CorrectionMaterial: {fileID: 2100000, guid: 628174bc19b9e4449b8ef5a313f3aad6, type: 2}
+  CorrectionMaterial: {fileID: 2100000, guid: 137b1c3edf3d3b44d9c2092a7f9e43ca, type: 2}
   TargetTexture: {fileID: 2800000, guid: 9553eda5f988062468143f72d7f495f9, type: 3}
   ShaderProperties:
-  - PropertyName: _HorizontalWave
-    DisplayName: Horizontal Wave
-    InitialValue: 1
-    TargetValue: 1
+  - PropertyName: _OffsetX
+    DisplayName: Offset X
+    InitialValue: 0
+    TargetValue: 0
+    MinValue: -0.1
+    MaxValue: 0.1
+  - PropertyName: _OffsetY
+    DisplayName: Offset Y
+    InitialValue: 0
+    TargetValue: 0
+    MinValue: -0.1
+    MaxValue: 0.1
+  - PropertyName: _Opacity
+    DisplayName: Opacity
+    InitialValue: 0.5
+    TargetValue: 0.5
     MinValue: 0
-    MaxValue: 10
-  - PropertyName: _VerticalWave
-    DisplayName: Vertical Wave
-    InitialValue: 1
-    TargetValue: 1
-    MinValue: 0
-    MaxValue: 10
+    MaxValue: 1
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150

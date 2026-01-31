@@ -78,6 +78,10 @@ public class CorrectionSettings : ScriptableObject
             // Only care about Float and Range properties for rulers
             if (type == ShaderUtil.ShaderPropertyType.Float || type == ShaderUtil.ShaderPropertyType.Range)
             {
+                // Skip hidden properties
+                if (ShaderUtil.IsShaderPropertyHidden(shader, i))
+                    continue;
+
                 string propName = ShaderUtil.GetPropertyName(shader, i);
                 string displayName = ShaderUtil.GetPropertyDescription(shader, i);
 
