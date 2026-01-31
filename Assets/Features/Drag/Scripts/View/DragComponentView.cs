@@ -23,7 +23,7 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
     private Tween _shakeTween;
     private Vector2 _currentDirection;
     private DragComponentController _controller;
-    private Canvas _canvas;
+    private RectTransform _controllerRectTransform;
     private bool _hasBeenInteracted = false; // Flag để check đã tương tác chưa
     private float _shakeStrength;
     private float _shakeDuration;
@@ -44,7 +44,7 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
         returnSpeed = DragComponentController.Instance.MoveSpeed;
         _shakeStrength = DragComponentController.Instance.ShakeStrength;
         _shakeDuration = DragComponentController.Instance.ShakeDuration;
-        _canvas = DragComponentController.Instance.CanvasRef;
+        _controllerRectTransform = DragComponentController.Instance.RectTransformRef;
     }
 
     private void Update()
@@ -110,7 +110,7 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
     /// </summary>
     private void MoveToRandomEdge()
     {
-        if (rectTransform == null || _canvas == null)
+        if (rectTransform == null || _controllerRectTransform == null)
         {
             return;
         }
@@ -166,7 +166,7 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
     /// </summary>
     private void MoveToRandomEdgeFromEdge()
     {
-        if (rectTransform == null || _canvas == null)
+        if (rectTransform == null || _controllerRectTransform == null)
         {
             _isMoving = false;
             _moveTween = null;

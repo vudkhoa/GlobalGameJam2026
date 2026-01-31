@@ -10,16 +10,18 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     [SerializeField] private Vector2Int matrixSize;
     [SerializeField] private Vector2 dragComponentSize;
     [SerializeField] private Vector2 offset;
-    
-    [SerializeField] private Canvas canvas;
-    public Canvas CanvasRef => canvas;
 
+    [SerializeField] private RectTransform rectTransform;
+    public RectTransform RectTransformRef => rectTransform;
 
     [SerializeField] private float awaitDuration;
     public float AwaitDuration => awaitDuration;
 
     [SerializeField] private float moveSpeed;
     public float MoveSpeed => moveSpeed;
+
+    [SerializeField] private float winMoveDuration = 1f; // Thời gian di chuyển khi Win (tất cả cùng lúc)
+    public float WinMoveDuration => winMoveDuration;
 
     [Header(" Shake Settings ")]
     [SerializeField] private float shakeStrength = 5f; // Độ mạnh của shake
@@ -47,6 +49,7 @@ public class DragComponentController : MonoSingleton<DragComponentController>
 
     private async void Awake()
     {
+        rectTransform = gameObject.GetComponent<RectTransform>();
         InitPictures();
     }
 
@@ -301,13 +304,9 @@ public class DragComponentController : MonoSingleton<DragComponentController>
                     centerCurrentPos.x + (avgWidth * colOffset),
                     centerCurrentPos.y - (avgHeight * rowOffset)
                 );
-                
-                // Tính khoảng cách và thời gian di chuyển
-                float distance = Vector2.Distance(rectTransform.anchoredPosition, targetPos);
-                float duration = distance / moveSpeed;
 
-                // Di chuyển đến vị trí đúng
-                rectTransform.DOAnchorPos(targetPos, duration)
+                // Di chuyển đến vị trí đúng với cùng duration (tất cả cùng lúc)
+                rectTransform.DOAnchorPos(targetPos, winMoveDuration)
                     .SetEase(Ease.OutQuad);
             }
         }
