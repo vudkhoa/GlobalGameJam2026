@@ -13,7 +13,7 @@ public class UIScreenManager : MonoBehaviour
     private Dictionary<string, RectTransform> _uiScreens = new();
     private int curIndex;
 
-    private void Start()
+    private void OnEnable()
     {
         CacheScreens();
 

@@ -10,4 +10,4 @@ public class ActiveObjectTask : BaseTask
         _target.SetActive(true);
         return UniTask.WaitUntil(() => doneTask == true);
     }
-}
+}   
