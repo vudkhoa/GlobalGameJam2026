@@ -183,6 +183,7 @@ GameObject:
   m_Component:
   - component: {fileID: 125966500933652925}
   - component: {fileID: 8519304762065470814}
+  - component: {fileID: 316190992854433447}
   m_Layer: 5
   m_Name: Game_Correction
   m_TagString: Untagged
@@ -226,6 +227,19 @@ MonoBehaviour:
   _settings: {fileID: 11400000, guid: fa30eceffd2bfe448829b1591fec6510, type: 2}
   _rulerContainer: {fileID: 3232815133378201940}
   _targetRenderer: {fileID: 0}
+--- !u!114 &316190992854433447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5006260023295861163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 810dcc54bda55af45ba58b6d4e7ac797, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _installer: {fileID: 8519304762065470814}
 --- !u!1 &8893405034422183421
 GameObject:
   m_ObjectHideFlags: 0

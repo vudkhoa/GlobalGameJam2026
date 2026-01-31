@@ -55,10 +55,13 @@ public class CorrectionLogicHandler
         float progress = _validator.GetProgress();
         OnProgressChanged?.Invoke(progress);
 
+        Debug.Log("Checking completion: " + progress);
+
         if (!_isComplete && _validator.IsCorrect())
         {
             _isComplete = true;
             OnCorrectionComplete?.Invoke();
+            Debug.Log("Correction Complete!");
         }
     }
 

@@ -311,10 +311,10 @@ MonoBehaviour:
   _container: {fileID: 7823490392245008238}
   _handle: {fileID: 4032918638490236301}
   _pixelsPerUnit: 100
-  _inertiaDuration: 1
+  _inertiaDuration: 0.5
   _snapDuration: 1
   _inertiaEase: 18
-  _snapEase: 27
+  _snapEase: 18
 --- !u!222 &3798832140709769148
 CanvasRenderer:
   m_ObjectHideFlags: 0

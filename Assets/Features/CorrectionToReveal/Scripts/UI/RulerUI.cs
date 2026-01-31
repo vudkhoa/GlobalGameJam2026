@@ -182,6 +182,9 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
         UpdateValueDirectly(_virtualValue);
     }
 
+    [Header("Gameplay Assist")]
+    [SerializeField] private float _magnetThreshold = 0.1f;
+
     private void UpdateValueDirectly(float newVirtualValue)
     {
         // Update stored virtual value (critical for Tween updates)
@@ -189,6 +192,17 @@ public class RulerUI : MonoBehaviour, IDragHandler, IPointerDownHandler, IBeginD
 
         // 1. Calculate Shader Value (PingPong -> Smooth Oscillation)
         float shaderValue = CalculatePingPongValue(_virtualValue);
+
+        // Ensure threshold is valid (fallback if 0 due to serialization)
+        float threshold = _magnetThreshold > 0.001f ? _magnetThreshold : 0.1f;
+
+        // Apply Magnetic Snap to nearest integer
+        float nearestInt = Mathf.Round(shaderValue);
+        if (Mathf.Abs(shaderValue - nearestInt) <= threshold)
+        {
+            shaderValue = nearestInt;
+        }
+
         _onValueChanged?.Invoke(shaderValue);
 
         // 2. Calculate Visual Value (Repeat -> Continuous Slide Loop)
