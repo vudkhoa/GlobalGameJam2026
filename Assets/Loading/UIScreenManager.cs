@@ -1,19 +1,22 @@
 using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class UIScreenManager : MonoSingleton<UIScreenManager>
 {
     [SerializeField] private float transitionDuration = 0.5f;
+    [SerializeField] private List<UIScreenTransition> uiScreens = new();
+    [SerializeField] private int startingScreenIndex = 0;
 
     private RectTransform _currentScreen;
-    private Dictionary<string, RectTransform> _screens = new();
+    private Dictionary<string, RectTransform> _uiScreens = new();
 
     private void Start()
     {
         CacheScreens();
 
-        _currentScreen = (RectTransform) transform.GetChild(0);
+        _currentScreen = uiScreens[startingScreenIndex].rect;
         _currentScreen.gameObject.SetActive(true);
     }
 
@@ -21,50 +24,45 @@ public class UIScreenManager : MonoSingleton<UIScreenManager>
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Load(transform.GetChild(1).name, LoadType.MoveRight);
+            LoadUIScreen(uiScreens[1]);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            Load(transform.GetChild(2).name, LoadType.Fade);
+            LoadUIScreen(uiScreens[2]);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            Load(transform.GetChild(3).name, LoadType.ScaleIn);
+            LoadUIScreen(uiScreens[3]);
         }
         else if (Input.GetKeyDown(KeyCode.F))
         {
-            Load(transform.GetChild(4).name, LoadType.MoveAndFade);
+            LoadUIScreen(uiScreens[4]);
         }
         else if (Input.GetKeyDown(KeyCode.G))
         {
-            Load(transform.GetChild(5).name, LoadType.FadeAndScale);
+            LoadUIScreen(uiScreens[5]);
         }
         else if (Input.GetKeyDown(KeyCode.H))
         {
-            Load(transform.GetChild(6).name, LoadType.ZoomIn);
+            LoadUIScreen(uiScreens[6]);
         }
     }
 
     private void CacheScreens()
     {
-        foreach (Transform child in transform)
+        foreach (UIScreenTransition child in uiScreens)
         {
-            var rect = child.GetComponent<RectTransform>();
-            if (rect == null) continue;
-
-            _screens.Add(child.name, rect);
-            child.gameObject.SetActive(false);
+            child.rect.gameObject.SetActive(false);
         }
     }
 
-    public void Load(string screenName, LoadType loadType)
+    public void LoadUIScreen(UIScreenTransition uIScreen)
     {
-        if (!_screens.TryGetValue(screenName, out var next))
-        {
-            Debug.LogError($"Screen {screenName} not found!");
-            return;
-        }
+        Load(uIScreen.rect, uIScreen.loadType);
+    }
 
+    public void Load(RectTransform next, LoadType loadType)
+    {
         switch (loadType)
         {
             case LoadType.MoveLeft:
@@ -285,4 +283,11 @@ public enum LoadType
 
     ZoomIn,
     ZoomOut
+}
+
+[Serializable]
+public class UIScreenTransition
+{
+    public RectTransform rect;
+    public LoadType loadType;
 }
