@@ -109,7 +109,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
 
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] Initialized at {data.position}, size: {beatSize}");
+
         }
     }
 
@@ -227,7 +227,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     {
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] OnPointerClick - IsActive={IsActive}, HasBeenHit={_hasBeenHit}, CanvasGroup.interactable={_canvasGroup.interactable}");
+
         }
 
         if (!IsActive || _hasBeenHit)
@@ -242,7 +242,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     {
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] OnPointerDown - IsActive={IsActive}, HasBeenHit={_hasBeenHit}, CanvasGroup.interactable={_canvasGroup.interactable}");
+
         }
 
         if (!IsActive || _hasBeenHit)
@@ -263,7 +263,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
 
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] OnTap SUCCESS at {transform.localPosition}");
+
         }
 
         // Set flags FIRST
@@ -290,7 +290,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
 
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] PlayHitFeedback");
+
         }
 
         ShowHitEffectSprite();
@@ -301,7 +301,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     {
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] PlayMissFeedback");
+
         }
 
         _animator.PlayMissAnimation(_innerRing, _outerRing, ReturnToPool);
@@ -346,7 +346,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     {
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] Returning to pool");
+
         }
 
         // Stop all coroutines first
@@ -393,7 +393,7 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
 
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] Animation complete - MISS");
+
         }
 
         // Beat missed - disable immediately

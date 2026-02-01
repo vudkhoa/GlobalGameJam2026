@@ -92,7 +92,7 @@ public class ChapterFlowManager : MonoBehaviour
 
     void SkipIntroSequence()
     {
-        Debug.Log("--- SKIPPING INTRO ---");
+
 
         foreach (var img in introSlides) img.gameObject.SetActive(false);
 
@@ -136,7 +136,7 @@ public class ChapterFlowManager : MonoBehaviour
     {
         if (playDayNightCycle && dayNightController != null)
         {
-            Debug.Log("--- STARTING DAY/NIGHT CYCLE ---");
+
             await dayNightController.PlayDayNightCycleAsync(token);
 
             // Optional: Fade out the Day/Night scene before showing slides
@@ -244,7 +244,7 @@ public class ChapterFlowManager : MonoBehaviour
         
         await UniTask.Delay(4000, cancellationToken: token);
 
-        Debug.Log("--- THE END ---");
+
 
         // _puzzleCompletionSource?.TrySetResult(true);
         // SceneManager.LoadScene("MainMenu");

@@ -84,7 +84,7 @@ public class GameLoopOSU : MonoBehaviour
 
     private void WarmupServices()
     {
-        Debug.Log("[GameLoopOSU] Warming up services...");
+
 
         // 1. Warm Evaluator
         Vector2 dummySize = Vector2.one * 100f;
@@ -101,7 +101,7 @@ public class GameLoopOSU : MonoBehaviour
         _scoreService.GetAccuracy();
         _scoreService.ResetPhaseScore(); // Reset về 0
 
-        Debug.Log("[GameLoopOSU] Services warmup complete!");
+
     }
 
     private void Update()
@@ -137,7 +137,7 @@ public class GameLoopOSU : MonoBehaviour
         // ✅ Wait 1 frame để warmup hoàn tất
         await UniTask.Yield();
 
-        Debug.Log("[GameLoopOSU] Initializing...");
+
 
         // Update beat config
         _beatSpawner.UpdateBeatConfig(_defaultBeatConfig);
@@ -161,7 +161,7 @@ public class GameLoopOSU : MonoBehaviour
 
     private void OnPhaseStarted(PhaseData phase)
     {
-        Debug.Log($"[GameLoopOSU] Phase started: {phase.phaseName}");
+
 
         // ✅ Hiển thị phase background + blur khi bắt đầu phase
         if (_blurEffect != null)
@@ -186,7 +186,7 @@ public class GameLoopOSU : MonoBehaviour
 
     private async void OnPhaseEnded(PhaseData phase, int phaseIndex)
     {
-        Debug.Log($"[GameLoopOSU] Phase ended: {phase.phaseName} (Index: {phaseIndex})");
+
 
         int phaseScore = _scoreService.GetTotalScore();
         _scoreService.RecordPhaseScore(phaseIndex, phaseScore);
@@ -215,7 +215,7 @@ public class GameLoopOSU : MonoBehaviour
         else
         {
             // No more phases - game will end
-            Debug.Log($"[GameLoopOSU] No more phases. Waiting for completion event...");
+
         }
     }
 

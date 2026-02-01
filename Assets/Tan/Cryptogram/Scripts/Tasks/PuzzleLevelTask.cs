@@ -24,7 +24,7 @@ public class PuzzleLevelTask : BaseTask
     private void HandleLevelFinished()
     {
         _controller.OnLevelCompleted -= HandleLevelFinished;
-        Debug.Log($"Task Level {LevelIndex} Finished via Event!");
+
         this.doneTask = true;
     }
 
