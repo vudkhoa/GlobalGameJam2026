@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class FourthChapter : BaseTask
 {
@@ -13,5 +14,8 @@ public class FourthChapter : BaseTask
             taskList.Add(UniTask.WaitUntil(() => task.doneTask));
         }
         await UniTask.WhenAll(taskList);
+
+        await UniTask.WaitForSeconds(1f);
+        SceneManager.LoadScene("Init", LoadSceneMode.Single);
     }
 }

@@ -434,6 +434,8 @@ public class DragComponentView : MonoBehaviour, IDragHandler, IPointerDownHandle
             return;
         }
 
+        /*SoundManager.Instance.PlaySFX(SoundType.SFX_Click_Picture);*/
+
         // Đánh dấu đã tương tác
         _hasBeenInteracted = true;
 
