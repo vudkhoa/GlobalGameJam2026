@@ -10,14 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52443b241dfaf4e44998aaa42797e110, type: 3}
-  m_Name: Zigzag_Complex
+  m_Name: Zigzag_Smooth
   m_EditorClassIdentifier: 
-  trajectoryName: ZigZag 3x (Smooth, gap=50, total=700)
+  trajectoryName: ZigZag 3x (Smooth, gap=50, total=750)
   boundaryRadius: 0
   normalizeToRadius: 0
-  beatCount: 5
-  beatInterval: 0.5
-  beatSize: {x: 100, y: 100}
+  beatCount: 4
+  beatInterval: 0.8
+  beatSize: {x: 150, y: 150}
+  beatSpriteSet: {fileID: 11400000, guid: b459a75e690deb944a62f801e5ada8d5, type: 2}
+  connectorToNext:
+    connectorSprite: {fileID: 0}
+    spriteSize: {x: 50, y: 10}
+    connectorColor: {r: 1, g: 1, b: 1, a: 1}
+    spawnSpeed: 20
+    fadeInDuration: 0.2
+    overlapFactor: 0.3
   direction: 0
   amplitude: 50
   zigzagCount: 3

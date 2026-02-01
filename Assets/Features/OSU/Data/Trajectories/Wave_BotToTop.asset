@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b78445f80d7cc49a46b2aae9fd8d7e, type: 3}
+  m_Name: Wave_BotToTop
+  m_EditorClassIdentifier: 
+  trajectoryName: Wave Right (amp=120, freq=1.2, len=1620)
+  boundaryRadius: 100
+  normalizeToRadius: 0
+  beatCount: 8
+  beatInterval: 1
+  beatSize: {x: 150, y: 150}
+  beatSpriteSet: {fileID: 11400000, guid: da2b1b51f458e944b9418dbed4f8d2fc, type: 2}
+  connectorToNext:
+    connectorSprite: {fileID: 0}
+    spriteSize: {x: 50, y: 10}
+    connectorColor: {r: 1, g: 1, b: 1, a: 1}
+    spawnSpeed: 20
+    fadeInDuration: 0.2
+    overlapFactor: 0.3
+  moveRight: 1
+  gap: 60
+  waveAmplitude: 120
+  waveFrequency: 1.2
+  minY: 0
+  maxY: 400
+  pathSeed: 0
+  randomness: 0.5

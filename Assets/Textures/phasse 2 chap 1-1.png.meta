@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: bb33643ed3e764e4fac57f89107ef537
+guid: 753c7cba5599ab94fbe834b424e5354f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4855278335797990703
-    second: Osu-Ball-2 1_0
+      213: -7929352393585863676
+    second: phasse 2 chap 1-1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Osu-Ball-2 1_0
+      name: phasse 2 chap 1-1_0
       rect:
         serializedVersion: 2
-        x: 1715
-        y: 821
-        width: 557
-        height: 559
+        x: 0
+        y: 0
+        width: 1065
+        height: 678
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1da6c15f3169e9cb0800000000000000
-      internalID: -4855278335797990703
+      spriteID: 404db61720845f190800000000000000
+      internalID: -7929352393585863676
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Osu-Ball-2 1_0: -4855278335797990703
+      phasse 2 chap 1-1_0: -7929352393585863676
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

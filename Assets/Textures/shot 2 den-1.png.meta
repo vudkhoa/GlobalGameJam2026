@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1b91382c65e050a44a2a95ae49ea7852
+guid: 3bee691665e5298449d9e14511c14506
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6622316888709034011
-    second: Osu-Ball-stroke 1_0
+      213: 1973540164455614224
+    second: shot 2 den-1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Osu-Ball-stroke 1_0
+      name: shot 2 den-1_0
       rect:
         serializedVersion: 2
-        x: 1490
-        y: 564
-        width: 1040
-        height: 1049
+        x: 0
+        y: 0
+        width: 1234
+        height: 1080
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b10729daf1237eb50800000000000000
-      internalID: 6622316888709034011
+      spriteID: 017c754c25c636b10800000000000000
+      internalID: 1973540164455614224
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Osu-Ball-stroke 1_0: 6622316888709034011
+      shot 2 den-1_0: 1973540164455614224
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

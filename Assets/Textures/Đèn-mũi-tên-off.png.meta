@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0e71dd35c3988ff4d8bd712ede8b65de
+guid: 7d7b0dfcfab0af047aae922211f268de
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5122814667194785740
-    second: Osu-Ball-1 1_0
+      213: -7913379758162420118
+    second: "\u0110\xE8n-m\u0169i-t\xEAn-off_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Osu-Ball-1 1_0
+      name: "\u0110\xE8n-m\u0169i-t\xEAn-off_0"
       rect:
         serializedVersion: 2
-        x: 1725
-        y: 845
-        width: 557
-        height: 560
+        x: 0
+        y: 0
+        width: 503
+        height: 342
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 430a1b7b33b18e8b0800000000000000
-      internalID: -5122814667194785740
+      spriteID: a6e56fd69070e2290800000000000000
+      internalID: -7913379758162420118
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Osu-Ball-1 1_0: -5122814667194785740
+      "\u0110\xE8n-m\u0169i-t\xEAn-off_0": -7913379758162420118
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
