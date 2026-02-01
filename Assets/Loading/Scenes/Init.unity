@@ -293,6 +293,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 240257325}
   m_CullTransparentMesh: 1
+--- !u!114 &275625534 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4250084709410800905, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+  m_PrefabInstance: {fileID: 1119928659}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ea53d9ce2268a3468a7a7c3ca7f653f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &348416119 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8532873446850424684, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
@@ -548,6 +559,7 @@ MonoBehaviour:
   tasks:
   - {fileID: 448687222}
   - {fileID: 2079109521}
+  - {fileID: 275625534}
   - {fileID: 1360328960}
   - {fileID: 134007289}
   - {fileID: 2088876085}
@@ -1005,12 +1017,12 @@ MonoBehaviour:
   - rect: {fileID: 1863195798}
     chapterScreenManager: {fileID: 1863195799}
     loadType: 2
-  - rect: {fileID: 4639994411144007587}
-    chapterScreenManager: {fileID: 5445262304637697802}
-    loadType: 5
   - rect: {fileID: 584100948}
     chapterScreenManager: {fileID: 584100949}
     loadType: 2
+  - rect: {fileID: 4639994411144007587}
+    chapterScreenManager: {fileID: 5445262304637697802}
+    loadType: 5
   - rect: {fileID: 488847201}
     chapterScreenManager: {fileID: 488847202}
     loadType: 2
@@ -1191,6 +1203,14 @@ PrefabInstance:
       propertyPath: '_tasks.Array.data[0]'
       value: 
       objectReference: {fileID: 584100949}
+    - target: {fileID: 5062319325443049141, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: storyLevels.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5062319325443049141, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
+      propertyPath: 'storyLevels.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d368bf04b45c7b54d892957215cc4e1a, type: 2}
     - target: {fileID: 5242856237638446097, guid: 4efa8e9994bbfd04db62f1325a1773d5, type: 3}
       propertyPath: dayNightController
       value: 

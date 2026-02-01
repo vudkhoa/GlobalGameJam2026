@@ -144,7 +144,7 @@ public class ChapterFlowManager : MonoBehaviour
             // await dayNightController.GetComponent<CanvasGroup>().DOFade(0, 1f).ToUniTask(cancellationToken: token);
 
             // Or simply deactivate it if it overlays the slides
-            dayNightController.gameObject.SetActive(false);
+            // dayNightController.gameObject.SetActive(false);
         }
         dayNightController.gameObject.SetActive(false);
         foreach (var img in introSlides)

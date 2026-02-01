@@ -522,22 +522,23 @@ public class PuzzleController : MonoBehaviour
     // --- ANIMATION CHUYỂN LEVEL ---
     public async UniTask AnimateLevelExitAsync()
     {
-        var token = this.GetCancellationTokenOnDestroy();
-        await puzzleContentGroup.transform
-            .DOLocalMoveY(150f, fadeDuration).SetRelative(true)
-            .ToUniTask(cancellationToken: token);
+        // var token = this.GetCancellationTokenOnDestroy();
+        // await puzzleContentGroup.transform
+        //     .DOLocalMoveY(150f, fadeDuration).SetRelative(true)
+        //     .ToUniTask(cancellationToken: token);
         
         puzzleContentGroup.alpha = 0f;
-        puzzleContentGroup.transform.DOLocalMoveY(-300f, 0f).SetRelative(true); 
+        // puzzleContentGroup.transform.DOLocalMoveY(-300f, 0f).SetRelative(true); 
     }
 
     public async UniTask AnimateLevelEnterAsync()
     {
-        var token = this.GetCancellationTokenOnDestroy();
-        puzzleContentGroup.DOFade(1f, fadeDuration);
-        await puzzleContentGroup.transform
-            .DOLocalMoveY(150f, fadeDuration).SetRelative(true).SetEase(Ease.OutBack)
-            .ToUniTask(cancellationToken: token);
+        // var token = this.GetCancellationTokenOnDestroy();
+        // puzzleContentGroup.DOFade(1f, fadeDuration);
+        // await puzzleContentGroup.transform
+        //     .DOLocalMoveY(150f, fadeDuration).SetRelative(true).SetEase(Ease.OutBack)
+        //     .ToUniTask(cancellationToken: token);
+        puzzleContentGroup.alpha = 1f;
     }
 
     // --- HELPER ---
