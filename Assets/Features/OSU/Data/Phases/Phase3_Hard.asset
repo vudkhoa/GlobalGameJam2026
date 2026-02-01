@@ -25,5 +25,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3b818a2150697e14f9722531b0d472d6, type: 2}
   - {fileID: 11400000, guid: 52a7f8ed4b1ea4343b6adc63abcc9452, type: 2}
   - {fileID: 11400000, guid: 4d05b8dfd35309c42af5e6ee5f8a40a9, type: 2}
-  pauseDuration: 2
+  pauseDuration: 1
   animationTrigger: 

@@ -123,6 +123,7 @@ public class GameLoopOSU : MonoBehaviour
 
     private async UniTask StartGame()
     {
+
         await intro.PlayAsync();
 
         // ✅ Blur trong intro2 (countdown 3-2-1) - không có phase sprite
