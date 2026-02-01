@@ -17,8 +17,6 @@ public class ClickToLoadScene : MonoBehaviour
 
     private void LoadScene()
     {
-        SoundManager.Instance?.PlaySFX(SoundType.SFX_Click_Picture);
-
         if (!string.IsNullOrEmpty(_sceneName))
         {
             SceneManager.LoadScene(_sceneName);
