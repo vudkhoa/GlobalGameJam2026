@@ -19,7 +19,7 @@ public class IngameUI : UICanvas
     private void OnClickReplayButton()
     {
         SoundManager.Instance.PlaySFX(SoundType.SFX_Click_Picture);
-        SceneManager.LoadScene("Init", LoadSceneMode.Single);
+        SceneManager.LoadScene("Home", LoadSceneMode.Single);
         /*UIManager.Instance.gameObject.SetActive(false);*/
     }
 }
