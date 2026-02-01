@@ -271,6 +271,7 @@ public class GameLoopOSU : MonoBehaviour
     private async UniTask ShowEndScreen(int finalScore)
     {
         await cutscene_3.PlayAsync();
+        GetComponentInParent<BaseTask>()?.CompletedTask();
     }
 
     private void OnBeatSpawned(BeatCircle beat)
