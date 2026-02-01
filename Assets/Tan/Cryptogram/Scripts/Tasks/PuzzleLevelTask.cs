@@ -9,17 +9,30 @@ public class PuzzleLevelTask : BaseTask
     [Header("References")]
     [SerializeField] private PuzzleController _controller;
 
-    public override async UniTask Execute()
+    public override UniTask Execute()
     {
         if (_controller == null)
         {
-            return;
+            doneTask = true;
+            return UniTask.CompletedTask;
         }
+        _controller.OnLevelCompleted += HandleLevelFinished;
+        _controller.StartLevel(LevelIndex);
+        return UniTask.CompletedTask;
+    }
 
-        _controller.LoadLevelDataOnly(LevelIndex);
-
-        await _controller.RunLevelAndWaitAsync();
-
+    private void HandleLevelFinished()
+    {
+        _controller.OnLevelCompleted -= HandleLevelFinished;
+        Debug.Log($"Task Level {LevelIndex} Finished via Event!");
         this.doneTask = true;
+    }
+
+    private void OnDisable()
+    {
+        if (_controller != null)
+        {
+            _controller.OnLevelCompleted -= HandleLevelFinished;
+        }
     }
 }

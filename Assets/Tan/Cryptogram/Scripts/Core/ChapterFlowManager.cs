@@ -4,17 +4,25 @@ using TMPro;
 using DG.Tweening;
 using Cysharp.Threading.Tasks; // Quan trọng
 using System.Collections.Generic;
+using System;
 
 public class ChapterFlowManager : MonoBehaviour
 {
     [Header("DEBUG")]
     public bool skipIntro = false;
+
+    [Header("0. PRE-INTRO ANIMATION")] // --- NEW SECTION ---
+    [Tooltip("Drag the DayNightCanvasController script here")]
+    public DayNightTransitionController dayNightController;
+    [Tooltip("Should we play the day/night cycle before slides?")]
+    public bool playDayNightCycle = true;
     [Header("1. INTRO CONFIG")]
     public List<Image> introSlides;
     [Tooltip("Kéo cái Gameobject 'FinalImageMask' vừa tạo vào đây")]
-    public RectTransform finalImageMaskRect; 
+    public RectTransform finalImageMaskRect;
     [Tooltip("Kéo cái ảnh con bên trong Mask vào đây để Fade")]
-    public Image finalImageContent; 
+    public Image finalImageContent;
+    public HandWritingAnimation handImage;
 
     [Tooltip("Kéo cái khung tranh ở LeftPanel vào đây (Đích đến bên trái)")]
     public RectTransform targetFrameLeft;
@@ -41,12 +49,16 @@ public class ChapterFlowManager : MonoBehaviour
 
     private UniTaskCompletionSource<bool> _puzzleCompletionSource;
 
+    public event Action OnIntroCompleted;
+
     public async UniTask PlayIntroOnlyAsync()
     {
         var token = this.GetCancellationTokenOnDestroy();
         SetupInitialState();
 
         await PlayIntroSequence(token);
+
+        OnIntroCompleted?.Invoke();
     }
 
     public async UniTask RunPuzzleAndWaitAsync()
@@ -109,13 +121,32 @@ public class ChapterFlowManager : MonoBehaviour
         outroPanel.SetActive(false);
         blackScreen.alpha = 0;
         quoteText.DOFade(0f, 0f).Complete();
-        foreach(var img in introSlides) img.gameObject.SetActive(false);
+        foreach (var img in introSlides) img.gameObject.SetActive(false);
         // finalIntroImage.gameObject.SetActive(false);
+        
+        if (dayNightController != null) 
+        {
+            dayNightController.gameObject.SetActive(true);
+            dayNightController.ResetToDay();
+        }
     }
 
     // --- LOGIC INTRO ---
     async UniTask PlayIntroSequence(System.Threading.CancellationToken token)
     {
+        if (playDayNightCycle && dayNightController != null)
+        {
+            Debug.Log("--- STARTING DAY/NIGHT CYCLE ---");
+            await dayNightController.PlayDayNightCycleAsync(token);
+
+            // Optional: Fade out the Day/Night scene before showing slides
+            // For example, if DayNightController is on a specific CanvasGroup:
+            // await dayNightController.GetComponent<CanvasGroup>().DOFade(0, 1f).ToUniTask(cancellationToken: token);
+
+            // Or simply deactivate it if it overlays the slides
+            // dayNightController.gameObject.SetActive(false);
+        }
+        dayNightController.gameObject.SetActive(false);
         foreach (var img in introSlides)
         {
             img.gameObject.SetActive(true);
@@ -145,9 +176,10 @@ public class ChapterFlowManager : MonoBehaviour
         finalImageMaskRect.sizeDelta = startSize;
 
         var seqPhase1 = DOTween.Sequence();
-        seqPhase1.Join(finalImageMaskRect.DOSizeDelta(targetSquareSize, 1.5f).SetEase(Ease.InOutExpo));
+        seqPhase1.Append(finalImageContent.transform.DOScale(0.78f, 1.0f).SetEase(Ease.InOutBack).SetLink(finalImageContent.gameObject));
+        seqPhase1.Join(finalImageMaskRect.DOSizeDelta(targetSquareSize, 1.5f).SetEase(Ease.InOutExpo).SetLink(finalImageMaskRect.gameObject));
         // Đảm bảo nó nằm đúng giữa (phòng hờ)
-        seqPhase1.Join(finalImageMaskRect.DOAnchorPos(Vector2.zero, 1.5f).SetEase(Ease.InOutExpo));
+        seqPhase1.Join(finalImageMaskRect.DOAnchorPos(Vector2.zero, 1.5f).SetEase(Ease.InOutExpo).SetLink(finalImageMaskRect.gameObject));
 
         await seqPhase1.ToUniTask(cancellationToken: token);
         
@@ -161,6 +193,7 @@ public class ChapterFlowManager : MonoBehaviour
 
         var seqPhase2 = DOTween.Sequence();
         
+        
         seqPhase2.Append(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
 
         seqPhase2.Append(rightPanelCG.DOFade(1f, 1.0f).SetEase(Ease.Linear));
@@ -169,8 +202,10 @@ public class ChapterFlowManager : MonoBehaviour
 
         finalImageMaskRect.SetParent(targetFrameLeft);
         finalImageMaskRect.anchoredPosition = Vector2.zero;
-        
+
         gameplayCanvasGroup.blocksRaycasts = true;
+
+        handImage.StartWriting();
     }
 
     // --- LOGIC OUTRO ---
@@ -178,6 +213,7 @@ public class ChapterFlowManager : MonoBehaviour
     {
         var token = this.GetCancellationTokenOnDestroy();
         // Chuyển việc gọi hàm nội bộ thành await trực tiếp
+        handImage.StopWriting();
         await PlayOutroSequence(decision, token);
     }
 

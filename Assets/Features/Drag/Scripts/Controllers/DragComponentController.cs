@@ -303,7 +303,7 @@ public class DragComponentController : MonoSingleton<DragComponentController>
 
                 // Di chuyển đến vị trí đúng với cùng duration (tất cả cùng lúc)
                 rectTransform.DOAnchorPos(targetPos, winMoveDuration)
-                    .SetEase(Ease.OutQuad);
+                    .SetEase(Ease.OutQuad).SetLink(rectTransform.gameObject);
             }
         }
         AwaitingWinAnim();

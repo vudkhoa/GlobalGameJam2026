@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e048d5c8104e5474a88136209876269e, type: 3}
   m_Name: Level_3
   m_EditorClassIdentifier: 
-  sentence: "Kh\xF4ng {a}i {l}\u1EAF{n}g {n}g{h}{e} / t\xF4{i} c\u1EA3. L\xE0m \u01A1n
-    h\xE3y / {d}\u1EEBng {l}\u1EA1{i}."
+  sentence: "Kh\xF4ng {a}i {l}\u1EAF{n}g {n}g{h}{e} t\xF4{i} c\u1EA3. / L\xE0m \u01A1n
+    h\xE3y {d}\u1EEBng {l}\u1EA1{i}."
   typingSpeed: 0.02
   phaseType: 1
   manualMapping:
