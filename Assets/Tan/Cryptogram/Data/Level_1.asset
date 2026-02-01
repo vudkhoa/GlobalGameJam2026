@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e048d5c8104e5474a88136209876269e, type: 3}
+  m_Name: Level_1
+  m_EditorClassIdentifier: 
+  sentence: "{H}\xF4m {n}ay kh\xE1n gi\u1EA3 c\u01B0\u1EDD{i} / r\u1EA5t vui. T\xF4i
+    th\u1EA5y t{h}\u1EADt / h\u1EA1nh ph\xFAc."
+  typingSpeed: 0.05
+  phaseType: 0
+  manualMapping:
+  - character: C
+    id: 3
+  - character: I
+    id: 9
+  - character: H
+    id: 8
+  - character: N
+    id: 14
+  - character: P
+    id: 16
+  - character: T
+    id: 20

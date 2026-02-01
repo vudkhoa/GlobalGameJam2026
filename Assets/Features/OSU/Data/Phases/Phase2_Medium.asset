@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16d995ae6ad378441839353f2109adef, type: 3}
+  m_Name: Phase2_Medium
+  m_EditorClassIdentifier: 
+  phaseName: Phase 1
+  audioClip: {fileID: 0}
+  beatConfig: {fileID: 11400000, guid: fa09bd41f9a5adf419672a3aa5b58239, type: 2}
+  trajectoryConfigs:
+  - {fileID: 11400000, guid: 6e9e5a27b53eb3b4cb18f406f0301a75, type: 2}
+  - {fileID: 11400000, guid: c45a3e24c55342f4d81dc46cc3c56655, type: 2}
+  - {fileID: 11400000, guid: 52a7f8ed4b1ea4343b6adc63abcc9452, type: 2}
+  - {fileID: 11400000, guid: be30de2fd7e877b43b03f24c62dacf24, type: 2}
+  - {fileID: 11400000, guid: 6e9e5a27b53eb3b4cb18f406f0301a75, type: 2}
+  - {fileID: 11400000, guid: 3b818a2150697e14f9722531b0d472d6, type: 2}
+  - {fileID: 11400000, guid: 3b818a2150697e14f9722531b0d472d6, type: 2}
+  pauseDuration: 1
+  animationTrigger: 
