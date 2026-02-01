@@ -13,7 +13,12 @@ public class UIScreenManager : MonoBehaviour
     private Dictionary<string, RectTransform> _uiScreens = new();
     private int curIndex;
 
-    private void Start()
+    private void Awake()
+    {
+        DOTween.Init();
+    }
+
+    private void OnEnable()
     {
         CacheScreens();
 
@@ -48,7 +53,7 @@ public class UIScreenManager : MonoBehaviour
     public void LoadNextUIScene()
     {
         curIndex++;
-
+        if (curIndex >= uiScreens.Count) { return;}
         LoadUIScreen(uiScreens[curIndex]);
     }
 
@@ -111,16 +116,18 @@ public class UIScreenManager : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        if (_currentScreen != null)
+        if (_currentScreen != null && _currentScreen.gameObject != null && _currentScreen.gameObject.activeInHierarchy)
         {
             seq.Join(_currentScreen
                 .DOAnchorPos(-offset, transitionDuration)
-                .SetEase(Ease.OutCubic));
+                .SetEase(Ease.OutCubic)
+                .SetLink(_currentScreen.gameObject)); 
         }
 
         seq.Join(next
             .DOAnchorPos(Vector2.zero, transitionDuration)
-            .SetEase(Ease.OutCubic));
+            .SetEase(Ease.OutCubic)
+            .SetLink(next.gameObject));
 
         Complete(seq, next);
     }
@@ -135,14 +142,16 @@ public class UIScreenManager : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        if (_currentScreen != null)
+        if (_currentScreen != null && _currentScreen.gameObject != null && _currentScreen.gameObject.activeInHierarchy)
         {
             seq.Append(_currentScreen
                 .GetComponent<CanvasGroup>()
-                .DOFade(0, transitionDuration));
+                .DOFade(0, transitionDuration)
+                .SetLink(_currentScreen.gameObject));
+                
         }
 
-        seq.Append(nextCg.DOFade(1, transitionDuration));
+        seq.Append(nextCg.DOFade(1, transitionDuration).SetLink(next.gameObject));
 
         Complete(seq, next);
     }
@@ -171,10 +180,10 @@ public class UIScreenManager : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        if (_currentScreen != null)
-            seq.Append(_currentScreen.DOScale(0f, transitionDuration));
+        if (_currentScreen != null && _currentScreen.gameObject != null && _currentScreen.gameObject.activeInHierarchy)
+            seq.Append(_currentScreen.DOScale(0f, transitionDuration).SetLink(_currentScreen.gameObject));
 
-        seq.Append(next.DOScale(1f, transitionDuration + 0.1f));
+        seq.Append(next.DOScale(1f, transitionDuration + 0.1f).SetLink(next.gameObject).SetEase(Ease.OutBack));
 
         Complete(seq, next);
     }
@@ -190,17 +199,17 @@ public class UIScreenManager : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        if (_currentScreen != null)
+        if (_currentScreen != null && _currentScreen.gameObject != null && _currentScreen.gameObject.activeInHierarchy)
         {
             seq.Join(_currentScreen
-                .DOAnchorPos(new Vector2(-300, 0), transitionDuration));
+                .DOAnchorPos(new Vector2(-300, 0), transitionDuration).SetLink(_currentScreen.gameObject));
             seq.Join(_currentScreen
                 .GetComponent<CanvasGroup>()
-                .DOFade(0, transitionDuration));
+                .DOFade(0, transitionDuration).SetLink(_currentScreen.gameObject)); 
         }
 
-        seq.Join(next.DOAnchorPos(Vector2.zero, transitionDuration));
-        seq.Join(cg.DOFade(1, transitionDuration));
+        seq.Join(next.DOAnchorPos(Vector2.zero, transitionDuration).SetLink(next.gameObject));
+        seq.Join(cg.DOFade(1, transitionDuration).SetLink(cg.gameObject));
 
         Complete(seq, next);
     }
@@ -215,11 +224,11 @@ public class UIScreenManager : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        if (_currentScreen != null)
-            seq.Append(_currentScreen.GetComponent<CanvasGroup>().DOFade(0, transitionDuration));
+        if (_currentScreen != null && _currentScreen.gameObject != null && _currentScreen.gameObject.activeInHierarchy)
+            seq.Append(_currentScreen.GetComponent<CanvasGroup>().DOFade(0, transitionDuration).SetLink(_currentScreen.gameObject));
 
-        seq.Join(cg.DOFade(1, transitionDuration));
-        seq.Join(next.DOScale(1f, transitionDuration));
+        seq.Join(cg.DOFade(1, transitionDuration).SetLink(cg.gameObject));
+        seq.Join(next.DOScale(1f, transitionDuration).SetLink(next.gameObject));
 
         Complete(seq, next);
     }
@@ -230,7 +239,7 @@ public class UIScreenManager : MonoBehaviour
         next.localScale = Vector3.one * 1.5f;
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(next.DOScale(1f, transitionDuration).SetEase(Ease.OutExpo));
+        seq.Append(next.DOScale(1f, transitionDuration).SetEase(Ease.OutExpo).SetLink(next.gameObject));
 
         Complete(seq, next);
     }
@@ -241,7 +250,7 @@ public class UIScreenManager : MonoBehaviour
         next.localScale = Vector3.one * 0.6f;
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(next.DOScale(1f, transitionDuration).SetEase(Ease.OutExpo));
+        seq.Append(next.DOScale(1f, transitionDuration).SetEase(Ease.OutExpo).SetLink(next.gameObject));
 
         Complete(seq, next);
     }

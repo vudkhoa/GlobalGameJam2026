@@ -10,9 +10,10 @@ public class ThirdChapterTask : BaseTask
         foreach (var task in tasks)
         {
             if (task == null) continue;
-            await task.Execute();
+            task.doneTask = false;
+            task.Execute().Forget();
+            await UniTask.WaitUntil(() => task.doneTask == true);
         }
         this.doneTask = true;
-    
     }
 }

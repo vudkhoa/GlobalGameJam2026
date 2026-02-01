@@ -57,13 +57,13 @@ public class JournalSlotView : MonoBehaviour
 
         // 1. Hiệu ứng viết chữ (Typewriter)
         float duration = this.currentText.Length * 0.1f;
-        Debug.Log($"Animating fill for word '{this.currentText}' over {duration} seconds.");
         DOTween.To(() => textDisplay.maxVisibleCharacters,
                    x => textDisplay.maxVisibleCharacters = x,
                    currentText.Length, duration)
                .SetEase(Ease.Linear)
                .OnComplete(() =>
                {
+                    if (this == null || transform == null || gameObject == null) return;
                    // --- HIỆU ỨNG 2: NẢY VÀ LOÉ SÁNG (Khi viết xong) ---
                    if (phase == PuzzlePhase.Normal)
                    {
@@ -120,5 +120,10 @@ public class JournalSlotView : MonoBehaviour
         c.a = 1f;
         textDisplay.color = c;
         IsFilled = true;
+    }
+
+    private void OnDestroy()
+    {
+        transform.DOKill();
     }
 }

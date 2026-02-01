@@ -73,12 +73,12 @@ public class FrameController : MonoBehaviour
 
             case FrameShowType.SlideLeft:
                 rect.anchoredPosition = originPos + new Vector2(-Screen.width, 0);
-                rect.DOAnchorPos(originPos, duration).SetEase(Ease.OutCubic);
+                rect.DOAnchorPos(originPos, duration).SetEase(Ease.OutCubic).SetLink(rect.gameObject);
                 break;
 
             case FrameShowType.SlideRight:
                 rect.anchoredPosition = originPos + new Vector2(Screen.width, 0);
-                rect.DOAnchorPos(originPos, duration).SetEase(Ease.OutCubic);
+                rect.DOAnchorPos(originPos, duration).SetEase(Ease.OutCubic).SetLink(rect.gameObject);
                 break;
 
             case FrameShowType.ZoomIn:
@@ -106,7 +106,7 @@ public enum FrameShowType
     SlideLeft,
     SlideRight,
     ZoomIn,
-    MaskReveal // dùng RectMask2D
+    MaskReveal // dï¿½ng RectMask2D
 }
 
 [Serializable]

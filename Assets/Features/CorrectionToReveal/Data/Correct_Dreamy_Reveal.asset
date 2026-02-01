@@ -17,16 +17,16 @@ MonoBehaviour:
   ShaderProperties:
   - PropertyName: _BlurAmount
     DisplayName: Blur Amount
-    InitialValue: -10
+    InitialValue: -5
     TargetValue: 0
     MinValue: 0
-    MaxValue: 10
+    MaxValue: 5
   - PropertyName: _DistortionAmount
     DisplayName: Distortion Amount
-    InitialValue: 10
+    InitialValue: 5
     TargetValue: 0
     MinValue: 0
-    MaxValue: 10
+    MaxValue: 5
   Tolerance: 0.1
   RulerPrefab: {fileID: 8925314152252395656, guid: 90b64157b1b2897469e458a3b5581201, type: 3}
   RulerSpacing: 150
