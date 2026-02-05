@@ -71,6 +71,11 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        SoundManager.Instance.PlayBGM(SoundType.BGM_Menu);
+    }
+
     // ═══════════════════════════════════════════════════════════
     // PUBLIC API
     // ═══════════════════════════════════════════════════════════

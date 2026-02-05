@@ -12,11 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Angle0
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 0\xB0 (size=100, gap=40, total=520)"
+  trajectoryName: "Linear 0\xB0 (size=150, gap=60, total=360)"
   boundaryRadius: 300
   normalizeToRadius: 0
-  beatCount: 4
+  beatCount: 2
   beatInterval: 1.2
-  beatSize: {x: 100, y: 100}
+  beatSize: {x: 150, y: 150}
+  beatSpriteSet: {fileID: 11400000, guid: b459a75e690deb944a62f801e5ada8d5, type: 2}
+  connectorToNext:
+    connectorSprite: {fileID: 0}
+    spriteSize: {x: 50, y: 10}
+    connectorColor: {r: 1, g: 1, b: 1, a: 1}
+    spawnSpeed: 20
+    fadeInDuration: 0.2
+    overlapFactor: 0.3
   angle: 0
-  gap: 40
+  gap: 60

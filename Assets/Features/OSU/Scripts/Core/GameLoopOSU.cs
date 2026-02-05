@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BrunoMikoski.AnimationSequencer;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -18,9 +19,18 @@ public class GameLoopOSU : MonoBehaviour
     [Header("Components")]
     [SerializeField] private BeatSpawner _beatSpawner;
 
+    [Header("Animation Sequences")]
+    [SerializeField] private AnimationSequencerController intro;
+    [SerializeField] private AnimationSequencerController intro2;
+    [SerializeField] private AnimationSequencerController intro3;
+    [SerializeField] private AnimationSequencerController cutscene_1;
+    [SerializeField] private AnimationSequencerController cutscene_2;
+    [SerializeField] private AnimationSequencerController cutscene_3;
+
     [Header("UI References")]
     [SerializeField] private JudgementDisplay _judgementDisplay;
     [SerializeField] private ComboDisplay _comboDisplay;
+    [SerializeField] private BlurEffect _blurEffect;
 
     // Injected services
     private GameTimeService _timeService;
@@ -67,7 +77,31 @@ public class GameLoopOSU : MonoBehaviour
 
     private void Start()
     {
+        // ✅ FIX: Warm services BEFORE game starts
+        WarmupServices();
         StartGame().Forget();
+    }
+
+    private void WarmupServices()
+    {
+
+
+        // 1. Warm Evaluator
+        Vector2 dummySize = Vector2.one * 100f;
+        _evaluator.Evaluate(dummySize, dummySize);
+        _evaluator.GetFeedback(JudgementType.Perfect);
+        _evaluator.GetFeedback(JudgementType.Good);
+        _evaluator.GetFeedback(JudgementType.OK);
+        _evaluator.GetFeedback(JudgementType.Miss);
+
+        // 2. Warm ScoreService
+        _scoreService.RecordJudgement(JudgementType.Perfect);
+        _scoreService.GetTotalScore();
+        _scoreService.GetCurrentCombo();
+        _scoreService.GetAccuracy();
+        _scoreService.ResetPhaseScore(); // Reset về 0
+
+
     }
 
     private void Update()
@@ -80,7 +114,7 @@ public class GameLoopOSU : MonoBehaviour
         // Update spawner with current time
         _beatSpawner.UpdateSpawning(_timeService.CurrentTime);
 
-        // ✅ UPDATE COMBO DISPLAY
+        // ✅ UPDATE COMBO DISPLAY mỗi frame
         if (_comboDisplay != null)
         {
             _comboDisplay.UpdateCombo(_scoreService.GetCurrentCombo());
@@ -89,7 +123,23 @@ public class GameLoopOSU : MonoBehaviour
 
     private async UniTask StartGame()
     {
-        // Update beat config (BeatSpawner doesn't have Initialize)
+
+        await intro.PlayAsync();
+
+        // ✅ Blur trong intro2 (countdown 3-2-1) - không có phase sprite
+        if (_blurEffect != null)
+        {
+            _blurEffect.BlurBg();
+        }
+        await intro2.PlayAsync();
+
+        await intro3.PlayAsync();
+        // ✅ Wait 1 frame để warmup hoàn tất
+        await UniTask.Yield();
+
+
+
+        // Update beat config
         _beatSpawner.UpdateBeatConfig(_defaultBeatConfig);
 
         // Setup events
@@ -98,6 +148,9 @@ public class GameLoopOSU : MonoBehaviour
         _phaseController.OnPhaseStarted += OnPhaseStarted;
         _phaseController.OnPhaseEnded += OnPhaseEnded;
         _phaseController.OnAllPhasesCompleted += OnAllPhasesCompleted;
+
+        // ✅ Wait 1 more frame
+        await UniTask.Yield();
 
         // Start time service
         _timeService.Start();
@@ -108,6 +161,14 @@ public class GameLoopOSU : MonoBehaviour
 
     private void OnPhaseStarted(PhaseData phase)
     {
+
+
+        // ✅ Hiển thị phase background + blur khi bắt đầu phase
+        if (_blurEffect != null)
+        {
+            _blurEffect.ShowPhaseBackground(_phaseController.CurrentPhaseIndex);
+        }
+
         // Get BeatConfig for this phase
         BeatConfig beatConfigForPhase = phase.beatConfig != null
             ? phase.beatConfig
@@ -125,26 +186,65 @@ public class GameLoopOSU : MonoBehaviour
 
     private async void OnPhaseEnded(PhaseData phase, int phaseIndex)
     {
+
+
         int phaseScore = _scoreService.GetTotalScore();
         _scoreService.RecordPhaseScore(phaseIndex, phaseScore);
 
         // ✅ CHECK IF MORE PHASES EXIST
         if (_phaseController.CurrentPhaseIndex < _phaseController.TotalPhases - 1)
         {
-            // More phases available - pause and start next
+            // ✅ UnBlur và ẩn phase background khi kết thúc phase
+            if (_blurEffect != null)
+            {
+                _blurEffect.UnBlurBg();
+            }
+
+            // Play cutscene tương ứng với phase vừa kết thúc
+            await PlayCutsceneForPhase(phaseIndex);
+
+            // Pause if needed
             if (phase.pauseDuration > 0f)
             {
                 await UniTask.Delay((int)(phase.pauseDuration * 1000));
             }
 
-            // Start next phase
+            // Start next phase (sẽ hiện phase background mới trong OnPhaseStarted)
             _phaseController.StartNextPhase();
         }
         else
         {
             // No more phases - game will end
-            // OnAllPhasesCompleted will be called by PhaseController
+
         }
+    }
+
+    /// <summary>
+    /// Play cutscene dựa trên phase index vừa hoàn thành
+    /// Phase 0 (Phase 1) → cutscene_1
+    /// Phase 1 (Phase 2) → cutscene_2
+    /// Phase 2 (Phase 3) → cutscene_3
+    /// </summary>
+    private async UniTask PlayCutsceneForPhase(int completedPhaseIndex)
+    {
+        AnimationSequencerController cutscene = null;
+
+        switch (completedPhaseIndex)
+        {
+            case 0: // Sau phase 1
+                cutscene = cutscene_1;
+                await cutscene_1.PlayAsync();
+                break;
+            case 1: // Sau phase 2
+                cutscene = cutscene_2;
+                await cutscene_2.PlayAsync();
+                break;
+            case 2: // Sau phase 3
+                cutscene = cutscene_3;
+                break;
+        }
+
+
     }
 
     private void OnAllPhasesCompleted()
@@ -170,7 +270,8 @@ public class GameLoopOSU : MonoBehaviour
 
     private async UniTask ShowEndScreen(int finalScore)
     {
-        await UniTask.Delay(1000);
+        await cutscene_3.PlayAsync();
+        GetComponentInParent<BaseTask>()?.CompletedTask();
     }
 
     private void OnBeatSpawned(BeatCircle beat)
@@ -180,23 +281,33 @@ public class GameLoopOSU : MonoBehaviour
         beat.OnMissed += OnBeatMissed;
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // ✅ BEAT EVENT HANDLERS - FIXED DUPLICATE DISPLAY
+    // ═══════════════════════════════════════════════════════════
+
     private void OnBeatTapped(BeatCircle beat)
     {
         _activeBeats.Remove(beat);
 
+        // ✅ Evaluate judgement (Perfect/Good/OK/Miss based on timing)
         JudgementType judgement = _evaluator.Evaluate(beat.CurrentSize, beat.TargetSize);
-        int score = _scoreService.RecordJudgement(judgement);
 
+        // ✅ Record to score service (updates combo + score)
+        _scoreService.RecordJudgement(judgement);
+
+        // ✅ Get feedback data
         FeedbackData feedback = _evaluator.GetFeedback(judgement);
 
-        // ✅ DISPLAY JUDGEMENT UI
+        // ✅ Show judgement UI (ALWAYS show for tap, even if Miss)
         if (_judgementDisplay != null)
         {
             _judgementDisplay.Show(feedback);
         }
 
+        // ✅ Play visual feedback on beat
         beat.PlayHitFeedback();
 
+        // ✅ Notify phase controller
         _phaseController.OnBeatCompleted();
     }
 
@@ -204,21 +315,28 @@ public class GameLoopOSU : MonoBehaviour
     {
         _activeBeats.Remove(beat);
 
+        // ✅ Record miss to score service (breaks combo)
         _scoreService.RecordJudgement(JudgementType.Miss);
 
-        // Update combo display (combo broken)
+        // ✅ Get miss feedback
         FeedbackData feedback = _evaluator.GetFeedback(JudgementType.Miss);
 
-        // ✅ DISPLAY MISS UI
+        // ✅ Show MISS UI (user didn't tap at all)
         if (_judgementDisplay != null)
         {
             _judgementDisplay.Show(feedback);
         }
 
+        // ✅ Play miss feedback on beat
         beat.PlayMissFeedback();
 
+        // ✅ Notify phase controller
         _phaseController.OnBeatCompleted();
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // PUBLIC GETTERS
+    // ═══════════════════════════════════════════════════════════
 
     public int GetCurrentTotalScore()
     {

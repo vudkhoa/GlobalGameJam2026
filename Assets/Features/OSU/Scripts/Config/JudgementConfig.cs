@@ -31,9 +31,9 @@ public class JudgementConfig : ScriptableObject
     // ═══════════════════════════════════════════════════════════
 
     [Header("Scoring")]
-    public int perfectScore = 100;
-    public int goodScore = 50;
-    public int okScore = 20;
+    public int perfectScore = 3;
+    public int goodScore = 2;
+    public int okScore = 1;
     public int missScore = 0;
 
     // ═══════════════════════════════════════════════════════════

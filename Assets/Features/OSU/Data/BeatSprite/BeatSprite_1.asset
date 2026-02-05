@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 599c42623ea944c449a58c6e83f0a8b1, type: 3}
   m_Name: BeatSprite_1
   m_EditorClassIdentifier: 
-  outerRingSprite: {fileID: -5122814667194785740, guid: 0e71dd35c3988ff4d8bd712ede8b65de, type: 3}
-  innerRingSprite: {fileID: 6622316888709034011, guid: 1b91382c65e050a44a2a95ae49ea7852, type: 3}
-  hitEffectSprite: {fileID: -5457043266224959566, guid: aec4efb38b8139540a34a4bd59d6bf63, type: 3}
+  outerRingSprite: {fileID: -5122814667194785740, guid: d3a3ecc7d137cc2409af19e30115e5b2, type: 3}
+  innerRingSprite: {fileID: 6622316888709034011, guid: 90f548cd36865654489326ce5d02e712, type: 3}
+  hitEffectSprite: {fileID: -5457043266224959566, guid: 8329e5cc5135c674d93966e275c7e212, type: 3}

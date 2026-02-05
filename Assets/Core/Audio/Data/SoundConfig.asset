@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundMappings:
   - soundType: 0
-    audioClip: {fileID: 0}
+    audioClip: {fileID: 8300000, guid: 41907dde6e9c8734293871f8d9c8061a, type: 3}
+    volume: 0.5
+  - soundType: 13
+    audioClip: {fileID: 8300000, guid: 23f4d97702368e64eb1f5e3eb9f00f8e, type: 3}
     volume: 1

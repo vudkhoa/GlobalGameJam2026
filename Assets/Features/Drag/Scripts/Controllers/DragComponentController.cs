@@ -188,7 +188,7 @@ public class DragComponentController : MonoSingleton<DragComponentController>
     {
         if (dragComponenets == null || dragComponenets.Length == 0)
         {
-            Debug.LogWarning("dragComponenets array is null or empty!");
+
             return float.MaxValue;
         }
 

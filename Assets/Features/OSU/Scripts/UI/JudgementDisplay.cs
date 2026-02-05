@@ -24,7 +24,23 @@ public class JudgementDisplay : MonoBehaviour
 
     public void Show(FeedbackData feedback)
     {
-        if (feedback == null || _judgementText == null) return;
+        // ✅ DEBUG: Check if method is called
+
+
+        if (feedback == null)
+        {
+
+            return;
+        }
+
+        if (_judgementText == null)
+        {
+
+            return;
+        }
+
+        // ✅ DEBUG: Log feedback data
+
 
         // Kill existing animation
         _displaySequence?.Kill();
@@ -33,6 +49,9 @@ public class JudgementDisplay : MonoBehaviour
         _judgementText.text = feedback.text;
         _judgementText.color = feedback.color;
         _judgementText.gameObject.SetActive(true);
+
+        // ✅ DEBUG: Confirm text is active
+
 
         // Reset transform
         _judgementText.transform.localScale = _startScale;
@@ -55,6 +74,8 @@ public class JudgementDisplay : MonoBehaviour
             Color c = feedback.color;
             c.a = 1f;
             _judgementText.color = c;
+
+
         });
     }
 

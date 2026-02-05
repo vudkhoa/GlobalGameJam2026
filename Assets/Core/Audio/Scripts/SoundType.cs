@@ -24,5 +24,8 @@ public enum SoundType
     // SFX - Game
     SFX_BeatSpawn,
     SFX_ComboBreak,
-    SFX_PhaseComplete
+    SFX_PhaseComplete,
+
+    // Chapter 4
+    SFX_Click_Picture,
 }

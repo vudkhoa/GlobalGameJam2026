@@ -198,7 +198,7 @@ public class PuzzleController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Không tìm thấy ô trống nào để Focus!");
+
         }
     }
 
@@ -323,20 +323,20 @@ public class PuzzleController : MonoBehaviour
         // LOG 1: Kiểm tra xem hàm có được gọi không
         if (_currentState == null)
         {
-            Debug.LogError("LỖI: _currentState đang NULL! Bạn đã gọi StartGameManually chưa?");
+
             return;
         }
 
         if (!_currentState.CanInteract())
         {
-            Debug.LogWarning("State hiện tại không cho phép tương tác.");
+
             return;
         }
 
         // LOG 2: Kiểm tra xem đã chọn ô nào chưa
         if (_focusedSlot == null)
         {
-            Debug.LogError("LỖI: _focusedSlot đang NULL! Người chơi chưa chọn ô nào để điền.");
+
             return;
         }
         int targetSlotNumber = _focusedSlot.assignedNumber; // Số ID của ô vuông (Ví dụ: 5)
@@ -558,7 +558,7 @@ public class PuzzleController : MonoBehaviour
     private async void OnFinalDecisionMade(int choiceIndex)
     {
         PlayerDecision decision = (choiceIndex == 0) ? PlayerDecision.Denial : PlayerDecision.Acceptance;
-        Debug.Log($"Chosen ending: {decision}");
+
 
         choiceView.gameObject.SetActive(false);
 
