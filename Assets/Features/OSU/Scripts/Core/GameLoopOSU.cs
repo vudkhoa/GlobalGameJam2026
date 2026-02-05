@@ -19,6 +19,11 @@ public class GameLoopOSU : MonoBehaviour
     [Header("Components")]
     [SerializeField] private BeatSpawner _beatSpawner;
 
+    [Header("Input Configuration")]
+    [SerializeField] private Camera _gameCamera;
+    [SerializeField] private LayerMask _beatLayerMask = -1; // Default: everything
+    [SerializeField] private bool _debugInput = false;
+
     [Header("Animation Sequences")]
     [SerializeField] private AnimationSequencerController intro;
     [SerializeField] private AnimationSequencerController intro2;
@@ -37,6 +42,7 @@ public class GameLoopOSU : MonoBehaviour
     private IScoreService _scoreService;
     private JudgementEvaluator _evaluator;
     private PhaseController _phaseController;
+    private BeatInputHandler _inputHandler;
 
     // Beat tracking
     private List<BeatCircle> _activeBeats = new List<BeatCircle>();
@@ -51,6 +57,22 @@ public class GameLoopOSU : MonoBehaviour
             enabled = false;
             return;
         }
+
+        // Setup camera
+        if (_gameCamera == null)
+        {
+            _gameCamera = Camera.main;
+        }
+
+        if (_gameCamera == null)
+        {
+            Debug.LogError("[GameLoopOSU] No camera found! Input will not work.");
+            enabled = false;
+            return;
+        }
+
+        // Initialize input handler
+        _inputHandler = new BeatInputHandler(_gameCamera, _beatLayerMask, _debugInput);
 
         // Explicitly ensure installer has initialized its services
         // This solves script execution order issues
@@ -108,16 +130,35 @@ public class GameLoopOSU : MonoBehaviour
     {
         if (_timeService == null || !_timeService.IsRunning) return;
 
+        //  PROCESS INPUT FIRST (highest priority to avoid missing input)
+        HandleInput();
+
         // Update time service
         _timeService.Update(Time.deltaTime);
 
         // Update spawner with current time
         _beatSpawner.UpdateSpawning(_timeService.CurrentTime);
 
-        // ✅ UPDATE COMBO DISPLAY mỗi frame
+        //  UPDATE COMBO DISPLAY mỗi frame
         if (_comboDisplay != null)
         {
             _comboDisplay.UpdateCombo(_scoreService.GetCurrentCombo());
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  INPUT HANDLING - Processed every frame in Update()
+    // ═══════════════════════════════════════════════════════════
+
+    private void HandleInput()
+    {
+        // Process input and get the beat that was hit (if any)
+        BeatCircle hitBeat = _inputHandler.ProcessInput();
+
+        if (hitBeat != null)
+        {
+            // Trigger tap on the beat
+            hitBeat.OnTap();
         }
     }
 
@@ -126,7 +167,7 @@ public class GameLoopOSU : MonoBehaviour
 
         await intro.PlayAsync();
 
-        // ✅ Blur trong intro2 (countdown 3-2-1) - không có phase sprite
+        // Blur trong intro2 (countdown 3-2-1) - không có phase sprite
         if (_blurEffect != null)
         {
             _blurEffect.BlurBg();
@@ -134,10 +175,9 @@ public class GameLoopOSU : MonoBehaviour
         await intro2.PlayAsync();
 
         await intro3.PlayAsync();
-        // ✅ Wait 1 frame để warmup hoàn tất
+        // Wait 1 frame để warmup hoàn tất
         await UniTask.Yield();
 
-        Debug.Log("[GameLoopOSU] Initializing...");
 
         // Update beat config
         _beatSpawner.UpdateBeatConfig(_defaultBeatConfig);
@@ -186,7 +226,6 @@ public class GameLoopOSU : MonoBehaviour
 
     private async void OnPhaseEnded(PhaseData phase, int phaseIndex)
     {
-        Debug.Log($"[GameLoopOSU] Phase ended: {phase.phaseName} (Index: {phaseIndex})");
 
         int phaseScore = _scoreService.GetTotalScore();
         _scoreService.RecordPhaseScore(phaseIndex, phaseScore);
@@ -215,7 +254,6 @@ public class GameLoopOSU : MonoBehaviour
         else
         {
             // No more phases - game will end
-            Debug.Log($"[GameLoopOSU] No more phases. Waiting for completion event...");
         }
     }
 
@@ -288,25 +326,25 @@ public class GameLoopOSU : MonoBehaviour
     {
         _activeBeats.Remove(beat);
 
-        // ✅ Evaluate judgement (Perfect/Good/OK/Miss based on timing)
+        //  Evaluate judgement (Perfect/Good/OK/Miss based on timing)
         JudgementType judgement = _evaluator.Evaluate(beat.CurrentSize, beat.TargetSize);
 
-        // ✅ Record to score service (updates combo + score)
+        //  Record to score service (updates combo + score)
         _scoreService.RecordJudgement(judgement);
 
-        // ✅ Get feedback data
+        //  Get feedback data
         FeedbackData feedback = _evaluator.GetFeedback(judgement);
 
-        // ✅ Show judgement UI (ALWAYS show for tap, even if Miss)
+        //  Show judgement UI (ALWAYS show for tap, even if Miss)
         if (_judgementDisplay != null)
         {
             _judgementDisplay.Show(feedback);
         }
 
-        // ✅ Play visual feedback on beat
+        //  Play visual feedback on beat
         beat.PlayHitFeedback();
 
-        // ✅ Notify phase controller
+        //  Notify phase controller
         _phaseController.OnBeatCompleted();
     }
 
@@ -314,22 +352,22 @@ public class GameLoopOSU : MonoBehaviour
     {
         _activeBeats.Remove(beat);
 
-        // ✅ Record miss to score service (breaks combo)
+        //  Record miss to score service (breaks combo)
         _scoreService.RecordJudgement(JudgementType.Miss);
 
-        // ✅ Get miss feedback
+        //  Get miss feedback
         FeedbackData feedback = _evaluator.GetFeedback(JudgementType.Miss);
 
-        // ✅ Show MISS UI (user didn't tap at all)
+        //  Show MISS UI (user didn't tap at all)
         if (_judgementDisplay != null)
         {
             _judgementDisplay.Show(feedback);
         }
 
-        // ✅ Play miss feedback on beat
+        //  Play miss feedback on beat
         beat.PlayMissFeedback();
 
-        // ✅ Notify phase controller
+        //  Notify phase controller
         _phaseController.OnBeatCompleted();
     }
 

@@ -22,22 +22,14 @@ public class LinearTrajectory : TrajectoryConfig
         float rad = angle * Mathf.Deg2Rad;
         Vector2 direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
 
-        // Get the size component along the direction (width for horizontal, height for vertical)
-        // For angle 0° (horizontal), use beatSize.x
-        // For angle 90° (vertical), use beatSize.y
-        // For other angles, use the projection
-        float sizeAlongDirection = Mathf.Abs(Mathf.Cos(rad)) * beatSize.x + Mathf.Abs(Mathf.Sin(rad)) * beatSize.y;
-
-        // Calculate total length:
-        // Total = (beatCount * beatSize) + ((beatCount - 1) * gap)
-        float totalLength = (totalCount * sizeAlongDirection) + ((totalCount - 1) * gap);
+        // ✅ Calculate total length based ONLY on gap (beat size handled by BeatConfig)
+        float totalLength = (totalCount - 1) * gap;
 
         // Calculate start position (centered)
         Vector2 start = -direction * (totalLength * 0.5f);
 
         // Calculate position for this beat
-        // Position = start + (index * (beatSize + gap))
-        float offset = index * (sizeAlongDirection + gap);
+        float offset = index * gap;
         Vector2 position = start + direction * offset;
 
         // Apply boundary radius if needed
@@ -61,12 +53,10 @@ public class LinearTrajectory : TrajectoryConfig
         gap = Mathf.Max(0f, gap);
         angle = Mathf.Repeat(angle, 360f);
 
-        // Calculate total length for display
-        float rad = angle * Mathf.Deg2Rad;
-        float sizeAlongDirection = Mathf.Abs(Mathf.Cos(rad)) * beatSize.x + Mathf.Abs(Mathf.Sin(rad)) * beatSize.y;
-        float totalLength = (beatCount * sizeAlongDirection) + ((beatCount - 1) * gap);
+        // Calculate total length for display (gap only)
+        float totalLength = (beatCount - 1) * gap;
 
-        trajectoryName = $"Linear {angle:F0}° (size={sizeAlongDirection:F0}, gap={gap:F0}, total={totalLength:F0})";
+        trajectoryName = $"Linear {angle:F0}° (gap={gap:F0}, beats={beatCount}, len={totalLength:F0})";
     }
 #endif
 }

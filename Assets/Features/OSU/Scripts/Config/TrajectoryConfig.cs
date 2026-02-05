@@ -3,7 +3,8 @@ using UnityEngine;
 /// <summary>
 /// SRP: Base class for all trajectory configurations
 /// Responsibility: Define interface for beat position generation along trajectories
-/// ✅ NOW: Each trajectory can specify its own sprite set + connector config
+/// ✅ NOW: Each trajectory can specify its own sprite set
+/// ✅ Beat SIZE is controlled by BeatConfig, NOT trajectory
 /// </summary>
 public abstract class TrajectoryConfig : ScriptableObject
 {
@@ -27,14 +28,10 @@ public abstract class TrajectoryConfig : ScriptableObject
     [Range(0.3f, 3f)]
     public float beatInterval = 1f;
 
-    [Tooltip("Kích thước của beat (sizeDelta của RectTransform)")]
-    public Vector2 beatSize = new Vector2(100f, 100f);
-
     [Header("Visual Settings")]
     [Tooltip("Sprite set cho tất cả beats trong trajectory này (optional)")]
     public BeatSpriteSet beatSpriteSet;
 
-    // ✅ NEW: Connector config
     [Tooltip("Config để nối từ beat cuối trajectory này đến beat đầu trajectory tiếp theo")]
     public BeatConnectorData connectorToNext;
 
@@ -65,8 +62,6 @@ public abstract class TrajectoryConfig : ScriptableObject
         boundaryRadius = Mathf.Max(0f, boundaryRadius);
         beatCount = Mathf.Max(1, beatCount);
         beatInterval = Mathf.Max(0.3f, beatInterval);
-        beatSize.x = Mathf.Max(10f, beatSize.x);
-        beatSize.y = Mathf.Max(10f, beatSize.y);
     }
 #endif
 }

@@ -4,10 +4,11 @@ using UnityEngine;
 /// <summary>
 /// SRP: Generate beat data from phase config
 /// Responsibility: Convert PhaseData → List<BeatData>
+/// ✅ Beat size comes from BeatConfig (auto-converted to world scale)
 /// </summary>
 public static class BeatGenerator
 {
-    public static List<BeatData> GenerateBeats(PhaseData phase, float phaseStartTime)
+    public static List<BeatData> GenerateBeats(PhaseData phase, BeatConfig beatConfig, float phaseStartTime)
     {
         List<BeatData> beats = new List<BeatData>();
 
@@ -17,6 +18,9 @@ public static class BeatGenerator
         }
 
         float currentTime = phaseStartTime;
+
+        // ✅ Get beat size from BeatConfig (already converted to world scale)
+        Vector2 beatSizeWorld = Vector2.one * beatConfig.BeatSizeWorld;
 
         foreach (var trajectoryConfig in phase.trajectoryConfigs)
         {
@@ -38,8 +42,8 @@ public static class BeatGenerator
                 {
                     time = currentTime,
                     position = position,
-                    size = trajectoryConfig.beatSize,
-                    spriteSet = trajectoryConfig.beatSpriteSet // ✅ NEW: Pass sprite set
+                    size = beatSizeWorld, // ✅ World scale size (already divided by 100)
+                    spriteSet = trajectoryConfig.beatSpriteSet
                 };
 
                 beats.Add(beat);

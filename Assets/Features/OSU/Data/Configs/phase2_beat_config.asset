@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43168ac4048078c45ba67a7be166c8fe, type: 3}
   m_Name: phase2_beat_config
   m_EditorClassIdentifier: 
-  outerRingSize: 200
-  innerRingStartSize: 600
-  ringThickness: 10
-  outerRingColor: {r: 1, g: 1, b: 1, a: 1}
+  beatSizePixels: 200
+  innerRingScale: 1
+  outerRingStartScale: 3
+  ringThickness: 20
   innerRingColor: {r: 1, g: 0.5, b: 0, a: 1}
+  outerRingColor: {r: 1, g: 1, b: 1, a: 1}
   ringAlpha: 0.8
   shrinkDuration: 1

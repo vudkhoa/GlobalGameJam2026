@@ -14,6 +14,7 @@ public class PhaseController
     private float _currentPhaseStartTime = 0f;
 
     private List<BeatData> _currentPhaseBeats;
+    private BeatConfig _defaultBeatConfig; // ✅ Store default config
 
     public GameState CurrentState { get; private set; } = GameState.Idle;
     public PhaseData CurrentPhase => _currentPhaseIndex >= 0 ? _phases[_currentPhaseIndex] : null;
@@ -29,9 +30,10 @@ public class PhaseController
     // INITIALIZATION
     // ═══════════════════════════════════════════════════════════
 
-    public void Initialize(List<PhaseData> phases)
+    public void Initialize(List<PhaseData> phases, BeatConfig defaultBeatConfig)
     {
         _phases = phases ?? new List<PhaseData>();
+        _defaultBeatConfig = defaultBeatConfig;
 
         if (_phases.Count == 0)
         {
@@ -71,8 +73,11 @@ public class PhaseController
 
         PhaseData phase = CurrentPhase;
 
-        // Generate beats using BeatGenerator
-        _currentPhaseBeats = BeatGenerator.GenerateBeats(phase, _currentPhaseStartTime);
+        // ✅ Get BeatConfig for this phase (or use default)
+        BeatConfig beatConfig = phase.beatConfig != null ? phase.beatConfig : _defaultBeatConfig;
+
+        // Generate beats using BeatGenerator with BeatConfig
+        _currentPhaseBeats = BeatGenerator.GenerateBeats(phase, beatConfig, _currentPhaseStartTime);
 
         OnPhaseStarted?.Invoke(phase);
     }
@@ -93,7 +98,6 @@ public class PhaseController
     private void EndCurrentPhase()
     {
         PhaseData completedPhase = CurrentPhase;
-        //Debug.Log($"[PhaseController] {completedPhase.phaseName} completed ({_beatsCompletedInPhase} beats)");
 
         OnPhaseEnded?.Invoke(completedPhase, _currentPhaseIndex);
 

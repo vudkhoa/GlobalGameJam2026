@@ -1,22 +1,25 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 /// <summary>
-/// SRP: Represent a single beat circle (Poolable)
+/// SRP: Represent a single beat circle using SpriteRenderer (Poolable)
 /// Responsibility: Hold beat state, emit events, support pooling
-/// ✅ FIXED: Outer ring raycast ALWAYS enabled
 /// </summary>
 [RequireComponent(typeof(BeatAnimator))]
-[RequireComponent(typeof(CanvasGroup))]
-public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandler
+[RequireComponent(typeof(CircleCollider2D))]
+public class BeatCircle : MonoBehaviour
 {
+    // Static counter for dynamic sorting order
+    private static int _spawnCounter = 0;
+    private const int SORTING_ORDER_OFFSET = 10; // Offset between each beat
+
     [Header("References")]
-    [SerializeField] private Image _outerRing;
-    [SerializeField] private Image _innerRing;
-    [SerializeField] private Image _hitEffectImage;
-    [SerializeField] private CanvasGroup _canvasGroup;
+    [SerializeField] private SpriteRenderer _outerRing; // Vòng thu vào (shrinking)
+    [SerializeField] private SpriteRenderer _innerRing; // Vòng cố định (target)
+    [SerializeField] private SpriteRenderer _hitEffectSprite;
+    private CircleCollider2D _collider;
 
     [Header("Default Sprites (Fallback)")]
     [Tooltip("Fallback sprite nếu không có BeatSpriteSet")]
@@ -30,10 +33,12 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     private BeatData _data;
     private BeatAnimator _animator;
     private bool _hasBeenHit = false;
+    private int _sortingOrderBase; // Base sorting order for this beat
+    private CancellationTokenSource _cts; // For cancelling async operations
 
     public bool IsActive { get; private set; }
-    public Vector2 CurrentSize => _innerRing.rectTransform.sizeDelta;
-    public Vector2 TargetSize => _data.size;
+    public Vector2 CurrentSize => _outerRing.transform.localScale;
+    public Vector2 TargetSize => _innerRing.transform.localScale;
 
     public event Action<BeatCircle> OnTapped;
     public event Action<BeatCircle> OnMissed;
@@ -47,27 +52,22 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
     private void Awake()
     {
         _animator = GetComponent<BeatAnimator>();
+        _collider = GetComponent<CircleCollider2D>();
 
-        // Get or add CanvasGroup
-        if (_canvasGroup == null)
+        // Setup collider
+        if (_collider == null)
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
-            if (_canvasGroup == null)
-            {
-                _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            }
+            _collider = gameObject.AddComponent<CircleCollider2D>();
         }
-
-        // ✅ FIX: Setup raycast targets ONCE - outer ring ALWAYS enabled
-        SetupRaycastTargetsOnce();
+        _collider.isTrigger = false; // We want physics raycasts to hit this
 
         // Set proper layer order
         SetupLayerOrder();
 
-        // Hide hit effect image initially
-        if (_hitEffectImage != null)
+        // Hide hit effect initially
+        if (_hitEffectSprite != null)
         {
-            _hitEffectImage.gameObject.SetActive(false);
+            _hitEffectSprite.gameObject.SetActive(false);
         }
     }
 
@@ -81,60 +81,33 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
         IsActive = true;
         _hasBeenHit = false;
 
-        // ✅ FIX: Control interaction via CanvasGroup ONLY
-        _canvasGroup.interactable = true;
-        _canvasGroup.blocksRaycasts = true;
+        // Create new cancellation token source
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+
+        // Enable collider for input
+        _collider.enabled = true;
 
         // Ensure GameObject is active
         gameObject.SetActive(true);
 
-        // Setup visuals
-        SetupVisuals();
-
+        // Set position
         transform.localPosition = data.position;
 
-        // Calculate start and target sizes
-        Vector2 beatSize = _data.size;
-        float sizeRatio = config.innerRingStartSize / config.outerRingSize;
-        Vector2 innerStartSize = beatSize * sizeRatio;
-        Vector2 targetSize = beatSize;
+        // Setup visuals (this sets initial scales and sprites)
+        SetupVisuals();
 
-        _animator.StartShrink(
-            _innerRing,
-            innerStartSize,
-            targetSize,
-            config.shrinkDuration,
-            OnAnimationComplete
-        );
+        // Start shrink animation on outer ring
+        StartShrinkAnimation();
 
         if (_debugMode)
         {
-            Debug.Log($"[BeatCircle] Initialized at {data.position}, size: {beatSize}");
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // ✅ FIX: SETUP RAYCAST TARGETS ONCE (PERMANENT)
-    // ═══════════════════════════════════════════════════════════
-
-    private void SetupRaycastTargetsOnce()
-    {
-        // ✅ CRITICAL: Outer ring ALWAYS enabled for raycasting
-        if (_outerRing != null)
-        {
-            _outerRing.raycastTarget = true; // NEVER change this!
-        }
-
-        // ✅ CRITICAL: Inner ring ALWAYS disabled (prevent blocking outer ring)
-        if (_innerRing != null)
-        {
-            _innerRing.raycastTarget = false; // NEVER change this!
-        }
-
-        // ✅ Hit effect ALWAYS disabled
-        if (_hitEffectImage != null)
-        {
-            _hitEffectImage.raycastTarget = false; // NEVER change this!
+            Debug.Log($"[BeatCircle] Initialized at {data.position}");
+            Debug.Log($"[BeatCircle] BeatData.size (world): {data.size}");
+            Debug.Log($"[BeatCircle] BeatConfig - beatSizePixels: {_config.beatSizePixels}, innerScale: {_config.innerRingScale}, outerScale: {_config.outerRingStartScale}");
+            Debug.Log($"[BeatCircle] Computed - Inner world scale: {_config.InnerRingWorldScale}, Outer world scale: {_config.OuterRingStartWorldScale}");
+            Debug.Log($"[BeatCircle] Transform - Inner scale: {_innerRing.transform.localScale}, Outer scale: {_outerRing.transform.localScale}");
         }
     }
 
@@ -144,63 +117,60 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
 
     private void SetupLayerOrder()
     {
-        // Outer ring phải ở TRÊN inner ring
-        if (_outerRing != null)
+        // Tính toán sorting order dựa trên spawn counter
+        _sortingOrderBase = _spawnCounter * SORTING_ORDER_OFFSET;
+        _spawnCounter++;
+
+        if (_spawnCounter > 1000)
         {
-            _outerRing.transform.SetAsLastSibling();
+            _spawnCounter = 0;
         }
 
-        if (_innerRing != null)
-        {
-            _innerRing.transform.SetAsFirstSibling();
-        }
+        // Tên Sorting Layer bạn đã tạo trong Unity (Ví dụ: "Gameplay")
+        string targetLayer = "Gameplay";
 
-        if (_hitEffectImage != null)
+        // Outer ring ở dưới (shrinking), Inner ring ở trên (target, visible)
+        SetSpriteSorting(_outerRing, targetLayer, _sortingOrderBase + 1);
+        SetSpriteSorting(_innerRing, targetLayer, _sortingOrderBase + 2);
+        SetSpriteSorting(_hitEffectSprite, targetLayer, _sortingOrderBase + 3);
+
+        if (_debugMode)
         {
-            _hitEffectImage.transform.SetAsLastSibling();
+            Debug.Log($"[BeatCircle] Sorting Setup - Layer: {targetLayer}, Base: {_sortingOrderBase}");
+        }
+    }
+
+    /// <summary>
+    /// Hàm phụ trợ để gán Sorting Layer và Order một cách an toàn
+    /// </summary>
+    private void SetSpriteSorting(SpriteRenderer sr, string layerName, int order)
+    {
+        if (sr != null)
+        {
+            sr.sortingLayerName = layerName;
+            sr.sortingOrder = order;
         }
     }
 
     // ═══════════════════════════════════════════════════════════
-    // VISUAL SETUP
+    // VISUAL SETUP - ALL DATA MANIPULATION HAPPENS HERE
     // ═══════════════════════════════════════════════════════════
 
     private void SetupVisuals()
     {
-        Vector2 beatSize = _data.size;
         BeatSpriteSet spriteSet = _data.spriteSet;
 
-        SetupOuterRing(beatSize, spriteSet);
-        SetupInnerRing(beatSize, spriteSet);
+        SetupInnerRing(spriteSet);
+        SetupOuterRing(spriteSet);
     }
 
-    private void SetupOuterRing(Vector2 beatSize, BeatSpriteSet spriteSet)
+    private void SetupInnerRing(BeatSpriteSet spriteSet)
     {
-        _outerRing.rectTransform.sizeDelta = beatSize;
+        // ✅ Use auto-converted world scale from config
+        float worldScale = _config.InnerRingWorldScale;
+        _innerRing.transform.localScale = Vector3.one * worldScale;
 
-        if (spriteSet != null && spriteSet.outerRingSprite != null)
-        {
-            _outerRing.sprite = spriteSet.outerRingSprite;
-            _outerRing.color = Color.white;
-        }
-        else
-        {
-            if (_defaultOuterSprite != null)
-            {
-                _outerRing.sprite = _defaultOuterSprite;
-            }
-
-            Color outerColor = _config.outerRingColor;
-            outerColor.a = _config.ringAlpha;
-            _outerRing.color = outerColor;
-        }
-    }
-
-    private void SetupInnerRing(Vector2 beatSize, BeatSpriteSet spriteSet)
-    {
-        float sizeRatio = _config.innerRingStartSize / _config.outerRingSize;
-        _innerRing.rectTransform.sizeDelta = beatSize * sizeRatio;
-
+        // Set sprite
         if (spriteSet != null && spriteSet.innerRingSprite != null)
         {
             _innerRing.sprite = spriteSet.innerRingSprite;
@@ -217,40 +187,55 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
             innerColor.a = _config.ringAlpha;
             _innerRing.color = innerColor;
         }
+
+        // Update collider radius based on inner ring size (target area)
+        _collider.radius = worldScale * 0.5f;
+
+        if (_debugMode)
+        {
+            Debug.Log($"[BeatCircle] Inner Ring - World Scale: {worldScale}");
+        }
+    }
+
+    private void SetupOuterRing(BeatSpriteSet spriteSet)
+    {
+        // ✅ Use auto-converted world scale from config
+        float worldScale = _config.OuterRingStartWorldScale;
+        _outerRing.transform.localScale = Vector3.one * worldScale;
+
+        // Set sprite
+        if (spriteSet != null && spriteSet.outerRingSprite != null)
+        {
+            _outerRing.sprite = spriteSet.outerRingSprite;
+            _outerRing.color = Color.white;
+        }
+        else
+        {
+            if (_defaultOuterSprite != null)
+            {
+                _outerRing.sprite = _defaultOuterSprite;
+            }
+
+            Color outerColor = _config.outerRingColor;
+            outerColor.a = _config.ringAlpha;
+            _outerRing.color = outerColor;
+        }
+
+        if (_debugMode)
+        {
+            Debug.Log($"[BeatCircle] Outer Ring - World Scale: {worldScale}");
+        }
     }
 
     // ═══════════════════════════════════════════════════════════
-    // ✅ INPUT HANDLING
+    // ANIMATION CONTROL
     // ═══════════════════════════════════════════════════════════
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void StartShrinkAnimation()
     {
-        if (_debugMode)
-        {
-            Debug.Log($"[BeatCircle] OnPointerClick - IsActive={IsActive}, HasBeenHit={_hasBeenHit}, CanvasGroup.interactable={_canvasGroup.interactable}");
-        }
-
-        if (!IsActive || _hasBeenHit)
-        {
-            return;
-        }
-
-        OnTap();
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        if (_debugMode)
-        {
-            Debug.Log($"[BeatCircle] OnPointerDown - IsActive={IsActive}, HasBeenHit={_hasBeenHit}, CanvasGroup.interactable={_canvasGroup.interactable}");
-        }
-
-        if (!IsActive || _hasBeenHit)
-        {
-            return;
-        }
-
-        OnTap();
+        // ✅ BeatCircle controls the data, BeatAnimator just animates
+        float targetScale = _innerRing.transform.localScale.x;
+        _animator.StartShrink(_outerRing, targetScale, _config.shrinkDuration, OnAnimationComplete);
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -273,12 +258,8 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
         // Stop animation
         _animator.StopShrink();
 
-        // ✅ FIX: Disable interaction via CanvasGroup (NOT raycastTarget!)
-        if (_canvasGroup != null)
-        {
-            _canvasGroup.interactable = false;
-            _canvasGroup.blocksRaycasts = false; // Prevent further clicks
-        }
+        // Disable collider to prevent further clicks
+        _collider.enabled = false;
 
         // Invoke event (GameLoop will call PlayHitFeedback)
         OnTapped?.Invoke(this);
@@ -293,8 +274,8 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
             Debug.Log($"[BeatCircle] PlayHitFeedback");
         }
 
-        ShowHitEffectSprite();
-        _animator.PlayHitAnimation(_innerRing, _outerRing, ReturnToPool);
+        ShowHitEffectSpriteAsync().Forget();
+        _animator.PlayHitAnimation(_outerRing, _innerRing, ReturnToPool);
     }
 
     public void PlayMissFeedback()
@@ -304,37 +285,46 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
             Debug.Log($"[BeatCircle] PlayMissFeedback");
         }
 
-        _animator.PlayMissAnimation(_innerRing, _outerRing, ReturnToPool);
+        _animator.PlayMissAnimation(_outerRing, _innerRing, ReturnToPool);
     }
 
     // ═══════════════════════════════════════════════════════════
-    // HIT EFFECT SPRITE
+    // HIT EFFECT SPRITE - UNITASK VERSION
     // ═══════════════════════════════════════════════════════════
 
-    private void ShowHitEffectSprite()
+    private async UniTaskVoid ShowHitEffectSpriteAsync()
     {
-        if (_hitEffectImage == null) return;
+        if (_hitEffectSprite == null) return;
 
         BeatSpriteSet spriteSet = _data.spriteSet;
 
         if (spriteSet != null && spriteSet.hitEffectSprite != null)
         {
-            _hitEffectImage.sprite = spriteSet.hitEffectSprite;
-            _hitEffectImage.rectTransform.sizeDelta = _data.size * 1.2f;
-            _hitEffectImage.color = Color.white;
-            _hitEffectImage.gameObject.SetActive(true);
+            _hitEffectSprite.sprite = spriteSet.hitEffectSprite;
+            // ✅ Hit effect is 120% of inner ring world scale
+            float scale = _config.InnerRingWorldScale * 1.2f;
+            _hitEffectSprite.transform.localScale = Vector3.one * scale;
+            _hitEffectSprite.color = Color.white;
+            _hitEffectSprite.gameObject.SetActive(true);
 
-            StartCoroutine(FadeOutHitEffect());
-        }
-    }
+            try
+            {
+                // Use cancellation token to allow cleanup
+                await UniTask.WaitForSeconds(0.2f, cancellationToken: _cts.Token);
 
-    private System.Collections.IEnumerator FadeOutHitEffect()
-    {
-        yield return new WaitForSeconds(0.2f);
-
-        if (_hitEffectImage != null)
-        {
-            _hitEffectImage.gameObject.SetActive(false);
+                if (_hitEffectSprite != null)
+                {
+                    _hitEffectSprite.gameObject.SetActive(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Task was cancelled during cleanup - this is expected behavior
+                if (_debugMode)
+                {
+                    Debug.Log($"[BeatCircle] Hit effect fade cancelled");
+                }
+            }
         }
     }
 
@@ -349,8 +339,10 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
             Debug.Log($"[BeatCircle] Returning to pool");
         }
 
-        // Stop all coroutines first
-        StopAllCoroutines();
+        // Cancel all async operations
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = null;
 
         // Stop animations
         _animator.StopShrink();
@@ -360,17 +352,13 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
         _hasBeenHit = false;
 
         // Hide hit effect
-        if (_hitEffectImage != null)
+        if (_hitEffectSprite != null)
         {
-            _hitEffectImage.gameObject.SetActive(false);
+            _hitEffectSprite.gameObject.SetActive(false);
         }
 
-        // ✅ FIX: Disable interaction via CanvasGroup (NOT raycastTarget!)
-        if (_canvasGroup != null)
-        {
-            _canvasGroup.interactable = false;
-            _canvasGroup.blocksRaycasts = false;
-        }
+        // Disable collider
+        _collider.enabled = false;
 
         // Invoke callback to return to pool
         var callback = _onReturnToPool;
@@ -399,14 +387,17 @@ public class BeatCircle : MonoBehaviour, IPointerClickHandler, IPointerDownHandl
         // Beat missed - disable immediately
         IsActive = false;
 
-        // ✅ FIX: Disable interaction via CanvasGroup
-        if (_canvasGroup != null)
-        {
-            _canvasGroup.interactable = false;
-            _canvasGroup.blocksRaycasts = false;
-        }
+        // Disable collider
+        _collider.enabled = false;
 
         // Invoke miss event
         OnMissed?.Invoke(this);
+    }
+
+    private void OnDestroy()
+    {
+        // Cleanup cancellation token on destroy
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

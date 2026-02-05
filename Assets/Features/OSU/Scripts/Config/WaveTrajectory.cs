@@ -49,14 +49,11 @@ public class WaveTrajectory : TrajectoryConfig
             Random.InitState(pathSeed + index);
         }
 
-        // Get the size component along X direction (horizontal movement)
-        float sizeAlongX = beatSize.x;
-
-        // Calculate total length along X axis
-        float totalLength = (totalCount * sizeAlongX) + ((totalCount - 1) * gap);
+        // ✅ Calculate total length based ONLY on gap
+        float totalLength = (totalCount - 1) * gap;
 
         // Calculate X position (linear progression)
-        float xOffset = index * (sizeAlongX + gap);
+        float xOffset = index * gap;
         float xPosition;
 
         if (moveRight)
@@ -82,15 +79,15 @@ public class WaveTrajectory : TrajectoryConfig
         // Clamp Y to stay within bounds
         yPosition = Mathf.Clamp(yPosition, minY, maxY);
 
-        // Smooth connection between beats (ensure beats "flow" together)
+        // ✅ Smooth connection between beats (use gap instead of beatSize)
         if (index > 0)
         {
             // Get previous beat position
             float prevT = totalCount > 1 ? (float)(index - 1) / (totalCount - 1) : 0f;
             Vector2 prevPosition = GetPreviousPosition(prevT, index - 1, totalCount);
 
-            // Limit Y change to create smooth flow
-            float maxYChange = beatSize.y * 1.5f; // Max vertical jump
+            // Limit Y change to create smooth flow (use gap as reference)
+            float maxYChange = gap * 1.5f; // Max vertical jump
             float yDiff = yPosition - prevPosition.y;
 
             if (Mathf.Abs(yDiff) > maxYChange)
@@ -129,9 +126,8 @@ public class WaveTrajectory : TrajectoryConfig
             Random.InitState(pathSeed + index);
         }
 
-        float sizeAlongX = beatSize.x;
-        float totalLength = (totalCount * sizeAlongX) + ((totalCount - 1) * gap);
-        float xOffset = index * (sizeAlongX + gap);
+        float totalLength = (totalCount - 1) * gap;
+        float xOffset = index * gap;
 
         float xPosition = moveRight
             ? -totalLength * 0.5f + xOffset
@@ -163,12 +159,11 @@ public class WaveTrajectory : TrajectoryConfig
             maxY = temp;
         }
 
-        // Calculate total length for display
-        float sizeAlongX = beatSize.x;
-        float totalLength = (beatCount * sizeAlongX) + ((beatCount - 1) * gap);
+        // Calculate total length for display (gap only)
+        float totalLength = (beatCount - 1) * gap;
 
         string direction = moveRight ? "Right" : "Left";
-        trajectoryName = $"Wave {direction} (amp={waveAmplitude:F0}, freq={waveFrequency:F1}, len={totalLength:F0})";
+        trajectoryName = $"Wave {direction} (amp={waveAmplitude:F0}, freq={waveFrequency:F1}, beats={beatCount}, len={totalLength:F0})";
     }
 #endif
 }
