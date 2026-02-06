@@ -1,10 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// SRP: Input processing service for beat circles
-/// Responsibility: Convert screen input to world position and raycast to beats
-/// Note: This is NOT a MonoBehaviour - it's a helper service called by GameLoopOSU
-/// </summary>
 public class BeatInputHandler
 {
     private readonly Camera _gameCamera;
@@ -16,130 +12,61 @@ public class BeatInputHandler
         _gameCamera = gameCamera;
         _beatLayerMask = beatLayerMask;
         _debugMode = debugMode;
-
-        if (_gameCamera == null)
-        {
-            Debug.LogError("[BeatInputHandler] Camera is null! Input will not work.");
-        }
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // INPUT PROCESSING - Called by GameLoopOSU.Update()
-    // ═══════════════════════════════════════════════════════════
-
-    /// <summary>
-    /// Process all current input (mouse + touch) and return the first valid beat hit
-    /// Returns null if no beat was hit
-    /// </summary>
-    public BeatCircle ProcessInput()
+    // Thay đổi: Trả về List thay vì 1 cái
+    public List<BeatCircle> ProcessInput()
     {
-        if (_gameCamera == null) return null;
+        List<BeatCircle> hitBeats = new List<BeatCircle>();
+        if (_gameCamera == null) return hitBeats;
 
-        // Handle mouse/touch input
+        // 1. Xử lý chuột (cho Editor/PC)
         if (Input.GetMouseButtonDown(0))
         {
-            Vector2 inputPosition = _gameCamera.ScreenToWorldPoint(Input.mousePosition);
-            return ProcessClick(inputPosition);
+            Vector2 mousePos = _gameCamera.ScreenToWorldPoint(Input.mousePosition);
+            BeatCircle beat = CastRay(mousePos);
+            if (beat != null && !hitBeats.Contains(beat)) hitBeats.Add(beat);
         }
 
-        // Handle touch input for mobile (multiple touches)
+        // 2. Xử lý cảm ứng (cho Mobile) - Lấy TẤT CẢ ngón tay
         if (Input.touchCount > 0)
         {
             foreach (Touch touch in Input.touches)
             {
                 if (touch.phase == TouchPhase.Began)
                 {
-                    Vector2 touchPosition = _gameCamera.ScreenToWorldPoint(touch.position);
-                    BeatCircle beat = ProcessClick(touchPosition);
+                    Vector2 touchPos = _gameCamera.ScreenToWorldPoint(touch.position);
+                    BeatCircle beat = CastRay(touchPos);
 
-                    // Return first valid beat hit (prevents double-tap same frame)
-                    if (beat != null) return beat;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // RAYCAST LOGIC
-    // ═══════════════════════════════════════════════════════════
-
-    private BeatCircle ProcessClick(Vector2 worldPosition)
-    {
-        if (_debugMode)
-        {
-            Debug.Log($"[BeatInputHandler] Click at world position: {worldPosition}");
-        }
-
-        // Perform raycast to find beat circles
-        RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero, Mathf.Infinity, _beatLayerMask);
-
-        if (hit.collider != null)
-        {
-            // Try to get BeatCircle component
-            BeatCircle beatCircle = hit.collider.GetComponent<BeatCircle>();
-
-            if (beatCircle != null && beatCircle.IsActive)
-            {
-                if (_debugMode)
-                {
-                    Debug.Log($"[BeatInputHandler] Hit beat circle at {beatCircle.transform.position}");
-                }
-
-                return beatCircle;
-            }
-            else if (_debugMode)
-            {
-                Debug.Log($"[BeatInputHandler] Hit object '{hit.collider.name}' but it's not an active beat");
-            }
-        }
-        else if (_debugMode)
-        {
-            Debug.Log($"[BeatInputHandler] No hit detected");
-        }
-
-        return null;
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // MULTI-TAP PROCESSING (Optional - for future features)
-    // ═══════════════════════════════════════════════════════════
-
-    /// <summary>
-    /// Get all beats hit by current input (for multi-tap features)
-    /// </summary>
-    public BeatCircle[] ProcessAllInputs()
-    {
-        if (_gameCamera == null) return System.Array.Empty<BeatCircle>();
-
-        var hits = new System.Collections.Generic.List<BeatCircle>();
-
-        // Handle mouse
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector2 inputPosition = _gameCamera.ScreenToWorldPoint(Input.mousePosition);
-            BeatCircle beat = ProcessClick(inputPosition);
-            if (beat != null) hits.Add(beat);
-        }
-
-        // Handle all touches
-        if (Input.touchCount > 0)
-        {
-            foreach (Touch touch in Input.touches)
-            {
-                if (touch.phase == TouchPhase.Began)
-                {
-                    Vector2 touchPosition = _gameCamera.ScreenToWorldPoint(touch.position);
-                    BeatCircle beat = ProcessClick(touchPosition);
-                    if (beat != null && !hits.Contains(beat))
+                    // Logic quan trọng: Cho phép Multitouch (nhiều nốt cùng lúc)
+                    if (beat != null && !hitBeats.Contains(beat))
                     {
-                        hits.Add(beat);
+                        hitBeats.Add(beat);
                     }
                 }
             }
         }
 
-        return hits.ToArray();
+        return hitBeats;
+    }
+
+    private BeatCircle CastRay(Vector2 worldPos)
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(worldPos, Vector2.zero, Mathf.Infinity, _beatLayerMask);
+
+        foreach (var hit in hits)
+        {
+            if (hit.collider != null)
+            {
+                BeatCircle beat = hit.collider.GetComponent<BeatCircle>();
+                // Chỉ lấy nốt đang Active
+                if (beat != null && beat.IsActive)
+                {
+                    return beat; 
+                }
+            }
+        }
+
+        return null;
     }
 }

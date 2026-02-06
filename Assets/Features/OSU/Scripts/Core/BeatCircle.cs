@@ -189,7 +189,7 @@ public class BeatCircle : MonoBehaviour
         }
 
         // Update collider radius based on inner ring size (target area)
-        _collider.radius = worldScale * 0.5f;
+        _collider.radius = worldScale * 1.5f;
 
         if (_debugMode)
         {

@@ -152,13 +152,16 @@ public class GameLoopOSU : MonoBehaviour
 
     private void HandleInput()
     {
-        // Process input and get the beat that was hit (if any)
-        BeatCircle hitBeat = _inputHandler.ProcessInput();
+        // Lấy danh sách các nốt bị bấm trúng (hỗ trợ đa điểm)
+        List<BeatCircle> hitBeats = _inputHandler.ProcessInput();
 
-        if (hitBeat != null)
+        // Duyệt qua từng nốt và kích hoạt
+        foreach (var beat in hitBeats)
         {
-            // Trigger tap on the beat
-            hitBeat.OnTap();
+            if (beat != null)
+            {
+                beat.OnTap();
+            }
         }
     }
 
