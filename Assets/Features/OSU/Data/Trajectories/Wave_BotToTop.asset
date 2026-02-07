@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b78445f80d7cc49a46b2aae9fd8d7e, type: 3}
   m_Name: Wave_BotToTop
   m_EditorClassIdentifier: 
-  trajectoryName: Wave Right (amp=120, freq=1.2, len=1620)
-  boundaryRadius: 100
-  normalizeToRadius: 0
+  trajectoryName: Wave Right (Fit=Full)
+  safePadding: 2
+  maxX: 20
+  maxY: 10
+  screenPadding: 0
   beatCount: 8
   beatInterval: 1
-  beatSize: {x: 150, y: 150}
   beatSpriteSet: {fileID: 11400000, guid: da2b1b51f458e944b9418dbed4f8d2fc, type: 2}
   connectorToNext:
     connectorSprite: {fileID: 0}
@@ -27,10 +28,9 @@ MonoBehaviour:
     fadeInDuration: 0.2
     overlapFactor: 0.3
   moveRight: 1
-  gap: 60
-  waveAmplitude: 120
+  desiredGap: 0.74
+  forceFullScreen: 1
+  waveAmplitude: 2.52
   waveFrequency: 1.2
-  minY: 0
-  maxY: 400
   pathSeed: 0
   randomness: 0.5

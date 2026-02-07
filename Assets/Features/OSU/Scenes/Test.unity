@@ -151,6 +151,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3713813789984648069, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
+      propertyPath: _defaultBeatConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 92498d49d530e994a9cdd83094994507, type: 2}
     - target: {fileID: 4401979125054330774, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
@@ -243,30 +247,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6914392162098527138, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6914392162098527138, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6914392162098527138, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6914392162098527138, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9148520662093364430, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
       propertyPath: _gameCamera
       value: 
       objectReference: {fileID: 831142180}
-    - target: {fileID: 9150243355069725903, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -360,7 +344,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: -10}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

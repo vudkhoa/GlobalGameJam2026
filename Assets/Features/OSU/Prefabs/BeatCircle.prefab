@@ -155,7 +155,7 @@ MonoBehaviour:
   _outerRing: {fileID: 7987576373095470604}
   _innerRing: {fileID: 2244689867553108971}
   _hitEffectSprite: {fileID: 5234985738185466116}
-  _defaultOuterSprite: {fileID: 6622316888709034011, guid: 90f548cd36865654489326ce5d02e712, type: 3}
+  _defaultOuterSprite: {fileID: 1553666474427244367, guid: 052d45e3c10be404aa9a5ddba8ec9b38, type: 3}
   _defaultInnerSprite: {fileID: -5122814667194785740, guid: d3a3ecc7d137cc2409af19e30115e5b2, type: 3}
   _debugMode: 0
 --- !u!58 &1227223172525048755

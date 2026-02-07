@@ -93,7 +93,7 @@ public class BeatCircle : MonoBehaviour
         gameObject.SetActive(true);
 
         // Set position
-        transform.localPosition = data.position;
+        transform.position = data.position;
 
         // Setup visuals (this sets initial scales and sprites)
         SetupVisuals();

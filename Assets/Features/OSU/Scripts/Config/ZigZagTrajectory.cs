@@ -1,105 +1,81 @@
 using UnityEngine;
 
-/// <summary>
-/// SRP: ZigZag trajectory configuration
-/// Responsibility: Generate beat positions in a zigzag pattern
-/// </summary>
 [CreateAssetMenu(fileName = "ZigZag_Trajectory", menuName = "Audition/Trajectories/ZigZag")]
 public class ZigZagTrajectory : TrajectoryConfig
 {
     [Header("ZigZag Settings")]
-    [Tooltip("Hướng chính của zigzag (0° = right, 90° = up)")]
     [Range(0f, 360f)]
     public float direction = 0f;
 
-    [Tooltip("Biên độ zigzag (độ rộng của mỗi zag)")]
-    [Range(0f, 200f)]
-    public float amplitude = 50f;
+    [Tooltip("Độ rộng zigzag (World Unit)")]
+    [Range(0f, 5f)]
+    public float amplitude = 1.5f;
 
-    [Tooltip("Số lần zigzag trong toàn bộ trajectory")]
     [Range(1, 20)]
     public int zigzagCount = 3;
 
-    [Tooltip("Khoảng cách giữa các beat (gap)")]
-    [Range(0f, 200f)]
-    public float gap = 50f;
+    [Range(0.5f, 5f)]
+    public float desiredGap = 1.5f;
 
-    [Header("Pattern")]
-    [Tooltip("Kiểu zigzag (Sharp = góc nhọn, Smooth = sin wave)")]
+    public bool forceFullScreen = false;
+
     public ZigZagPattern pattern = ZigZagPattern.Sharp;
-
-    public enum ZigZagPattern
-    {
-        Sharp,      // Triangle wave (góc nhọn)
-        Smooth      // Sin wave (mượt)
-    }
+    public enum ZigZagPattern { Sharp, Smooth }
 
     public override Vector2 EvaluatePosition(float t, int index, int totalCount)
     {
-        // Calculate main direction vector
+        // 1. Lấy giới hạn màn hình
+        Vector2 bounds = GetDynamicScreenBounds();
+
+        // 2. Tính hướng chính và hướng vuông góc (để zigzag)
         float rad = direction * Mathf.Deg2Rad;
-        Vector2 mainDirection = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
-        Vector2 perpendicular = new Vector2(-mainDirection.y, mainDirection.x);
+        Vector2 mainDir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+        Vector2 perpDir = new Vector2(-mainDir.y, mainDir.x);
 
-        // ✅ Calculate total length based ONLY on gap
-        float totalLength = (totalCount - 1) * gap;
+        // 3. Tính không gian an toàn (Trừ đi amplitude để đỉnh không bị cắt)
+        // Ví dụ: Nếu zigzag theo chiều dọc, ta phải trừ chiều cao đi 1 đoạn bằng amplitude
+        float safeX = Mathf.Max(0, bounds.x - Mathf.Abs(perpDir.x * amplitude));
+        float safeY = Mathf.Max(0, bounds.y - Mathf.Abs(perpDir.y * amplitude));
 
-        // Calculate start position (centered)
-        Vector2 start = -mainDirection * (totalLength * 0.5f);
+        // Tính chiều dài tối đa của trục chính trong vùng an toàn này
+        float xLimit = (mainDir.x != 0) ? Mathf.Abs(safeX / mainDir.x) : float.MaxValue;
+        float yLimit = (mainDir.y != 0) ? Mathf.Abs(safeY / mainDir.y) : float.MaxValue;
+        float maxAllowedLength = Mathf.Min(xLimit, yLimit) * 2f;
 
-        // Calculate position for this beat along main direction
-        float offset = index * gap;
-        float mainProgress = offset;
-
-        // Calculate zigzag offset based on progress ratio
-        float progressRatio = totalCount > 1 ? (float)index / (totalCount - 1) : 0.5f;
-        float zigzagOffset;
-        float zigzagPhase = progressRatio * zigzagCount;
-
-        if (pattern == ZigZagPattern.Sharp)
+        // 4. Auto Fit Gap
+        float calculatedGap = desiredGap;
+        if (totalCount > 1)
         {
-            // Triangle wave: -1 → 1 → -1
-            float triangleWave = Mathf.PingPong(zigzagPhase * 2f, 2f) - 1f;
-            zigzagOffset = triangleWave * amplitude;
-        }
-        else // Smooth
-        {
-            // Sin wave
-            zigzagOffset = Mathf.Sin(zigzagPhase * Mathf.PI * 2f) * amplitude;
-        }
-
-        // Combine main direction + zigzag offset
-        Vector2 position = start + mainDirection * mainProgress + perpendicular * zigzagOffset;
-
-        // Apply boundary radius if needed
-        if (normalizeToRadius && boundaryRadius > 0f)
-        {
-            float currentDistance = position.magnitude;
-            if (currentDistance > boundaryRadius)
+            float desiredLen = (totalCount - 1) * desiredGap;
+            if (forceFullScreen || desiredLen > maxAllowedLength)
             {
-                position = position.normalized * boundaryRadius;
+                calculatedGap = maxAllowedLength / (totalCount - 1);
             }
         }
 
-        return position;
+        // 5. Tính vị trí
+        float totalLength = (totalCount - 1) * calculatedGap;
+        Vector2 start = -mainDir * (totalLength * 0.5f);
+        Vector2 basePos = start + mainDir * (index * calculatedGap);
+
+        // Cộng thêm offset Zigzag
+        float progress = totalCount > 1 ? (float)index / (totalCount - 1) : 0.5f;
+        float zigzagPhase = progress * zigzagCount;
+        float zigzagOffset = 0f;
+
+        if (pattern == ZigZagPattern.Sharp)
+            zigzagOffset = (Mathf.PingPong(zigzagPhase * 2f, 2f) - 1f) * amplitude;
+        else
+            zigzagOffset = Mathf.Sin(zigzagPhase * Mathf.PI * 2f) * amplitude;
+
+        return basePos + perpDir * zigzagOffset;
     }
 
 #if UNITY_EDITOR
     protected override void OnValidate()
     {
         base.OnValidate();
-
-        direction = Mathf.Repeat(direction, 360f);
-        amplitude = Mathf.Max(0f, amplitude);
-        gap = Mathf.Max(0f, gap);
-        zigzagCount = Mathf.Max(1, zigzagCount);
-
-        // Calculate total length for display (gap only)
-        float totalLength = (beatCount - 1) * gap;
-
-        // Update trajectory name
-        string patternName = pattern == ZigZagPattern.Sharp ? "Sharp" : "Smooth";
-        trajectoryName = $"ZigZag {zigzagCount}x ({patternName}, gap={gap:F0}, beats={beatCount}, len={totalLength:F0})";
+        trajectoryName = $"ZigZag {zigzagCount}x (Fit={(forceFullScreen ? "Full" : "Auto")})";
     }
 #endif
 }

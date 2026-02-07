@@ -2,66 +2,69 @@ using UnityEngine;
 
 /// <summary>
 /// SRP: Base class for all trajectory configurations
-/// Responsibility: Define interface for beat position generation along trajectories
-/// ✅ NOW: Each trajectory can specify its own sprite set
-/// ✅ Beat SIZE is controlled by BeatConfig, NOT trajectory
+/// Responsibility: Define interface & dynamic screen bound calculations
 /// </summary>
 public abstract class TrajectoryConfig : ScriptableObject
 {
     [Header("Trajectory Settings")]
-    [Tooltip("Tên trajectory (để debug/display)")]
     public string trajectoryName = "Trajectory";
 
-    [Tooltip("Giới hạn vùng spawning (boundary radius)")]
-    [Range(0f, 500f)]
-    public float boundaryRadius = 100f;
+    [Header("Dynamic Screen Settings")]
+    [Tooltip("Khoảng cách an toàn thụt vào từ mép màn hình (World Unit)")]
+    [Range(0f, 2f)]
+    public float safePadding = 0.5f;
 
-    [Tooltip("Có scale trajectory về boundaryRadius không")]
-    public bool normalizeToRadius = false;
+    // Các biến cũ giữ lại để tránh lỗi missing ref, nhưng logic sẽ ưu tiên Dynamic
+    [HideInInspector] public float maxX = 8.5f;
+    [HideInInspector] public float maxY = 4.5f;
+    [HideInInspector] public float screenPadding = 0.5f;
 
     [Header("Beat Settings")]
-    [Tooltip("Số lượng beat trong trajectory")]
     [Range(1, 100)]
     public int beatCount = 10;
 
-    [Tooltip("Khoảng thời gian giữa các beat (giây)")]
     [Range(0.3f, 3f)]
     public float beatInterval = 1f;
 
     [Header("Visual Settings")]
-    [Tooltip("Sprite set cho tất cả beats trong trajectory này (optional)")]
     public BeatSpriteSet beatSpriteSet;
-
-    [Tooltip("Config để nối từ beat cuối trajectory này đến beat đầu trajectory tiếp theo")]
     public BeatConnectorData connectorToNext;
 
     /// <summary>
-    /// Evaluate vị trí beat tại thời điểm t trong trajectory
+    /// Hàm cốt lõi: Lấy giới hạn màn hình thực tế (World Space) từ Camera hiện tại
     /// </summary>
+    protected Vector2 GetDynamicScreenBounds()
+    {
+        Camera cam = Camera.main;
+        if (cam == null) return new Vector2(8.5f, 4.5f); // Fallback nếu không tìm thấy cam
+
+        // Viewport (1,1) là góc trên phải. Chuyển sang World Space.
+        Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, 0));
+
+        // Trừ padding để đảm bảo an toàn
+        return new Vector2(topRight.x - safePadding, topRight.y - safePadding);
+    }
+
     public abstract Vector2 EvaluatePosition(float t, int index, int totalCount);
 
     /// <summary>
-    /// Get vị trí của beat cuối cùng trong trajectory
+    /// Clamp vị trí vào trong giới hạn dynamic
     /// </summary>
-    public Vector2 GetLastBeatPosition()
+    protected Vector2 ClampToScreenBounds(Vector2 position)
     {
-        return EvaluatePosition(1f, beatCount - 1, beatCount);
-    }
+        Vector2 bounds = GetDynamicScreenBounds();
 
-    /// <summary>
-    /// Get vị trí của beat đầu tiên trong trajectory
-    /// </summary>
-    public Vector2 GetFirstBeatPosition()
-    {
-        return EvaluatePosition(0f, 0, beatCount);
+        float clampedX = Mathf.Clamp(position.x, -bounds.x, bounds.x);
+        float clampedY = Mathf.Clamp(position.y, -bounds.y, bounds.y);
+
+        return new Vector2(clampedX, clampedY);
     }
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()
     {
-        boundaryRadius = Mathf.Max(0f, boundaryRadius);
         beatCount = Mathf.Max(1, beatCount);
-        beatInterval = Mathf.Max(0.3f, beatInterval);
+        beatInterval = Mathf.Max(0.1f, beatInterval);
     }
 #endif
 }

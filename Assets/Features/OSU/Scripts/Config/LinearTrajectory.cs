@@ -1,46 +1,64 @@
 using UnityEngine;
 
-/// <summary>
-/// SRP: Linear trajectory configuration
-/// Responsibility: Generate beat positions along a straight line
-/// </summary>
 [CreateAssetMenu(fileName = "Linear_Trajectory", menuName = "Audition/Trajectories/Linear")]
 public class LinearTrajectory : TrajectoryConfig
 {
     [Header("Linear Settings")]
-    [Tooltip("Góc của đường thẳng (0° = right, 90° = up)")]
+    [Tooltip("Góc của đường thẳng (0° = phải, 90° = lên, 180° = trái)")]
     [Range(0f, 360f)]
     public float angle = 0f;
 
-    [Tooltip("Khoảng cách giữa các beat (gap)")]
-    [Range(10f, 200f)]
-    public float gap = 50f;
+    [Tooltip("Khoảng cách mong muốn giữa các beat (World Unit). Sẽ tự co lại nếu quá dài.")]
+    [Range(0.5f, 5f)]
+    public float desiredGap = 1.5f;
+
+    [Tooltip("Nếu bật: Tự động giãn khoảng cách để đường thẳng chạm 2 mép màn hình")]
+    public bool forceFullScreen = false;
 
     public override Vector2 EvaluatePosition(float t, int index, int totalCount)
     {
-        // Calculate direction from angle
+        // 1. Lấy giới hạn màn hình thực tế
+        Vector2 bounds = GetDynamicScreenBounds();
+        float dynamicMaxX = bounds.x;
+        float dynamicMaxY = bounds.y;
+
+        // 2. Tính hướng
         float rad = angle * Mathf.Deg2Rad;
         Vector2 direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
 
-        // ✅ Calculate total length based ONLY on gap (beat size handled by BeatConfig)
-        float totalLength = (totalCount - 1) * gap;
+        // 3. Tính toán chiều dài tối đa cho phép trong cái hộp màn hình này
+        // Công thức: Tìm giao điểm của tia (direction) với hình chữ nhật (bounds)
+        float xLimit = (direction.x != 0) ? Mathf.Abs(dynamicMaxX / direction.x) : float.MaxValue;
+        float yLimit = (direction.y != 0) ? Mathf.Abs(dynamicMaxY / direction.y) : float.MaxValue;
 
-        // Calculate start position (centered)
-        Vector2 start = -direction * (totalLength * 0.5f);
+        // Đường kính tối đa (từ tâm ra 2 phía)
+        float maxAllowedLength = Mathf.Min(xLimit, yLimit) * 2f;
 
-        // Calculate position for this beat
-        float offset = index * gap;
-        Vector2 position = start + direction * offset;
+        // 4. Tính toán Gap thực tế (Auto Fit)
+        float calculatedGap = desiredGap;
 
-        // Apply boundary radius if needed
-        if (normalizeToRadius && boundaryRadius > 0f)
+        if (totalCount > 1)
         {
-            float currentDistance = position.magnitude;
-            if (currentDistance > boundaryRadius)
+            float desiredTotalLength = (totalCount - 1) * desiredGap;
+
+            if (forceFullScreen)
             {
-                position = position.normalized * boundaryRadius;
+                // Ép full screen: Chia đều độ dài tối đa
+                calculatedGap = maxAllowedLength / (totalCount - 1);
+            }
+            else if (desiredTotalLength > maxAllowedLength)
+            {
+                // Nếu dài quá màn hình: Co Gap lại cho vừa khít
+                calculatedGap = maxAllowedLength / (totalCount - 1);
             }
         }
+
+        // 5. Tính vị trí cuối cùng
+        float totalLength = (totalCount - 1) * calculatedGap;
+
+        // Bắt đầu từ nửa bên này, đi về phía bên kia để tâm đường thẳng trùng tâm màn hình (0,0)
+        Vector2 start = -direction * (totalLength * 0.5f);
+        Vector2 position = start + direction * (index * calculatedGap);
 
         return position;
     }
@@ -49,14 +67,7 @@ public class LinearTrajectory : TrajectoryConfig
     protected override void OnValidate()
     {
         base.OnValidate();
-
-        gap = Mathf.Max(0f, gap);
-        angle = Mathf.Repeat(angle, 360f);
-
-        // Calculate total length for display (gap only)
-        float totalLength = (beatCount - 1) * gap;
-
-        trajectoryName = $"Linear {angle:F0}° (gap={gap:F0}, beats={beatCount}, len={totalLength:F0})";
+        trajectoryName = $"Linear {angle:F0}° (Fit={(forceFullScreen ? "Full" : "Auto")})";
     }
 #endif
 }

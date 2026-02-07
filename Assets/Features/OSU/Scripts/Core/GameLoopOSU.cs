@@ -168,18 +168,18 @@ public class GameLoopOSU : MonoBehaviour
     private async UniTask StartGame()
     {
 
-        await intro.PlayAsync();
+        ////await intro.PlayAsync();
 
-        // Blur trong intro2 (countdown 3-2-1) - không có phase sprite
-        if (_blurEffect != null)
-        {
-            _blurEffect.BlurBg();
-        }
-        await intro2.PlayAsync();
+        //// Blur trong intro2 (countdown 3-2-1) - không có phase sprite
+        //if (_blurEffect != null)
+        //{
+        //    _blurEffect.BlurBg();
+        //}
+        //await intro2.PlayAsync();
 
-        await intro3.PlayAsync();
-        // Wait 1 frame để warmup hoàn tất
-        await UniTask.Yield();
+        //await intro3.PlayAsync();
+        //// Wait 1 frame để warmup hoàn tất
+        //await UniTask.Yield();
 
 
         // Update beat config

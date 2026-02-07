@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Angle90
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 90\xB0 (size=150, gap=50, total=550)"
-  boundaryRadius: 300
-  normalizeToRadius: 0
+  trajectoryName: "Linear 90\xB0 (Fit=Full)"
+  safePadding: 2
+  maxX: 100
+  maxY: 50
+  screenPadding: 10
   beatCount: 3
   beatInterval: 1.2
-  beatSize: {x: 150, y: 150}
   beatSpriteSet: {fileID: 11400000, guid: da2b1b51f458e944b9418dbed4f8d2fc, type: 2}
   connectorToNext:
     connectorSprite: {fileID: 0}
@@ -27,4 +28,5 @@ MonoBehaviour:
     fadeInDuration: 0.2
     overlapFactor: 0.3
   angle: 90
-  gap: 50
+  desiredGap: 2
+  forceFullScreen: 1
