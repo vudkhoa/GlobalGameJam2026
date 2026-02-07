@@ -24,8 +24,8 @@ public class PuzzleTransitionTask : BaseTask
     {
         await UniTask.Delay((int)(_delaySeconds * 1000));
         await _controller.AnimateLevelExitAsync();
-        await UniTask.Delay((int)(_delaySeconds * 1000));
-        await _controller.AnimateLevelEnterAsync();
+        // await UniTask.Delay((int)(_delaySeconds * 1000));
+        // await _controller.AnimateLevelEnterAsync();
         this.doneTask = true;
     }
 }

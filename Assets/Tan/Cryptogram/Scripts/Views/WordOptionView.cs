@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System; // Để dùng Action
-using DG.Tweening; // Để dùng DOTween
+using System;
+using DG.Tweening;
 
 public class WordOptionView : MonoBehaviour
 {
@@ -20,12 +20,10 @@ public class WordOptionView : MonoBehaviour
         wordText.text = letter;
         _onClickCallback = callback;
 
-        // Reset state
         gameObject.SetActive(true);
         btnComp.onClick.RemoveAllListeners();
         if (isActive)
         {
-            // Trạng thái Bấm Được
             btnComp.interactable = true;
             canvasGroup.alpha = 1f;
             btnComp.onClick.AddListener(() =>
@@ -44,23 +42,32 @@ public class WordOptionView : MonoBehaviour
 
     public void SetupFunctionKey(string icon, Action callback)
     {
-        wordText.text = icon; 
+        wordText.text = icon;
         btnComp.interactable = true;
         canvasGroup.alpha = 1f;
-        
+
         btnComp.onClick.RemoveAllListeners();
-        btnComp.onClick.AddListener(() => callback?.Invoke());
+        btnComp.onClick.AddListener(() =>
+        {
+            AnimateClick();
+            callback?.Invoke();
+        });
+    }
+
+    public void AnimateClick()
+    {
+        transform.DOKill();
+        transform.localScale = Vector3.one;
+        transform.DOPunchScale(new Vector3(-0.2f, -0.2f, 0), 0.2f, 10, 1);
     }
 
     public void Disappear()
     {
-        // Hiệu ứng biến mất khi chọn đúng
         transform.DOScale(0f, 0.2f).OnComplete(() => Destroy(gameObject));
     }
 
     public void ShakeError()
     {
-        // Nếu nút đang bị tắt (đang rung), thì không làm gì cả
         if (btnComp.interactable == false) return;
 
         btnComp.interactable = false;
@@ -71,7 +78,6 @@ public class WordOptionView : MonoBehaviour
                      btnComp.interactable = true;
                  });
 
-        // Hiệu ứng màu
         wordText.DOKill(true);
         wordText.DOColor(Color.red, 0.2f).SetLoops(2, LoopType.Yoyo);
     }

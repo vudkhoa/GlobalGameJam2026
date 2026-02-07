@@ -1,133 +1,93 @@
 using UnityEngine;
-using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public class DayNightTransitionController : MonoBehaviour
 {
-    [Header("--- BACKGROUNDS ---")]
-    public CanvasGroup bgDayGroup;
-    public CanvasGroup bgNightGroup;
+    [Header("--- PIVOT ROTATION ---")]
+    [SerializeField] private RectTransform _celestialPivot; 
 
-    [Header("--- EARTH SYSTEM ---")]
-    public RectTransform earthSpinContainer;
-    public Image earthDay;
-    public Image earthNight;
+    [Header("--- EARTH SETUP ---")]
+    [SerializeField] private RectTransform _earthContainer;
+    [SerializeField] private CanvasGroup _earthDayGroup;
+    [SerializeField] private Image _earthDayImage; 
+    [SerializeField] private CanvasGroup _earthNightGroup;
+    [SerializeField] private float _earthRotationDuration = 20f; 
 
-    [Header("--- ORBIT SYSTEM ---")]
-    public RectTransform orbitPivot;
-    public CanvasGroup sunGroup;
-    public CanvasGroup moonGroup;
+    [Header("--- CELESTIAL BODIES (LOCK ROTATION) ---")]
+    [SerializeField] private RectTransform _sunRect;
+    [SerializeField] private RectTransform _moonRect;
 
-    [Header("--- SETTINGS ---")]
-    public float transitionDuration = 3f;
-    public float holdDuration = 2f;
-    public float earthRotationSpeed = 20f;
-    public float orbitIdleSpeed = 10f;
-    public float delayTime = 1000f;
+    [Header("--- SKY BACKGROUNDS ---")]
+    [SerializeField] private CanvasGroup _daySkyGroup;
+    [SerializeField] private Image _daySkyImage; 
+    [SerializeField] private CanvasGroup _nightSkyGroup;
 
-    private Tween _orbitIdleTween;
-    private Tween _earthSpinTween;
+    [Header("--- ANIMATION SETTINGS ---")]
+    [SerializeField] private float _cycleDuration = 3.0f; 
 
     private void Start()
     {
-        // CHỈ Reset về trạng thái tĩnh (đứng yên)
-        ResetToDay();
+        if (_earthContainer != null)
+        {
+            _earthContainer
+                .DORotate(new Vector3(0, 0, -360), _earthRotationDuration, RotateMode.FastBeyond360)
+                .SetLoops(-1, LoopType.Incremental) 
+                .SetEase(Ease.Linear);
+        }
         
-        // QUAN TRỌNG: Comment hoặc xóa dòng này đi để nó không tự chạy
-        // StartIdleAnimations(); 
+        ResetToDay();
+    }
+
+    private void LateUpdate()
+    {
+        if (_sunRect != null) _sunRect.rotation = Quaternion.identity;
+        if (_moonRect != null) _moonRect.rotation = Quaternion.identity;
     }
 
     public void ResetToDay()
     {
-        SetAlpha(bgDayGroup, 1);
-        SetAlpha(bgNightGroup, 0);
+        if (_daySkyGroup) _daySkyGroup.alpha = 1f;
+        if (_nightSkyGroup) _nightSkyGroup.alpha = 0f;
 
-        earthDay.DOFade(1, 0);
-        earthNight.DOFade(0, 0);
+        if (_daySkyImage) _daySkyImage.color = Color.white;
+        if (_earthDayImage) _earthDayImage.color = Color.white;
 
-        SetAlpha(sunGroup, 1);
-        SetAlpha(moonGroup, 0);
+        if (_earthDayGroup) _earthDayGroup.alpha = 1f;
+        if (_earthNightGroup) _earthNightGroup.alpha = 0f;
 
-        // Reset vị trí về 0 (đứng yên)
-        orbitPivot.localRotation = Quaternion.Euler(0, 0, 0);
-        
-        // Nếu muốn chắc chắn, kill luôn tween tại đây
-        _earthSpinTween?.Kill();
-        _orbitIdleTween?.Kill();
+        if (_celestialPivot) 
+        {
+            _celestialPivot.DOKill();
+            _celestialPivot.localEulerAngles = Vector3.zero;
+        }
     }
 
-    // Hàm này sẽ được gọi nội bộ khi PlayDayNightCycleAsync bắt đầu
-    private void StartIdleAnimations()
+    public async UniTask PlayDayNightCycleAsync(CancellationToken token)
     {
-        _earthSpinTween?.Kill();
-        _orbitIdleTween?.Kill();
-
-        // 1. Trái đất quay
-        _earthSpinTween = earthSpinContainer
-            .DORotate(new Vector3(0, 0, -360), 360f / earthRotationSpeed, RotateMode.FastBeyond360)
-            .SetEase(Ease.Linear)
-            .SetLoops(-1, LoopType.Incremental)
-            .SetLink(gameObject);
-
-        // 2. Hệ mặt trời quay chậm
-        _orbitIdleTween = orbitPivot
-            .DORotate(new Vector3(0, 0, -360), 360f / orbitIdleSpeed, RotateMode.FastBeyond360)
-            .SetEase(Ease.Linear)
-            .SetLoops(-1, LoopType.Incremental)
-            .SetLink(gameObject);
-    }
-
-    // --- MAIN FUNCTION ---
-    public async UniTask PlayDayNightCycleAsync(System.Threading.CancellationToken token)
-    {
-        // 1. Bắt đầu animation quay (Idle) tại đây
-        // Lúc này người chơi mới thấy trái đất bắt đầu quay
-        StartIdleAnimations();
-
-        // 2. Đợi 1 chút để người chơi ngắm cảnh "Ban ngày đang quay" (ví dụ 1 giây)
-        await UniTask.Delay(1000, cancellationToken: token);
-
-        // 3. Chuẩn bị chuyển sang Ban đêm -> Kill cái quay chậm của mặt trời
-        _orbitIdleTween?.Kill();
-
-        // 4. Bắt đầu chuỗi chuyển cảnh (Sequence)
         Sequence seq = DOTween.Sequence();
-        seq.SetLink(gameObject);
 
-        // Background
-        seq.Join(bgDayGroup.DOFade(0, transitionDuration));
-        seq.Join(bgNightGroup.DOFade(1, transitionDuration));
-
-        // Earth Skin
-        seq.Join(earthDay.DOFade(0, transitionDuration));
-        seq.Join(earthNight.DOFade(1, transitionDuration));
-
-        // Sun Sets / Moon Rises (Xoay nhanh)
-        Vector3 currentRot = orbitPivot.localEulerAngles;
-        Vector3 targetRot = new Vector3(0, 0, currentRot.z - 180f);
-        
-        seq.Join(orbitPivot
-            .DOLocalRotate(targetRot, transitionDuration, RotateMode.Fast)
+        seq.Append(_celestialPivot.DORotate(new Vector3(0, 0, -180), _cycleDuration, RotateMode.FastBeyond360)
             .SetEase(Ease.InOutSine));
 
-        // Fade Sun/Moon
-        seq.Join(sunGroup.DOFade(0, transitionDuration * 0.5f));
-        seq.Join(moonGroup.DOFade(1, transitionDuration).SetDelay(transitionDuration * 0.3f));
+        float switchTime = _cycleDuration * 0.4f;
+        float fadeDuration = _cycleDuration * 0.4f;
+
+        seq.Insert(switchTime, _daySkyGroup.DOFade(0f, fadeDuration));
+        
+        if (_daySkyImage != null && _earthDayImage != null)
+        {
+            seq.Insert(switchTime, _daySkyImage.DOColor(new Color(0.2f, 0.2f, 0.2f, 1f), fadeDuration));
+            seq.Insert(switchTime, _earthDayImage.DOColor(new Color(0.2f, 0.2f, 0.2f, 1f), fadeDuration));
+        }
+
+        seq.Insert(switchTime, _nightSkyGroup.DOFade(1f, fadeDuration));
+
+        seq.Insert(switchTime, _earthDayGroup.DOFade(0f, fadeDuration));
+        seq.Insert(switchTime, _earthNightGroup.DOFade(1f, fadeDuration));
 
         await seq.ToUniTask(cancellationToken: token);
-
-        // Hold Night state
-        await UniTask.Delay((int)(holdDuration * 1000), cancellationToken: token);
-        
-        // (Tuỳ chọn) Fade out toàn bộ Panel khi xong
-        var mainCG = GetComponent<CanvasGroup>();
-        if(mainCG != null) 
-            await mainCG.DOFade(0, 1f).SetLink(gameObject).ToUniTask(cancellationToken: token);
-    }
-
-    private void SetAlpha(CanvasGroup cg, float alpha)
-    {
-        if (cg != null) cg.alpha = alpha;
     }
 }

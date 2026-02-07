@@ -61,35 +61,6 @@ public class ChapterFlowManager : MonoBehaviour
         OnIntroCompleted?.Invoke();
     }
 
-    public async UniTask RunPuzzleAndWaitAsync()
-    {
-        _puzzleCompletionSource = new UniTaskCompletionSource<bool>();
-        puzzleController.StartGameManually();
-        await _puzzleCompletionSource.Task;
-    }
-
-    // public async UniTask RunChapterSequence()
-    // {
-    //     var token = this.GetCancellationTokenOnDestroy();
-        
-    //     _chapterCompletionSource = new UniTaskCompletionSource<bool>();
-
-    //     SetupInitialState();
-
-    //     if (skipIntro)
-    //     {
-    //         SkipIntroSequence();
-    //     }
-    //     else
-    //     {
-    //         await PlayIntroSequence(token);
-    //     }
-
-    //     puzzleController.StartGameManually();
-
-    //     await _chapterCompletionSource.Task;
-    // }
-
     void SkipIntroSequence()
     {
 
@@ -100,7 +71,7 @@ public class ChapterFlowManager : MonoBehaviour
         gameplayCanvasGroup.blocksRaycasts = true;
 
         finalImageMaskRect.gameObject.SetActive(true);
-        finalImageContent.color = Color.white; // Alpha = 1
+        finalImageContent.color = Color.white;
 
         finalImageMaskRect.anchorMin = new Vector2(0.5f, 0.5f);
         finalImageMaskRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -131,39 +102,34 @@ public class ChapterFlowManager : MonoBehaviour
         }
     }
 
-    // --- LOGIC INTRO ---
     async UniTask PlayIntroSequence(System.Threading.CancellationToken token)
     {
+        await UniTask.Delay(1500, cancellationToken: token);
+
         if (playDayNightCycle && dayNightController != null)
         {
 
             await dayNightController.PlayDayNightCycleAsync(token);
-
-            // Optional: Fade out the Day/Night scene before showing slides
-            // For example, if DayNightController is on a specific CanvasGroup:
-            // await dayNightController.GetComponent<CanvasGroup>().DOFade(0, 1f).ToUniTask(cancellationToken: token);
-
-            // Or simply deactivate it if it overlays the slides
-            // dayNightController.gameObject.SetActive(false);
         }
         dayNightController.gameObject.SetActive(false);
         foreach (var img in introSlides)
         {
             img.gameObject.SetActive(true);
             
-            // Fade In & Wait
             await img.DOFade(1f, 1f).From(0f).ToUniTask(cancellationToken: token);
             
-            // Chờ người xem (Delay)
             await UniTask.Delay((int)(slideDuration * 1000), cancellationToken: token);
             
-            // Fade Out & Wait
             await img.DOFade(0f, 1f).WithCancellation(token);
             img.gameObject.SetActive(false);
         }
 
+        var rightPanelCG = rightPanelRect.GetComponent<CanvasGroup>();
+        if (rightPanelCG == null) rightPanelCG = rightPanelRect.gameObject.AddComponent<CanvasGroup>();
+        rightPanelCG.alpha = 0f;
+
         gameplayCanvasGroup.alpha = 1; 
-        rightPanelRect.anchoredPosition = Vector2.zero; // Nằm giữa
+        rightPanelRect.anchoredPosition = Vector2.zero; 
 
         finalImageMaskRect.gameObject.SetActive(true);
         finalImageContent.DOFade(1f, 1f).From(0f).WithCancellation(token);
@@ -178,25 +144,18 @@ public class ChapterFlowManager : MonoBehaviour
         var seqPhase1 = DOTween.Sequence();
         seqPhase1.Append(finalImageContent.transform.DOScale(0.78f, 1.0f).SetEase(Ease.InOutBack).SetLink(finalImageContent.gameObject));
         seqPhase1.Join(finalImageMaskRect.DOSizeDelta(targetSquareSize, 1.5f).SetEase(Ease.InOutExpo).SetLink(finalImageMaskRect.gameObject));
-        // Đảm bảo nó nằm đúng giữa (phòng hờ)
         seqPhase1.Join(finalImageMaskRect.DOAnchorPos(Vector2.zero, 1.5f).SetEase(Ease.InOutExpo).SetLink(finalImageMaskRect.gameObject));
 
         await seqPhase1.ToUniTask(cancellationToken: token);
         
         await UniTask.Delay(500, cancellationToken: token);
 
-        var rightPanelCG = rightPanelRect.GetComponent<CanvasGroup>();
-        if (rightPanelCG == null) rightPanelCG = rightPanelRect.gameObject.AddComponent<CanvasGroup>();
-
-        rightPanelCG.alpha = 0f;
         rightPanelRect.gameObject.SetActive(true);
 
         var seqPhase2 = DOTween.Sequence();
         
         
         seqPhase2.Append(finalImageMaskRect.DOMove(targetFrameLeft.position, 1.5f).SetEase(Ease.InOutBack));
-
-        seqPhase2.Append(rightPanelCG.DOFade(1f, 1.0f).SetEase(Ease.Linear));
 
         await seqPhase2.ToUniTask(cancellationToken: token);
 
@@ -208,22 +167,18 @@ public class ChapterFlowManager : MonoBehaviour
         handImage.StartWriting();
     }
 
-    // --- LOGIC OUTRO ---
     public async UniTask TriggerOutro(PlayerDecision decision)
     {
         var token = this.GetCancellationTokenOnDestroy();
-        // Chuyển việc gọi hàm nội bộ thành await trực tiếp
         handImage.StopWriting();
         await PlayOutroSequence(decision, token);
     }
 
     async UniTask PlayOutroSequence(PlayerDecision decision, System.Threading.CancellationToken token)
     {
-        // 1. Tắt Gameplay
         await gameplayCanvasGroup.DOFade(0f, 1f).WithCancellation(token);
         gameplayCanvasGroup.blocksRaycasts = false;
 
-        // 2. Hiện Outro Panel
         outroPanel.SetActive(true);
         imgDenial.gameObject.SetActive(false);
         imgAcceptance.gameObject.SetActive(false);
@@ -231,11 +186,9 @@ public class ChapterFlowManager : MonoBehaviour
         Image chosenImg = (decision == PlayerDecision.Acceptance) ? imgAcceptance : imgDenial;
         chosenImg.gameObject.SetActive(true);
 
-        // 3. Fade ảnh kết lên
         await chosenImg.DOFade(1f, 2f).From(0f).WithCancellation(token);
         await UniTask.Delay(3000, cancellationToken: token);
 
-        // 4. Màn hình đen & Quote
         blackScreen.gameObject.SetActive(true);
         await blackScreen.DOFade(1f, 2f).WithCancellation(token);
         
@@ -243,10 +196,5 @@ public class ChapterFlowManager : MonoBehaviour
         await quoteText.DOFade(1f, 2f).From(0f).WithCancellation(token);
         
         await UniTask.Delay(4000, cancellationToken: token);
-
-
-
-        // _puzzleCompletionSource?.TrySetResult(true);
-        // SceneManager.LoadScene("MainMenu");
     }
 }

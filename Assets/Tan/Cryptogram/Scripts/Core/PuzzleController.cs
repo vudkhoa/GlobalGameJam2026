@@ -31,7 +31,7 @@ public class PuzzleController : MonoBehaviour
 
     [Header("--- 2. ANIMATION REFS ---")]
     [Tooltip("Kéo cái RightPanel (chứa cả Sentence và WordPool) vào đây để làm hiệu ứng bay")]
-    public CanvasGroup puzzleContentGroup; 
+    public CanvasGroup  puzzleContentGroup; 
     public float fadeDuration = 0.5f;
 
     [Header("--- 3. DATA & CONFIG ---")]
@@ -54,30 +54,26 @@ public class PuzzleController : MonoBehaviour
     public GameObject spacePrefab;
 
     // --- INTERNAL STATE ---
-    private PuzzleState _currentState;
+    // private PuzzleState _currentState;
     private List<JournalSlotView> _activeSlots = new List<JournalSlotView>();
     private Dictionary<char, int> _charToNumberMap = new Dictionary<char, int>();
     private List<char> _uniqueHiddenChars = new List<char>();
     private JournalSlotView _focusedSlot;
+    private Vector3 _initialUiPosition;
 
     private UniTaskCompletionSource<bool> _levelCompletionSource;
 
+    private bool _isInputActive = false;
+
     public event Action OnLevelCompleted;
 
-    // ========================================================================
-    // 1. KHỞI TẠO & FSM
-    // ========================================================================
 
-    void Start()
+    private void Awake()
     {
-        if (autoStart) StartGameManually();
-    }
-
-    public void StartGameManually()
-    {
-        CurrentLevelIndex = 0;
-        LoadLevelRaw(CurrentLevelIndex);
-        SwitchState(new StatePlaying(this));
+        if (puzzleContentGroup != null)
+        {
+            _initialUiPosition = puzzleContentGroup.transform.localPosition;
+        }
     }
 
     public void SignalLevelCompleted()
@@ -85,38 +81,26 @@ public class PuzzleController : MonoBehaviour
         OnLevelCompleted?.Invoke();
     }
 
-    void Update() => _currentState?.Update();
-
-    public void SwitchState(PuzzleState newState) => RunStateTransition(newState).Forget();
-
-    private async UniTaskVoid RunStateTransition(PuzzleState newState)
-    {
-        if (_currentState != null) await _currentState.Exit();
-        _currentState = newState;
-        await _currentState.Enter();
-    }
-
-    // ========================================================================
-    // 2. CORE LOGIC: LOAD LEVEL (CRYPTOGRAM STYLE)
-    // ========================================================================
-
     public void LoadLevelDataOnly(int index)
     {
         CurrentLevelIndex = index;
         LoadLevelRaw(index);
     }
 
-    // public async UniTask RunLevelAndWaitAsync()
-    // {
-    //     _levelCompletionSource = new UniTaskCompletionSource<bool>();
-    //     SwitchState(new StatePlaying(this));
-    //     await _levelCompletionSource.Task;
-    // }
-    
     public void StartLevel(int levelIndex)
     {
         LoadLevelDataOnly(levelIndex);
-        SwitchState(new StatePlaying(this));
+        _isInputActive = true;
+    }
+
+    public void StartInput()
+    {
+        _isInputActive = true;
+    }
+
+    public void StopInput()
+    {
+        _isInputActive = false;
     }
 
     public void LoadLevelRaw(int index)
@@ -140,7 +124,6 @@ public class PuzzleController : MonoBehaviour
         _charToNumberMap.Clear();
         _uniqueHiddenChars.Clear();
 
-        // B. XỬ LÝ MANUAL MAPPING (ID CỨNG) TRƯỚC
         if (levelData.manualMapping != null)
         {
             foreach (var item in levelData.manualMapping)
@@ -154,12 +137,9 @@ public class PuzzleController : MonoBehaviour
             }
         }
 
-        // C. QUÉT CÂU ĐỂ TÌM CÁC KÝ TỰ ẨN VÀ GÁN SỐ TỰ ĐỘNG (NẾU CHƯA CÓ)
-        // Regex: Lấy nội dung trong ngoặc { }
         string allHiddenParts = string.Join("", Regex.Matches(levelData.sentence, @"\{(.*?)\}")
                                      .Cast<Match>().Select(m => m.Groups[1].Value));
 
-        // Tìm số lớn nhất hiện có để gán tiếp, tránh trùng lặp
         int numberCounter = 1;
         if (_charToNumberMap.Count > 0)
             numberCounter = _charToNumberMap.Values.Max() + 1;
@@ -167,14 +147,12 @@ public class PuzzleController : MonoBehaviour
         foreach (char c in allHiddenParts)
         {
             char upperC = char.ToUpper(c);
-            // Chỉ xử lý nếu là chữ cái hoặc số (bỏ qua dấu câu trong ngoặc nếu có)
             if (char.IsLetterOrDigit(upperC) && !_charToNumberMap.ContainsKey(upperC))
             {
                 _charToNumberMap.Add(upperC, numberCounter);
                 numberCounter++;
             }
 
-            // Thêm vào danh sách để tạo nút bấm tí nữa
             if (!_uniqueHiddenChars.Contains(upperC) && char.IsLetterOrDigit(upperC))
             {
                 _uniqueHiddenChars.Add(upperC);
@@ -183,10 +161,7 @@ public class PuzzleController : MonoBehaviour
 
         GenerateJournalUI(levelData.sentence);
 
-        // BuildFullKeyboard();
         Build3x3Grid();
-        // journalContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
-        // wordPoolContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(journalContainer as RectTransform);
         LayoutRebuilder.ForceRebuildLayoutImmediate(wordPoolContainer as RectTransform);
@@ -210,7 +185,6 @@ public class PuzzleController : MonoBehaviour
             GameObject currentRowObj = Instantiate(lineRowPrefab, journalContainer);
             Transform currentRowTransform = currentRowObj.transform;
 
-            // Tách các cụm {abc} và văn bản thường
             string pattern = @"(\{.*?\})";
             string[] segments = Regex.Split(line, pattern);
 
@@ -220,20 +194,16 @@ public class PuzzleController : MonoBehaviour
 
                 if (segment.StartsWith("{") && segment.EndsWith("}"))
                 {
-                    // Đây là phần ẩn: {abc}
                     string content = segment.Substring(1, segment.Length - 2);
                     foreach (char c in content)
                     {
                         char upperC = char.ToUpper(c);
-                        // Lấy ID từ Map
                         int assignedNumber = _charToNumberMap.ContainsKey(upperC) ? _charToNumberMap[upperC] : 0;
-                        // Tạo Slot ẩn
                         CreateLetterSlot(c.ToString(), assignedNumber, true, currentRowTransform);
                     }
                 }
                 else
                 {
-                    // Đây là văn bản thường
                     foreach (char c in segment)
                     {
                         if (c == ' ')
@@ -241,7 +211,6 @@ public class PuzzleController : MonoBehaviour
                             CreateSpace(currentRowTransform);
                             continue;
                         }
-                        // Tạo Slot hiện sẵn (không có số ID dưới chân)
                         CreateLetterSlot(c.ToString(), 0, false, currentRowTransform);
                     }
                 }
@@ -249,7 +218,6 @@ public class PuzzleController : MonoBehaviour
         }
     }
 
-    // --- CÁC HÀM HỖ TRỢ SINH UI ---
     void CreateLetterSlot(string content, int number, bool isHidden, Transform parent)
     {
         GameObject slotObj = Instantiate(journalSlotPrefab, parent);
@@ -317,33 +285,13 @@ public class PuzzleController : MonoBehaviour
         btnView.SetupFunctionKey(icon, callback);
     }
 
-
-    // ========================================================================
-    // 3. GAMEPLAY LOGIC (INPUT)
-    // ========================================================================
-
     public void OnKeyboardKeyPressed(string letter, WordOptionView btnView)
     {
-        // LOG 1: Kiểm tra xem hàm có được gọi không
-        if (_currentState == null)
-        {
+        if (!_isInputActive || _focusedSlot == null) return;
 
-            return;
-        }
+        btnView.AnimateClick();
 
-        if (!_currentState.CanInteract())
-        {
-
-            return;
-        }
-
-        // LOG 2: Kiểm tra xem đã chọn ô nào chưa
-        if (_focusedSlot == null)
-        {
-
-            return;
-        }
-        int targetSlotNumber = _focusedSlot.assignedNumber; // Số ID của ô vuông (Ví dụ: 5)
+        int targetSlotNumber = _focusedSlot.assignedNumber;
     
         char inputChar = char.ToUpper(letter[0]);
         int inputNumber = _charToNumberMap.ContainsKey(inputChar) ? _charToNumberMap[inputChar] : -1;
@@ -352,6 +300,7 @@ public class PuzzleController : MonoBehaviour
         if (inputNumber == targetSlotNumber)
         {
             currentSlot.FillWord(currentSlot.currentText);
+            currentSlot.AnimatePop();
             
             PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
             if (currentData.phaseType == PuzzlePhase.Glitch)
@@ -360,28 +309,18 @@ public class PuzzleController : MonoBehaviour
                 currentSlot.AnimateFill(PuzzlePhase.Normal);
 
             CheckWinCondition();
-            
             NavigateToNextEmptySlot();
         }
         else
         {
             currentSlot.ShowWrongInput(letter);
+            btnView.ShakeError();
         }
     }
 
-    // Khi bấm mũi tên TRÁI
-    public void OnArrowLeftClicked()
-    {
-        NavigateFocus(-1);
-    }
+    public void OnArrowLeftClicked() => NavigateFocus(-1);
+    public void OnArrowRightClicked() => NavigateFocus(1);
 
-    // Khi bấm mũi tên PHẢI
-    public void OnArrowRightClicked()
-    {
-        NavigateFocus(1);
-    }
-
-    // Logic điều hướng Focus
     void NavigateFocus(int direction)
     {
         if (_activeSlots.Count == 0 || _focusedSlot == null) return;
@@ -396,7 +335,6 @@ public class PuzzleController : MonoBehaviour
 
             var candidateSlot = _activeSlots[checkIndex];
 
-            // Nếu tìm thấy ô chưa điền -> Chọn ngay và thoát
             if (!candidateSlot.IsFilled)
             {
                 SetCurrentFocus(candidateSlot);
@@ -407,8 +345,6 @@ public class PuzzleController : MonoBehaviour
 
     void NavigateToNextEmptySlot()
     {
-        // Tìm ô trống tiếp theo từ vị trí hiện tại
-        // Logic đơn giản: tìm ô đầu tiên chưa điền
         var nextEmpty = _activeSlots.FirstOrDefault(s => !s.IsFilled);
         if (nextEmpty != null)
         {
@@ -418,44 +354,11 @@ public class PuzzleController : MonoBehaviour
     
     void SetCurrentFocus(JournalSlotView slot)
     {
-        if (slot == null || slot.IsFilled) 
-            return;
-        // Bỏ focus ô cũ
-        if (_focusedSlot != null)
-            _focusedSlot.SetFocus(false);
-
-        // Đặt focus ô mới
+        if (slot == null || slot.IsFilled) return;
+        if (_focusedSlot != null) _focusedSlot.SetFocus(false);
         _focusedSlot = slot;
-        if (_focusedSlot != null)
-            _focusedSlot.SetFocus(true);
+        if (_focusedSlot != null) _focusedSlot.SetFocus(true);
     }   
-
-    public void OnLetterOptionClicked(string letter, int number, WordOptionView btnView)
-    {
-        if (_currentState == null || !_currentState.CanInteract()) return;
-
-        foreach (var slot in _activeSlots)
-        {
-            slot.FillWord(letter); // Điền chữ cái vào
-
-            // Xử lý Animation tùy Phase
-            PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
-            if (currentData.phaseType == PuzzlePhase.Glitch)
-            {
-                slot.AnimateFill(PuzzlePhase.Glitch);
-            }
-            else
-            {
-                slot.AnimateFill(PuzzlePhase.Normal);
-                slot.underlineObj.SetActive(false); // Ẩn gạch chân khi điền xong
-                slot.numberText.gameObject.SetActive(false); // Ẩn số dưới chân khi điền xong
-            }
-        }
-
-        btnView.Disappear();
-
-        CheckWinCondition();
-    }
 
     private void CheckWinCondition()
     {
@@ -467,6 +370,8 @@ public class PuzzleController : MonoBehaviour
     
     private async UniTaskVoid HandleLevelCompleteSequence()
     {
+        StopInput();
+
         var token = this.GetCancellationTokenOnDestroy();
         PuzzleLevelData currentData = storyLevels[CurrentLevelIndex];
 
@@ -474,30 +379,18 @@ public class PuzzleController : MonoBehaviour
 
         if (currentData.phaseType == PuzzlePhase.Glitch)
         {
-            HandleGlitchEffect(_activeSlots.Last()).Forget();
+            await HandleGlitchEffect(_activeSlots.Last());
         }
-        else
-        {
-            if (_currentState is StatePlaying playingState)
-            {
-                playingState.OnLevelCleared();
-            }
-        }
+        
+        SignalLevelCompleted();
     }
 
-    // ========================================================================
-    // 4. HIỆU ỨNG GLITCH & TRANSITIONS
-    // ========================================================================
-
-    private async UniTaskVoid HandleGlitchEffect(JournalSlotView slot)
+    private async UniTask HandleGlitchEffect(JournalSlotView slot)
     {
         var token = this.GetCancellationTokenOnDestroy();
 
-        // Chờ 0.5s sau khi điền chữ cuối cùng
         await UniTask.Delay(500, cancellationToken: token);
 
-        // Hiệu ứng Glitch: Rung lắc, Đổi màu, Đổi chữ
-        // Lưu ý: Có thể loop qua tất cả _activeSlots để đổi chữ hàng loạt cho sợ
         foreach (var activeSlot in _activeSlots)
         {
             (activeSlot.transform as RectTransform).DOShakeAnchorPos(1f, 10f, 20);
@@ -505,47 +398,50 @@ public class PuzzleController : MonoBehaviour
             activeSlot.textDisplay.text = GetScaryText(activeSlot.textDisplay.text); 
         }
 
-        // Rung mạnh slot cuối
         (slot.transform as RectTransform).DOShakeAnchorPos(1f, 20f, 30);
 
-        // Chờ thêm chút cho người chơi hoảng
         await UniTask.Delay(2000, cancellationToken: token);
 
-        // Chuyển sang màn hình lựa chọn (Ending)
-        keyboardContainer.gameObject.SetActive(false); // Ẩn bàn phím
-        SwitchState(new StateEndingChoice(this));
+        keyboardContainer.gameObject.SetActive(false);
     }
 
-    // Hàm random chữ ghê rợn (Optional)
     string GetScaryText(string original)
     {
-        // Logic đơn giản: Đổi tất cả thành ký tự lạ hoặc chữ DỐI TRÁ
         return "?"; 
     }
 
-    // --- ANIMATION CHUYỂN LEVEL ---
     public async UniTask AnimateLevelExitAsync()
     {
+        _isInputActive = false;
+
         var token = this.GetCancellationTokenOnDestroy();
+
+        Vector3 exitPos = _initialUiPosition + new Vector3(0, 500f, 0);
+                
         await puzzleContentGroup.transform
-            .DOLocalMoveY(150f, fadeDuration).SetRelative(true)
+            .DOLocalMove(exitPos, fadeDuration).SetEase(Ease.InBack)
             .ToUniTask(cancellationToken: token);
         
         puzzleContentGroup.alpha = 0f;
-        puzzleContentGroup.transform.DOLocalMoveY(-300f, 0f).SetRelative(true); 
     }
 
     public async UniTask AnimateLevelEnterAsync()
     {
         var token = this.GetCancellationTokenOnDestroy();
+
+        Vector3 startPos = _initialUiPosition + new Vector3(0f, -500f, 0f);
+        puzzleContentGroup.transform.localPosition = startPos;
+
         puzzleContentGroup.DOFade(1f, fadeDuration);
         await puzzleContentGroup.transform
-            .DOLocalMoveY(150f, fadeDuration).SetRelative(true).SetEase(Ease.OutBack)
+            .DOLocalMove(_initialUiPosition, fadeDuration).SetEase(Ease.OutBack)
             .ToUniTask(cancellationToken: token);
+
         puzzleContentGroup.alpha = 1f;
+
+        _isInputActive = true;
     }
 
-    // --- HELPER ---
     public void LoadNextLevelData()
     {
         CurrentLevelIndex++;
@@ -566,10 +462,32 @@ public class PuzzleController : MonoBehaviour
 
         choiceView.gameObject.SetActive(false);
 
-        if (flowManager != null) 
+        if (flowManager != null)
         {
             await flowManager.TriggerOutro(decision);
         }
-        SignalLevelCompleted(); 
+        SignalLevelCompleted();
+    }
+
+    public async UniTask<int> ShowEndingChoiceAndWaitAsync()
+    {
+        keyboardContainer.gameObject.SetActive(false);
+        
+        var tcs = new UniTaskCompletionSource<int>();
+
+        if (choiceView != null)
+        {
+            choiceView.Setup((resultIndex) => 
+            {
+                tcs.TrySetResult(resultIndex);
+            });
+        }
+        else
+        {
+            Debug.LogError("Chưa gán EndingChoiceView!");
+            tcs.TrySetResult(0);
+        }
+
+        return await tcs.Task;
     }
 }

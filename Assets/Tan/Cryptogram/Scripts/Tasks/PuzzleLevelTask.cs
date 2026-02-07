@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -9,30 +10,43 @@ public class PuzzleLevelTask : BaseTask
     [Header("References")]
     [SerializeField] private PuzzleController _controller;
 
-    public override UniTask Execute()
+    public override async UniTask Execute()
     {
         if (_controller == null)
         {
             doneTask = true;
-            return UniTask.CompletedTask;
+            return;
         }
-        _controller.OnLevelCompleted += HandleLevelFinished;
-        _controller.StartLevel(LevelIndex);
-        return UniTask.CompletedTask;
+        _controller.LoadLevelDataOnly(LevelIndex);
+        _controller.StartInput();
+        // if (LevelIndex > 0)
+        // {
+        //     await _controller.AnimateLevelEnterAsync();
+        // }
+        await _controller.AnimateLevelEnterAsync();
+
+        var tcs = new UniTaskCompletionSource();
+        void OnComplete() => tcs.TrySetResult();
+
+        _controller.OnLevelCompleted += OnComplete;
+        await tcs.Task;
+        _controller.OnLevelCompleted -= OnComplete;
+
+        doneTask = true;
     }
 
-    private void HandleLevelFinished()
-    {
-        _controller.OnLevelCompleted -= HandleLevelFinished;
+    // private void HandleLevelFinished()
+    // {
+    //     _controller.OnLevelCompleted -= HandleLevelFinished;
 
-        this.doneTask = true;
-    }
+    //     this.doneTask = true;
+    // }
 
-    private void OnDisable()
-    {
-        if (_controller != null)
-        {
-            _controller.OnLevelCompleted -= HandleLevelFinished;
-        }
-    }
+    // private void OnDisable()
+    // {
+    //     if (_controller != null)
+    //     {
+    //         _controller.OnLevelCompleted -= HandleLevelFinished;
+    //     }
+    // }
 }

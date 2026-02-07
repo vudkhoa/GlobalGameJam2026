@@ -5,69 +5,79 @@ using System;
 
 public class EndingChoiceView : MonoBehaviour
 {
-    public CanvasGroup canvasGroup;
-    public Transform container; // Chứa 2 nút
-    public Button btnDenial;
-    public Button btnAcceptance;
+    [Header("--- UI References ---")]
+    [SerializeField] private Button _denialButton;    
+    [SerializeField] private Button _acceptanceButton;
+    [SerializeField] private CanvasGroup canvasGroup;
 
     [Header("Animation Settings")]
-    public float animDuration = 0.5f;
-    public float delayBetweenButtons = 0.15f;
+    [SerializeField] private float _entranceDuration = 0.6f;
+    [SerializeField] private float _entranceDelayBetween = 0.1f;
+    [SerializeField] private Ease _entranceEase = Ease.OutElastic;
 
-    public void Setup(Action<int> onChosen)
+    private Action<int> _onChosenCallback;
+
+    private void OnEnable()
+    {
+        ResetButtonsState();
+    }
+
+    private void ResetButtonsState()
     {
         gameObject.SetActive(true);
         canvasGroup.alpha = 0f;
         canvasGroup.DOKill();
-        container.localScale = Vector3.zero;
 
-        btnDenial.transform.localScale = Vector3.zero;
-        btnAcceptance.transform.localScale = Vector3.zero;
-        btnDenial.transform.DOKill();
-        btnAcceptance.transform.DOKill();
+        _denialButton.transform.localScale = Vector3.zero;
+        _acceptanceButton.transform.localScale = Vector3.zero;
 
-        // Reset nút
-        btnDenial.interactable = true;
-        btnAcceptance.interactable = true;
+        _denialButton.interactable = true;
+        _acceptanceButton.interactable = true;
 
-        // Binding sự kiện
-        btnDenial.onClick.RemoveAllListeners();
-        btnDenial.onClick.AddListener(() => {
-            DisableButtons();
-            onChosen?.Invoke(0);
-        });
-
-        btnAcceptance.onClick.RemoveAllListeners();
-        btnAcceptance.onClick.AddListener(() => {
-            DisableButtons();
-            onChosen?.Invoke(1);
-        });
-
-        canvasGroup.DOKill();
-        container.DOKill();
-
-        canvasGroup.alpha = 1f;           
-        container.localScale = Vector3.zero; 
-
-        canvasGroup.DOFade(1f, animDuration).SetLink(gameObject);
-
-        btnDenial.transform.DOScale(1f, animDuration)
-            .SetEase(Ease.OutBack)
-            .SetLink(btnDenial.gameObject);
-
-        btnAcceptance.transform.DOScale(1f, animDuration)
-            .SetEase(Ease.OutBack)
-            .SetDelay(delayBetweenButtons) 
-            .SetLink(btnAcceptance.gameObject);
-        
-        // // 0.2 giây sau thì bung ra
-        // container.DOScale(1f, 0.5f).SetEase(Ease.OutBack).SetDelay(0.2f);
+        _denialButton.transform.DOKill();
+        _acceptanceButton.transform.DOKill();
     }
 
-    void DisableButtons()
+    public void Setup(Action<int> onChosenCallback)
     {
-        btnDenial.interactable = false;
-        btnAcceptance.interactable = false;
-        canvasGroup.DOFade(0f, 0.5f);
+        _onChosenCallback = onChosenCallback;
+
+        _denialButton.onClick.RemoveAllListeners();
+        _denialButton.onClick.AddListener(() => HandleButtonClick(_denialButton, 0));
+
+        _acceptanceButton.onClick.RemoveAllListeners();
+        _acceptanceButton.onClick.AddListener(() => HandleButtonClick(_acceptanceButton, 1));
+
+        PlayEntranceAnimation();
+    }
+    
+    private void PlayEntranceAnimation()
+    {
+        ResetButtonsState();
+
+        Sequence seq = DOTween.Sequence();
+
+        // seq.Append(canvasGroup.DOFade(1f, 0.3f));
+        seq.Append(canvasGroup.DOFade(1f, 0.3f));
+
+        seq.Append(_denialButton.transform.DOScale(Vector3.one, _entranceDuration).SetEase(_entranceEase));
+
+        seq.Insert(_entranceDelayBetween, 
+                   _acceptanceButton.transform.DOScale(Vector3.one, _entranceDuration).SetEase(_entranceEase));
+    }
+
+    private void HandleButtonClick(Button clickedBtn, int choiceIndex)
+    {
+        _denialButton.interactable = false;
+        _acceptanceButton.interactable = false;
+
+        clickedBtn.transform.DOKill(true); 
+        clickedBtn.transform.localScale = Vector3.one; 
+
+        clickedBtn.transform.DOPunchScale(new Vector3(-0.1f, -0.1f, 0f), 0.2f, 10, 1)
+            .OnComplete(() => 
+            {
+                _onChosenCallback?.Invoke(choiceIndex);
+            });
     }
 }
