@@ -183,8 +183,8 @@ public class PuzzleController : MonoBehaviour
 
         GenerateJournalUI(levelData.sentence);
 
-        BuildFullKeyboard();
-
+        // BuildFullKeyboard();
+        Build3x3Grid();
         // journalContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
         // wordPoolContainer.GetComponent<CanvasGroup>().DOFade(1f, 1f);
 
@@ -263,33 +263,42 @@ public class PuzzleController : MonoBehaviour
         Instantiate(spacePrefab, parent);
     }
 
-    void BuildFullKeyboard()
+    void Build3x3Grid()
     {
-        // Duyệt qua 3 hàng: QWERTY..., ASDF..., ZXCV...
-        for (int rowIndex = 0; rowIndex < _keyboardLayout.Length; rowIndex++)
+        List<char> keyPool = new List<char>(_uniqueHiddenChars);
+
+        if (keyPool.Count > 9)
         {
-            string rowString = _keyboardLayout[rowIndex];
-            
-            // Tạo 1 Hàng (Row Container)
-            GameObject rowObj = Instantiate(keyboardRowPrefab, keyboardContainer);
-            
-            // Nếu là hàng cuối (ZXCVBNM), thêm nút Mũi tên TRÁI trước
-            if (rowIndex == 2)
-            {
-                SpawnFunctionKey("◄", OnArrowLeftClicked, rowObj.transform);
-            }
+            Debug.LogWarning($"Level có {keyPool.Count} ký tự unique, nhưng lưới chỉ có 9 ô. Sẽ cắt bớt!");
+            keyPool = keyPool.Take(9).ToList();
+        }
 
-            // Sinh các phím chữ cái
-            foreach (char c in rowString)
-            {
-                SpawnCharacterKey(c.ToString(), rowObj.transform);
-            }
+        while (keyPool.Count < 9)
+        {
+            char noiseChar = GetRandomNoiseChar(keyPool);
+            keyPool.Add(noiseChar);
+        }
 
-            // Nếu là hàng cuối, thêm nút Mũi tên PHẢI sau
-            if (rowIndex == 2)
-            {
-                SpawnFunctionKey("►", OnArrowRightClicked, rowObj.transform);
-            }
+        keyPool = keyPool.OrderBy(x => UnityEngine.Random.value).ToList();
+
+        GameObject row0 = Instantiate(keyboardRowPrefab, keyboardContainer);
+        for (int i = 0; i < 3; i++) SpawnCharacterKey(keyPool[i].ToString(), row0.transform);
+
+        GameObject row1 = Instantiate(keyboardRowPrefab, keyboardContainer);
+        SpawnFunctionKey("◄", OnArrowLeftClicked, row1.transform);
+        for (int i = 3; i < 6; i++) SpawnCharacterKey(keyPool[i].ToString(), row1.transform);
+        SpawnFunctionKey("►", OnArrowRightClicked, row1.transform);
+
+        GameObject row2 = Instantiate(keyboardRowPrefab, keyboardContainer);
+        for (int i = 6; i < 9; i++) SpawnCharacterKey(keyPool[i].ToString(), row2.transform);
+    }
+
+    char GetRandomNoiseChar(List<char> existingChars)
+    {
+        while (true)
+        {
+            char c = (char)('A' + UnityEngine.Random.Range(0, 26));
+            if (!existingChars.Contains(c)) return c;
         }
     }
 
@@ -298,12 +307,7 @@ public class PuzzleController : MonoBehaviour
         GameObject btnObj = Instantiate(wordOptionPrefab, parent);
         WordOptionView btnView = btnObj.GetComponent<WordOptionView>();
 
-        // LOGIC QUAN TRỌNG: 
-        // Active = Chữ này nằm trong danh sách CẦN ĐIỀN (_uniqueHiddenChars).
-        // Inactive = Chữ này đã hiện sẵn hoặc không có trong level.
-        bool isActive = _uniqueHiddenChars.Contains(letter[0]);
-
-        btnView.SetupKeyboardKey(letter, isActive, OnKeyboardKeyPressed);
+        btnView.SetupKeyboardKey(letter, true, OnKeyboardKeyPressed);
     }
 
     void SpawnFunctionKey(string icon, System.Action callback, Transform parent)
@@ -522,22 +526,22 @@ public class PuzzleController : MonoBehaviour
     // --- ANIMATION CHUYỂN LEVEL ---
     public async UniTask AnimateLevelExitAsync()
     {
-        // var token = this.GetCancellationTokenOnDestroy();
-        // await puzzleContentGroup.transform
-        //     .DOLocalMoveY(150f, fadeDuration).SetRelative(true)
-        //     .ToUniTask(cancellationToken: token);
+        var token = this.GetCancellationTokenOnDestroy();
+        await puzzleContentGroup.transform
+            .DOLocalMoveY(150f, fadeDuration).SetRelative(true)
+            .ToUniTask(cancellationToken: token);
         
         puzzleContentGroup.alpha = 0f;
-        // puzzleContentGroup.transform.DOLocalMoveY(-300f, 0f).SetRelative(true); 
+        puzzleContentGroup.transform.DOLocalMoveY(-300f, 0f).SetRelative(true); 
     }
 
     public async UniTask AnimateLevelEnterAsync()
     {
-        // var token = this.GetCancellationTokenOnDestroy();
-        // puzzleContentGroup.DOFade(1f, fadeDuration);
-        // await puzzleContentGroup.transform
-        //     .DOLocalMoveY(150f, fadeDuration).SetRelative(true).SetEase(Ease.OutBack)
-        //     .ToUniTask(cancellationToken: token);
+        var token = this.GetCancellationTokenOnDestroy();
+        puzzleContentGroup.DOFade(1f, fadeDuration);
+        await puzzleContentGroup.transform
+            .DOLocalMoveY(150f, fadeDuration).SetRelative(true).SetEase(Ease.OutBack)
+            .ToUniTask(cancellationToken: token);
         puzzleContentGroup.alpha = 1f;
     }
 

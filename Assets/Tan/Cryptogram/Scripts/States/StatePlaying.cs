@@ -17,4 +17,4 @@ public class StatePlaying : PuzzleState
         _controller.SwitchState(new StateLevelComplete(_controller));
         _controller.SignalLevelCompleted();
     }
-}
+}   
