@@ -106,7 +106,6 @@ public class GameLoopOSU : MonoBehaviour
 
     private void WarmupServices()
     {
-        Debug.Log("[GameLoopOSU] Warming up services...");
 
         // 1. Warm Evaluator
         Vector2 dummySize = Vector2.one * 100f;
@@ -123,7 +122,6 @@ public class GameLoopOSU : MonoBehaviour
         _scoreService.GetAccuracy();
         _scoreService.ResetPhaseScore(); // Reset về 0
 
-        Debug.Log("[GameLoopOSU] Services warmup complete!");
     }
 
     private void Update()
@@ -190,7 +188,6 @@ public class GameLoopOSU : MonoBehaviour
 
     private void OnPhaseStarted(PhaseData phase)
     {
-        Debug.Log($"[GameLoopOSU] Phase started: {phase.phaseName}");
 
         // ✅ Hiển thị phase background + blur khi bắt đầu phase
         if (_blurEffect != null)

@@ -8,21 +8,21 @@
 public class JudgementConfig : ScriptableObject
 {
     // ═══════════════════════════════════════════════════════════
-    // THRESHOLDS (Accuracy)
+    // THRESHOLDS (Accuracy) - NOW PERCENTAGE-BASED
     // ═══════════════════════════════════════════════════════════
 
-    [Header("Thresholds (Pixel Difference)")]
-    [Tooltip("Threshold cho Perfect (pixel difference)")]
-    [Range(0f, 50f)]
-    public float perfectThreshold = 20f;
+    [Header("Thresholds (% of Shrink Range)")]
+    [Tooltip("Perfect threshold (% của khoảng cách shrink)\nOsu! standard: ~15-35% (Easy-Medium difficulty)")]
+    [Range(0f, 1f)]
+    public float perfectThresholdPercent = 0.35f; // 35% of shrink range
 
-    [Tooltip("Threshold cho Good (pixel difference)")]
-    [Range(20f, 100f)]
-    public float goodThreshold = 50f;
+    [Tooltip("Good threshold (% của khoảng cách shrink)\nOsu! standard: ~40-60%")]
+    [Range(0f, 1f)]
+    public float goodThresholdPercent = 0.60f; // 60% of shrink range
 
-    [Tooltip("Threshold cho OK (pixel difference)")]
-    [Range(50f, 150f)]
-    public float okThreshold = 80f;
+    [Tooltip("OK threshold (% của khoảng cách shrink)\nOsu! standard: ~70-85%")]
+    [Range(0f, 1f)]
+    public float okThresholdPercent = 0.85f; // 85% of shrink range
 
     // Miss = anything > okThreshold
 
@@ -87,11 +87,16 @@ public class JudgementConfig : ScriptableObject
     private void OnValidate()
     {
         // Ensure thresholds are in order
-        if (goodThreshold <= perfectThreshold)
-            goodThreshold = perfectThreshold + 10f;
+        if (goodThresholdPercent <= perfectThresholdPercent)
+            goodThresholdPercent = perfectThresholdPercent + 0.15f;
 
-        if (okThreshold <= goodThreshold)
-            okThreshold = goodThreshold + 20f;
+        if (okThresholdPercent <= goodThresholdPercent)
+            okThresholdPercent = goodThresholdPercent + 0.20f;
+
+        // Clamp to 0-1 range
+        perfectThresholdPercent = Mathf.Clamp01(perfectThresholdPercent);
+        goodThresholdPercent = Mathf.Clamp01(goodThresholdPercent);
+        okThresholdPercent = Mathf.Clamp01(okThresholdPercent);
     }
 #endif
 }
