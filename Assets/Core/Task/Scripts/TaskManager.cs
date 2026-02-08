@@ -5,7 +5,7 @@ public class TaskManager : MonoBehaviour
 {
     [SerializeField] private BaseTask[] _tasks;
 
-    private void OnEnable() => ExecuteTasksAsync().Forget();
+    // private void OnEnable() => ExecuteTasksAsync().Forget();
 
     private async UniTask ExecuteTasksAsync()
     {

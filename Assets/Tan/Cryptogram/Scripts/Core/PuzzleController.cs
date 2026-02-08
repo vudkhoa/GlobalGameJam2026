@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Text.RegularExpressions; // Dùng để tách từ {abc}
-using System.Linq;                    // Dùng LINQ (First, All)
-using DG.Tweening;                    // Animation
+using System.Text.RegularExpressions; 
+using System.Linq;                   
+using DG.Tweening;                    
 using Cysharp.Threading.Tasks;
-using System;        // Async/Await
+using System;       
 
 public class PuzzleController : MonoBehaviour
 {
@@ -13,24 +13,14 @@ public class PuzzleController : MonoBehaviour
     public GameObject keyboardRowPrefab; 
     public Transform keyboardContainer; 
 
-    private readonly string[] _keyboardLayout = new string[]
-    {
-        "QWERTYUIOP",
-        "ASDFGHJKL",
-        "ZXCVBNM"
-    };
     [Header("--- 1. INTEGRATION ---")]
-    [Tooltip("Kéo ChapterDirector vào đây")]
     public ChapterFlowManager flowManager;
     
-    [Tooltip("Kéo UI Ending Choice Panel vào đây")]
     public EndingChoiceView choiceView;
     
-    [Tooltip("Để false khi chạy game thật. Để true nếu muốn test riêng Level này")]
     public bool autoStart = false;
 
     [Header("--- 2. ANIMATION REFS ---")]
-    [Tooltip("Kéo cái RightPanel (chứa cả Sentence và WordPool) vào đây để làm hiệu ứng bay")]
     public CanvasGroup  puzzleContentGroup; 
     public float fadeDuration = 0.5f;
 
@@ -39,34 +29,24 @@ public class PuzzleController : MonoBehaviour
     public int CurrentLevelIndex { get; private set; } = 0;
 
     [Header("--- 4. UI CONTAINERS ---")]
-    [Tooltip("Khung chứa các Hàng Chữ (SentenceContainer)")]
     public Transform journalContainer; 
-    [Tooltip("Khung chứa các nút bấm (BottomPanel)")]
     public Transform wordPoolContainer;
 
     [Header("--- 5. PREFABS ---")]
-    [Tooltip("Prefab Hàng Ngang (LineRow)")]
     public GameObject lineRowPrefab; 
-    [Tooltip("Prefab Ô Chữ (JournalSlot)")]
     public GameObject journalSlotPrefab;
-    [Tooltip("Prefab Nút Bấm (WordOption)")]
     public GameObject wordOptionPrefab;
     public GameObject spacePrefab;
 
-    // --- INTERNAL STATE ---
-    // private PuzzleState _currentState;
     private List<JournalSlotView> _activeSlots = new List<JournalSlotView>();
     private Dictionary<char, int> _charToNumberMap = new Dictionary<char, int>();
     private List<char> _uniqueHiddenChars = new List<char>();
     private JournalSlotView _focusedSlot;
     private Vector3 _initialUiPosition;
 
-    private UniTaskCompletionSource<bool> _levelCompletionSource;
-
     private bool _isInputActive = false;
 
     public event Action OnLevelCompleted;
-
 
     private void Awake()
     {

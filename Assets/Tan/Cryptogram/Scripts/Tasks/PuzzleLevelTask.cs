@@ -19,10 +19,6 @@ public class PuzzleLevelTask : BaseTask
         }
         _controller.LoadLevelDataOnly(LevelIndex);
         _controller.StartInput();
-        // if (LevelIndex > 0)
-        // {
-        //     await _controller.AnimateLevelEnterAsync();
-        // }
         await _controller.AnimateLevelEnterAsync();
 
         var tcs = new UniTaskCompletionSource();
@@ -34,19 +30,4 @@ public class PuzzleLevelTask : BaseTask
 
         doneTask = true;
     }
-
-    // private void HandleLevelFinished()
-    // {
-    //     _controller.OnLevelCompleted -= HandleLevelFinished;
-
-    //     this.doneTask = true;
-    // }
-
-    // private void OnDisable()
-    // {
-    //     if (_controller != null)
-    //     {
-    //         _controller.OnLevelCompleted -= HandleLevelFinished;
-    //     }
-    // }
 }
