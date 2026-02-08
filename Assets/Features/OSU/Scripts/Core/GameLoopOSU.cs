@@ -324,7 +324,7 @@ public class GameLoopOSU : MonoBehaviour
         //  Show judgement UI (ALWAYS show for tap, even if Miss)
         if (_judgementDisplay != null)
         {
-            _judgementDisplay.Show(feedback);
+            _judgementDisplay.Show(feedback, beat.transform.position);
         }
 
         //  Play visual feedback on beat
@@ -347,7 +347,7 @@ public class GameLoopOSU : MonoBehaviour
         //  Show MISS UI (user didn't tap at all)
         if (_judgementDisplay != null)
         {
-            _judgementDisplay.Show(feedback);
+            _judgementDisplay.Show(feedback, beat.transform.position);
         }
 
         //  Play miss feedback on beat

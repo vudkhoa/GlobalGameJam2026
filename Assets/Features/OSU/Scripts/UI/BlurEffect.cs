@@ -85,15 +85,12 @@ public class BlurEffect : MonoBehaviour
         {
             case 0: // Phase 1
                 selectedSprite = _phase1Sprite;
-                Debug.Log("[BlurEffect] Showing Phase 1 background");
                 break;
             case 1: // Phase 2
                 selectedSprite = _phase2Sprite;
-                Debug.Log("[BlurEffect] Showing Phase 2 background");
                 break;
             case 2: // Phase 3
                 selectedSprite = _phase3Sprite;
-                Debug.Log("[BlurEffect] Showing Phase 3 background");
                 break;
             default:
                 Debug.LogWarning($"[BlurEffect] Invalid phase index: {phaseIndex}");

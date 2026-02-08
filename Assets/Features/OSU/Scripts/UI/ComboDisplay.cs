@@ -1,23 +1,45 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
 
 /// <summary>
-/// SRP: Display combo counter
+/// SRP: Display combo counter using 3D TextMeshPro (MeshRenderer)
 /// Responsibility: Show combo when threshold reached, animate
+/// Uses near-zero scale instead of SetActive for performance
 /// </summary>
 public class ComboDisplay : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private TextMeshProUGUI _comboText;
+    [SerializeField] private TextMeshPro _comboText; // 3D TextMeshPro
 
-    [Header("Settings")]
+    [Header("Animation Settings")]
     [SerializeField] private int _comboThreshold = 5;
+    [SerializeField] private float _showHideDuration = 0.2f;
     [SerializeField] private float _pulseDuration = 0.1f;
-    [SerializeField] private float _pulseScale = 1.2f;
+    [SerializeField] private float _pulseScaleMultiplier = 1.2f;
+
+    private static readonly Vector3 HiddenScale = Vector3.one * 0.001f;
 
     private Sequence _pulseSequence;
+    private bool _isVisible;
+    private Vector3 _initialScale;
+
+    // ═══════════════════════════════════════════════════════════
+    // INITIALIZATION
+    // ═══════════════════════════════════════════════════════════
+
+    private void Awake()
+    {
+        if (_comboText == null) return;
+
+        // Remember initial scale from Inspector (preserve all Inspector settings)
+        _initialScale = _comboText.transform.localScale;
+
+        // Keep active, hide via near-zero scale (avoid Vector3.zero to prevent NaN AABB)
+        _comboText.gameObject.SetActive(true);
+        _comboText.transform.localScale = HiddenScale;
+        _isVisible = false;
+    }
 
     // ═══════════════════════════════════════════════════════════
     // PUBLIC API
@@ -41,13 +63,15 @@ public class ComboDisplay : MonoBehaviour
 
     private void ShowCombo(int combo)
     {
-        // Enable text
-        if (!_comboText.gameObject.activeSelf)
+        // Scale up if not visible
+        if (!_isVisible)
         {
-            _comboText.gameObject.SetActive(true);
+            DOTween.Kill(_comboText.transform);
+            _comboText.transform.DOScale(_initialScale, _showHideDuration).SetEase(Ease.OutBack);
+            _isVisible = true;
         }
 
-        // Update text
+        // Update text only
         _comboText.text = $"COMBO x{combo}";
 
         // Pulse animation
@@ -56,19 +80,24 @@ public class ComboDisplay : MonoBehaviour
 
     private void HideCombo()
     {
+        if (!_isVisible) return;
+
         _pulseSequence?.Kill();
-        _comboText.gameObject.SetActive(false);
+        DOTween.Kill(_comboText.transform);
+        _comboText.transform.DOScale(HiddenScale, _showHideDuration).SetEase(Ease.InBack);
+        _isVisible = false;
     }
 
     private void PlayPulseAnimation()
     {
-        // Kill existing animation
         _pulseSequence?.Kill();
 
-        // Create pulse sequence
+        // Pulse based on initial scale from Inspector
+        Vector3 pulseScale = _initialScale * _pulseScaleMultiplier;
+
         _pulseSequence = DOTween.Sequence();
-        _pulseSequence.Append(_comboText.transform.DOScale(_pulseScale, _pulseDuration));
-        _pulseSequence.Append(_comboText.transform.DOScale(1f, _pulseDuration));
+        _pulseSequence.Append(_comboText.transform.DOScale(pulseScale, _pulseDuration));
+        _pulseSequence.Append(_comboText.transform.DOScale(_initialScale, _pulseDuration));
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -78,5 +107,6 @@ public class ComboDisplay : MonoBehaviour
     private void OnDestroy()
     {
         _pulseSequence?.Kill();
+        DOTween.Kill(_comboText.transform);
     }
 }

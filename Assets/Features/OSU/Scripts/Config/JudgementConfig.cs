@@ -14,15 +14,15 @@ public class JudgementConfig : ScriptableObject
     [Header("Thresholds (% of Shrink Range)")]
     [Tooltip("Perfect threshold (% của khoảng cách shrink)\nOsu! standard: ~15-35% (Easy-Medium difficulty)")]
     [Range(0f, 1f)]
-    public float perfectThresholdPercent = 0.35f; // 35% of shrink range
+    public float perfectThresholdPercent = 0.35f;
 
     [Tooltip("Good threshold (% của khoảng cách shrink)\nOsu! standard: ~40-60%")]
     [Range(0f, 1f)]
-    public float goodThresholdPercent = 0.60f; // 60% of shrink range
+    public float goodThresholdPercent = 0.60f;
 
     [Tooltip("OK threshold (% của khoảng cách shrink)\nOsu! standard: ~70-85%")]
     [Range(0f, 1f)]
-    public float okThresholdPercent = 0.85f; // 85% of shrink range
+    public float okThresholdPercent = 0.85f;
 
     // Miss = anything > okThreshold
 
@@ -78,6 +78,29 @@ public class JudgementConfig : ScriptableObject
     public int comboThreshold = 5;
 
     public Color comboColor = Color.cyan;
+
+    // ═══════════════════════════════════════════════════════════
+    // 3D TEXT SETTINGS (for TextMeshPro MeshRenderer)
+    // ═══════════════════════════════════════════════════════════
+
+    [Header("3D Text Display")]
+    [Tooltip("Font size for 3D TextMeshPro (world space)")]
+    [Range(1f, 100f)]
+    public float textFontSize = 4f;
+
+    [Tooltip("Sorting layer for 3D text")]
+    public string textSortingLayer = "UI";
+
+    [Tooltip("Sorting order offset (higher = render on top)")]
+    public int textSortingOrder = 100;
+
+    [Tooltip("Scale khi hiện judgement text")]
+    [Range(0.1f, 20f)]
+    public float textShowScale = 10f;
+
+    [Tooltip("Scale lúc bắt đầu animation (trước khi scale lên)")]
+    [Range(0.1f, 20f)]
+    public float textStartScale = 5f;
 
     // ═══════════════════════════════════════════════════════════
     // VALIDATION

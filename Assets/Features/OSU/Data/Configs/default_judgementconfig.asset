@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8217eef35f1937745aa10fc9340e2c3c, type: 3}
   m_Name: default_judgementconfig
   m_EditorClassIdentifier: 
-  perfectThreshold: 20
-  goodThreshold: 50
-  okThreshold: 80
+  perfectThresholdPercent: 0.35
+  goodThresholdPercent: 0.6
+  okThresholdPercent: 0.85
   perfectScore: 100
   goodScore: 50
   okScore: 20
@@ -45,3 +45,6 @@ MonoBehaviour:
     particleEffectPrefab: {fileID: 0}
   comboThreshold: 5
   comboColor: {r: 0, g: 1, b: 1, a: 1}
+  textFontSize: 36
+  textSortingLayer: Gameplay
+  textSortingOrder: 9
