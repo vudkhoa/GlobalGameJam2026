@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52443b241dfaf4e44998aaa42797e110, type: 3}
   m_Name: Zigzag_Smooth
   m_EditorClassIdentifier: 
-  trajectoryName: ZigZag 3x (Fit=Auto)
+  trajectoryName: ZigZag 3x (Fit=Full)
   safePadding: 2
   maxX: 20
   maxY: 10
   screenPadding: 0
   beatCount: 4
-  beatInterval: 0.8
+  beatInterval: 1
   beatSpriteSet: {fileID: 11400000, guid: b459a75e690deb944a62f801e5ada8d5, type: 2}
   connectorToNext:
     connectorSprite: {fileID: 0}
@@ -31,5 +31,5 @@ MonoBehaviour:
   amplitude: 2
   zigzagCount: 3
   desiredGap: 1
-  forceFullScreen: 0
+  forceFullScreen: 1
   pattern: 1

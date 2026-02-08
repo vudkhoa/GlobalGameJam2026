@@ -151,10 +151,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3713813789984648069, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
-      propertyPath: _defaultBeatConfig
-      value: 
-      objectReference: {fileID: 11400000, guid: 92498d49d530e994a9cdd83094994507, type: 2}
+    - target: {fileID: 4341731253316910922, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4401979125054330774, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
@@ -254,7 +254,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2434583548634252861, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 999664217}
   m_SourcePrefab: {fileID: 100100000, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
 --- !u!1 &831142178
 GameObject:
@@ -427,6 +430,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &999664215 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2434583548634252861, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
+  m_PrefabInstance: {fileID: 451995817}
+  m_PrefabAsset: {fileID: 0}
+--- !u!223 &999664217
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999664215}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: -1188171183
+  m_SortingOrder: 10
+  m_TargetDisplay: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -86,7 +86,7 @@ public class BeatCircle : MonoBehaviour
         _cts?.Dispose();
         _cts = new CancellationTokenSource();
 
-        // Enable collider for input
+        // Enable collider for input    
         _collider.enabled = true;
 
         // Ensure GameObject is active

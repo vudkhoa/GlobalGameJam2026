@@ -8,7 +8,7 @@ public class GameInstallerOSU : MonoBehaviour
 {
     [Header("Configurations")]
     [SerializeField] private JudgementConfig _judgementConfig;
-    [SerializeField] private BeatConfig _defaultBeatConfig; // ✅ NEW: Default beat config
+    [SerializeField] private BeatConfig _defaultBeatConfig;
     [SerializeField] private AuditionSessionData _sessionData;
 
     // Services (created by installer)
@@ -69,8 +69,8 @@ public class GameInstallerOSU : MonoBehaviour
         _evaluator = new JudgementEvaluator(_judgementConfig);
         _phaseController = new PhaseController();
 
-        // ✅ Initialize phase controller with default beat config
-        _phaseController.Initialize(_sessionData.phases, _defaultBeatConfig);
+        // ✅ FIX: Inject GameTimeService vào PhaseController
+        _phaseController.Initialize(_sessionData.phases, _defaultBeatConfig, _timeService);
     }
 
     private void OnDestroy()

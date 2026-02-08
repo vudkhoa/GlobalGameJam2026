@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b78445f80d7cc49a46b2aae9fd8d7e, type: 3}
   m_Name: Wave_TopToBot
   m_EditorClassIdentifier: 
-  trajectoryName: Wave Right (Fit=Auto)
+  trajectoryName: Wave Right (Fit=Full)
   safePadding: 2
   maxX: 20
   maxY: 10
@@ -29,7 +29,7 @@ MonoBehaviour:
     overlapFactor: 0.3
   moveRight: 1
   desiredGap: 1
-  forceFullScreen: 0
+  forceFullScreen: 1
   waveAmplitude: 2
   waveFrequency: 1.3
   pathSeed: 0

@@ -14,7 +14,7 @@ public abstract class TrajectoryConfig : ScriptableObject
     [Range(0f, 2f)]
     public float safePadding = 0.5f;
 
-    // Các biến cũ giữ lại để tránh lỗi missing ref, nhưng logic sẽ ưu tiên Dynamic
+    // Các biến cũ giữ lại fallback
     [HideInInspector] public float maxX = 8.5f;
     [HideInInspector] public float maxY = 4.5f;
     [HideInInspector] public float screenPadding = 0.5f;
@@ -30,19 +30,43 @@ public abstract class TrajectoryConfig : ScriptableObject
     public BeatSpriteSet beatSpriteSet;
     public BeatConnectorData connectorToNext;
 
+    // =========================================================================
+    // ⚡ TỐI ƯU HIỆU NĂNG (FRAME CACHING)
+    // =========================================================================
+    // Biến lưu trữ kết quả tính toán của frame hiện tại
+    private Vector2? _cachedBounds;
+    // Biến đánh dấu frame nào đã tính toán rồi
+    private int _lastFrameCalculated = -1;
+
     /// <summary>
-    /// Hàm cốt lõi: Lấy giới hạn màn hình thực tế (World Space) từ Camera hiện tại
+    /// Hàm cốt lõi: Lấy giới hạn màn hình thực tế (World Space)
+    /// Đã tối ưu để chỉ gọi Camera.main 1 lần duy nhất mỗi frame
     /// </summary>
     protected Vector2 GetDynamicScreenBounds()
     {
+        // 1. Kiểm tra Cache: Nếu frame này đã tính rồi thì trả về luôn (Siêu nhanh)
+        if (_cachedBounds.HasValue && Time.frameCount == _lastFrameCalculated)
+        {
+            return _cachedBounds.Value;
+        }
+
+        // 2. Nếu chưa tính (Frame mới), thực hiện tính toán nặng
         Camera cam = Camera.main;
-        if (cam == null) return new Vector2(8.5f, 4.5f); // Fallback nếu không tìm thấy cam
+
+        // Fallback nếu không tìm thấy cam (để tránh lỗi trong Editor khi chưa Play)
+        if (cam == null)
+        {
+            return new Vector2(maxX, maxY);
+        }
 
         // Viewport (1,1) là góc trên phải. Chuyển sang World Space.
         Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1, 1, 0));
 
-        // Trừ padding để đảm bảo an toàn
-        return new Vector2(topRight.x - safePadding, topRight.y - safePadding);
+        // Lưu kết quả vào Cache
+        _cachedBounds = new Vector2(topRight.x - safePadding, topRight.y - safePadding);
+        _lastFrameCalculated = Time.frameCount;
+
+        return _cachedBounds.Value;
     }
 
     public abstract Vector2 EvaluatePosition(float t, int index, int totalCount);
@@ -65,6 +89,10 @@ public abstract class TrajectoryConfig : ScriptableObject
     {
         beatCount = Mathf.Max(1, beatCount);
         beatInterval = Mathf.Max(0.1f, beatInterval);
+
+        // Reset cache khi chỉnh sửa trong Editor để cập nhật ngay lập tức
+        _cachedBounds = null;
+        _lastFrameCalculated = -1;
     }
 #endif
 }

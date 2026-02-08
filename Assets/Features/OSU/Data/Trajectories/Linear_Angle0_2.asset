@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f332c683a11a564297cf989ed9c3191, type: 3}
   m_Name: Linear_Angle0_2
   m_EditorClassIdentifier: 
-  trajectoryName: "Linear 0\xB0 (Fit=Auto)"
+  trajectoryName: "Linear 0\xB0 (Fit=Full)"
   safePadding: 2
   maxX: 40
   maxY: 20
@@ -29,4 +29,4 @@ MonoBehaviour:
     overlapFactor: 0.3
   angle: 0
   desiredGap: 1
-  forceFullScreen: 0
+  forceFullScreen: 1

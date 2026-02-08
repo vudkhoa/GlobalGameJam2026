@@ -11,10 +11,12 @@ public class PhaseController
     private List<PhaseData> _phases;
     private int _currentPhaseIndex = -1;
     private int _beatsCompletedInPhase = 0;
-    private float _currentPhaseStartTime = 0f;
 
     private List<BeatData> _currentPhaseBeats;
-    private BeatConfig _defaultBeatConfig; // ✅ Store default config
+    private BeatConfig _defaultBeatConfig;
+
+    // ✅ NEW: Reference to GameTimeService để đồng bộ timing
+    private GameTimeService _timeService;
 
     public GameState CurrentState { get; private set; } = GameState.Idle;
     public PhaseData CurrentPhase => _currentPhaseIndex >= 0 ? _phases[_currentPhaseIndex] : null;
@@ -30,10 +32,11 @@ public class PhaseController
     // INITIALIZATION
     // ═══════════════════════════════════════════════════════════
 
-    public void Initialize(List<PhaseData> phases, BeatConfig defaultBeatConfig)
+    public void Initialize(List<PhaseData> phases, BeatConfig defaultBeatConfig, GameTimeService timeService)
     {
         _phases = phases ?? new List<PhaseData>();
         _defaultBeatConfig = defaultBeatConfig;
+        _timeService = timeService;
 
         if (_phases.Count == 0)
         {
@@ -56,7 +59,6 @@ public class PhaseController
             return;
         }
 
-        _currentPhaseStartTime = 0f;
         StartPhase(0);
     }
 
@@ -76,8 +78,12 @@ public class PhaseController
         // ✅ Get BeatConfig for this phase (or use default)
         BeatConfig beatConfig = phase.beatConfig != null ? phase.beatConfig : _defaultBeatConfig;
 
-        // Generate beats using BeatGenerator with BeatConfig
-        _currentPhaseBeats = BeatGenerator.GenerateBeats(phase, beatConfig, _currentPhaseStartTime);
+        // ✅ FIX: Sử dụng GameTimeService.CurrentTime thay vì tính toán thủ công
+        // Đây là nguồn sự thật duy nhất về thời gian trong game
+        float currentGameTime = _timeService != null ? _timeService.CurrentTime : 0f;
+
+        // Generate beats using BeatGenerator with ACTUAL game time
+        _currentPhaseBeats = BeatGenerator.GenerateBeats(phase, beatConfig, currentGameTime);
 
         OnPhaseStarted?.Invoke(phase);
     }
@@ -101,8 +107,8 @@ public class PhaseController
 
         OnPhaseEnded?.Invoke(completedPhase, _currentPhaseIndex);
 
-        // Update start time for next phase
-        _currentPhaseStartTime += completedPhase.TotalDuration;
+        // ✅ REMOVED: Không cần tính toán _currentPhaseStartTime nữa
+        // Thay vào đó, mỗi phase sẽ sử dụng GameTimeService.CurrentTime khi start
 
         // Check if more phases exist
         if (_currentPhaseIndex < _phases.Count - 1)

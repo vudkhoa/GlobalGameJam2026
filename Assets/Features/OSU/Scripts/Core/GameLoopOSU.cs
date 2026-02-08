@@ -167,21 +167,6 @@ public class GameLoopOSU : MonoBehaviour
 
     private async UniTask StartGame()
     {
-
-        ////await intro.PlayAsync();
-
-        //// Blur trong intro2 (countdown 3-2-1) - không có phase sprite
-        //if (_blurEffect != null)
-        //{
-        //    _blurEffect.BlurBg();
-        //}
-        //await intro2.PlayAsync();
-
-        //await intro3.PlayAsync();
-        //// Wait 1 frame để warmup hoàn tất
-        //await UniTask.Yield();
-
-
         // Update beat config
         _beatSpawner.UpdateBeatConfig(_defaultBeatConfig);
 
@@ -192,14 +177,15 @@ public class GameLoopOSU : MonoBehaviour
         _phaseController.OnPhaseEnded += OnPhaseEnded;
         _phaseController.OnAllPhasesCompleted += OnAllPhasesCompleted;
 
-        // ✅ Wait 1 more frame
         await UniTask.Yield();
 
-        // Start time service
-        _timeService.Start();
-
-        // Start first phase
+        // Đảm bảo beats được setup TRƯỚC KHI time bắt đầu chạy
         _phaseController.StartFirstPhase();
+
+        await UniTask.Yield();
+
+        // Start time service (SAU KHI phase đã ready)
+        _timeService.Start();
     }
 
     private void OnPhaseStarted(PhaseData phase)
