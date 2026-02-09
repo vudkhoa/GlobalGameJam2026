@@ -35,20 +35,14 @@ public class GameInstallerOSU : MonoBehaviour
 
     private void OnEnable()
     {
-        // Initialize services as early as possible (OnEnable runs before Awake)
         EnsureInitialized();
     }
 
     private void Awake()
     {
-        // Ensure initialization (in case OnEnable didn't run)
         EnsureInitialized();
     }
 
-    /// <summary>
-    /// Public method to ensure services are initialized
-    /// Can be called by dependent scripts to guarantee initialization
-    /// </summary>
     public void EnsureInitialized()
     {
         if (_isInitialized) return;
@@ -63,14 +57,13 @@ public class GameInstallerOSU : MonoBehaviour
 
     private void InstallServices()
     {
-        // Create services
         _timeService = new GameTimeService();
         _scoreService = new ScoreServiceOSU(_judgementConfig);
         _evaluator = new JudgementEvaluator(_judgementConfig);
         _phaseController = new PhaseController();
 
-        // ✅ FIX: Inject GameTimeService vào PhaseController
-        _phaseController.Initialize(_sessionData.phases, _defaultBeatConfig, _timeService);
+        // ✅ FIX: Convert List<PhaseData> → PhaseData[]
+        _phaseController.Initialize(_sessionData.phases.ToArray());
     }
 
     private void OnDestroy()

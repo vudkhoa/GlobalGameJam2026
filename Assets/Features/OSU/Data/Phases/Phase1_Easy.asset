@@ -15,6 +15,7 @@ MonoBehaviour:
   phaseName: Phase 1 - Warmup
   audioClip: {fileID: 0}
   beatConfig: {fileID: 11400000, guid: 7ccc4e2568cfa1045b2b6a42641f2f26, type: 2}
+  connectorConfig: {fileID: 11400000, guid: 480e0799cb8ca584db17cde580c2df57, type: 2}
   trajectoryConfigs:
   - {fileID: 11400000, guid: 7e399487fdb3dd440b7b64ceb7a4e8cb, type: 2}
   - {fileID: 11400000, guid: c45a3e24c55342f4d81dc46cc3c56655, type: 2}

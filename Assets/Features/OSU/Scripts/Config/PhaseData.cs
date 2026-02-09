@@ -12,6 +12,10 @@ public class PhaseData : ScriptableObject
     [Tooltip("BeatConfig cho phase này (null = dùng default)")]
     public BeatConfig beatConfig;
 
+    [Header("Connector Configuration")]
+    [Tooltip("BeatConnectorConfig cho phase này - dùng chung cho tất cả trajectory transitions")]
+    public BeatConnectorConfig connectorConfig;
+
     [Header("Trajectory")]
     [Tooltip("Danh sách trajectory configs cho phase này (play tuần tự)")]
     public TrajectoryConfig[] trajectoryConfigs;

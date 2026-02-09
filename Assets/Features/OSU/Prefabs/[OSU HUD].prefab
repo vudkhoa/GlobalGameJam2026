@@ -901,6 +901,7 @@ RectTransform:
   - {fileID: 6618319607033651027}
   - {fileID: 8281519528983694953}
   - {fileID: 6914392162098527138}
+  - {fileID: 4482609510563571654}
   - {fileID: 3973760908067333722}
   - {fileID: 9102944762942528995}
   - {fileID: 2930899485205018867}
@@ -930,25 +931,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &6914392162098527138
-RectTransform:
+--- !u!4 &6914392162098527138
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1809786456310771987}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.012207031, y: 0.0010986328, z: 0}
   m_LocalScale: {x: 10, y: 10, z: 10}
-  m_ConstrainProportionsScale: 1
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3806269746014700454}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.012207031, y: 0.0010986328}
-  m_SizeDelta: {x: 0.100097656, y: 0.98999023}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2048425278666930415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1644,6 +1641,7 @@ GameObject:
   - component: {fileID: 7718797082647740333}
   - component: {fileID: 4499975739742596327}
   - component: {fileID: 8598227114510595089}
+  - component: {fileID: 4611085462501111173}
   m_Layer: 0
   m_Name: Game_OSU
   m_TagString: Untagged
@@ -1799,6 +1797,7 @@ MonoBehaviour:
   _installer: {fileID: 3713813789984648069}
   _defaultBeatConfig: {fileID: 11400000, guid: 7ccc4e2568cfa1045b2b6a42641f2f26, type: 2}
   _beatSpawner: {fileID: 6909571931343569962}
+  _connectorManager: {fileID: 0}
   _gameCamera: {fileID: 0}
   _beatLayerMask:
     serializedVersion: 2
@@ -1827,7 +1826,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _beatConfig: {fileID: 11400000, guid: 7ccc4e2568cfa1045b2b6a42641f2f26, type: 2}
   _beatPool: {fileID: 2777555057322187238}
-  _beatContainer: {fileID: 6914392162098527138}
+  _beatContainer: {fileID: 0}
 --- !u!114 &7718797082647740333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1878,6 +1877,19 @@ MonoBehaviour:
   _phase1Sprite: {fileID: 8665365528975466992, guid: 00175e3facaf2f5469bca8ca931b34d8, type: 3}
   _phase2Sprite: {fileID: 7981473872491667585, guid: 740c3c158601a454686a6c4c6206f4aa, type: 3}
   _phase3Sprite: {fileID: -7929352393585863676, guid: 753c7cba5599ab94fbe834b424e5354f, type: 3}
+--- !u!114 &4611085462501111173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4852699042294440973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd8b1212d2c3a7e449440a5dca145231, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _connectorContainer: {fileID: 0}
 --- !u!1 &5264836644227562984
 GameObject:
   m_ObjectHideFlags: 0
@@ -2895,6 +2907,37 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!1 &7338121852646065395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4482609510563571654}
+  m_Layer: 5
+  m_Name: ConnectorContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4482609510563571654
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7338121852646065395}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 3806269746014700454}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7418819014982159888
 GameObject:
   m_ObjectHideFlags: 0
@@ -2945,7 +2988,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _beatConfig: {fileID: 11400000, guid: 92498d49d530e994a9cdd83094994507, type: 2}
   _beatPool: {fileID: 2777555057322187238}
-  _beatContainer: {fileID: 6914392162098527138}
+  _beatContainer: {fileID: 0}
 --- !u!1 &7890745455865496191
 GameObject:
   m_ObjectHideFlags: 0

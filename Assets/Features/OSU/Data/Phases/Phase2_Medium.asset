@@ -15,6 +15,7 @@ MonoBehaviour:
   phaseName: Phase 1
   audioClip: {fileID: 0}
   beatConfig: {fileID: 11400000, guid: fa09bd41f9a5adf419672a3aa5b58239, type: 2}
+  connectorConfig: {fileID: 11400000, guid: 480e0799cb8ca584db17cde580c2df57, type: 2}
   trajectoryConfigs:
   - {fileID: 11400000, guid: 6e9e5a27b53eb3b4cb18f406f0301a75, type: 2}
   - {fileID: 11400000, guid: c45a3e24c55342f4d81dc46cc3c56655, type: 2}

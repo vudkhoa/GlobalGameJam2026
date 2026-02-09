@@ -18,10 +18,11 @@ public class GameLoopOSU : MonoBehaviour
 
     [Header("Components")]
     [SerializeField] private BeatSpawner _beatSpawner;
+    [SerializeField] private BeatConnector _connectorManager; 
 
     [Header("Input Configuration")]
     [SerializeField] private Camera _gameCamera;
-    [SerializeField] private LayerMask _beatLayerMask = -1; // Default: everything
+    [SerializeField] private LayerMask _beatLayerMask = -1;
     [SerializeField] private bool _debugInput = false;
 
     [Header("Animation Sequences")]
@@ -47,18 +48,19 @@ public class GameLoopOSU : MonoBehaviour
     // Beat tracking
     private List<BeatCircle> _activeBeats = new List<BeatCircle>();
 
+    // ✅ Connector tracking
+    private Queue<PendingConnector> _pendingConnectors = new Queue<PendingConnector>();
+
     public event Action<int> OnGameCompleted;
 
     private void Awake()
     {
-        // Validate installer is assigned
         if (_installer == null)
         {
             enabled = false;
             return;
         }
 
-        // Setup camera
         if (_gameCamera == null)
         {
             _gameCamera = Camera.main;
@@ -71,26 +73,18 @@ public class GameLoopOSU : MonoBehaviour
             return;
         }
 
-        // Initialize input handler
         _inputHandler = new BeatInputHandler(_gameCamera, _beatLayerMask, _debugInput);
-
-        // Explicitly ensure installer has initialized its services
-        // This solves script execution order issues
         _installer.EnsureInitialized();
-
-        // Now inject services
         EnsureServicesInitialized();
     }
 
     private void EnsureServicesInitialized()
     {
-        // Inject services from installer
         _timeService = _installer.TimeService;
         _scoreService = _installer.ScoreService;
         _evaluator = _installer.Evaluator;
         _phaseController = _installer.PhaseController;
 
-        // Validate all services are available
         if (_timeService == null || _scoreService == null || _evaluator == null || _phaseController == null)
         {
             enabled = false;
@@ -99,15 +93,12 @@ public class GameLoopOSU : MonoBehaviour
 
     private void Start()
     {
-        // ✅ FIX: Warm services BEFORE game starts
         WarmupServices();
         StartGame().Forget();
     }
 
     private void WarmupServices()
     {
-
-        // 1. Warm Evaluator
         Vector2 dummySize = Vector2.one * 100f;
         _evaluator.Evaluate(dummySize, dummySize);
         _evaluator.GetFeedback(JudgementType.Perfect);
@@ -115,29 +106,24 @@ public class GameLoopOSU : MonoBehaviour
         _evaluator.GetFeedback(JudgementType.OK);
         _evaluator.GetFeedback(JudgementType.Miss);
 
-        // 2. Warm ScoreService
         _scoreService.RecordJudgement(JudgementType.Perfect);
         _scoreService.GetTotalScore();
         _scoreService.GetCurrentCombo();
         _scoreService.GetAccuracy();
-        _scoreService.ResetPhaseScore(); // Reset về 0
-
+        _scoreService.ResetPhaseScore();
     }
 
     private void Update()
     {
         if (_timeService == null || !_timeService.IsRunning) return;
 
-        //  PROCESS INPUT FIRST (highest priority to avoid missing input)
         HandleInput();
-
-        // Update time service
         _timeService.Update(Time.deltaTime);
-
-        // Update spawner with current time
         _beatSpawner.UpdateSpawning(_timeService.CurrentTime);
 
-        //  UPDATE COMBO DISPLAY mỗi frame
+        // ✅ Update connector spawning
+        UpdateConnectorSpawning(_timeService.CurrentTime);
+
         if (_comboDisplay != null)
         {
             _comboDisplay.UpdateCombo(_scoreService.GetCurrentCombo());
@@ -145,15 +131,50 @@ public class GameLoopOSU : MonoBehaviour
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  INPUT HANDLING - Processed every frame in Update()
+    // ✅ CONNECTOR SPAWNING LOGIC
+    // ═══════════════════════════════════════════════════════════
+
+    private void UpdateConnectorSpawning(float currentTime)
+    {
+        while (_pendingConnectors.Count > 0)
+        {
+            PendingConnector pending = _pendingConnectors.Peek();
+
+            if (currentTime >= pending.spawnTime)
+            {
+                _pendingConnectors.Dequeue();
+                SpawnConnector(pending.data);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    private void SpawnConnector(TrajectoryTransitionData data)
+    {
+        if (_connectorManager == null)
+        {
+            Debug.LogWarning("[GameLoopOSU] BeatConnectorManager not assigned!");
+            return;
+        }
+
+        _connectorManager.SpawnConnector(
+            data.currentTrajectoryEndPos,
+            data.nextTrajectoryStartPos,
+            data.connectorConfig
+        );
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // INPUT HANDLING
     // ═══════════════════════════════════════════════════════════
 
     private void HandleInput()
     {
-        // Lấy danh sách các nốt bị bấm trúng (hỗ trợ đa điểm)
         List<BeatCircle> hitBeats = _inputHandler.ProcessInput();
 
-        // Duyệt qua từng nốt và kích hoạt
         foreach (var beat in hitBeats)
         {
             if (beat != null)
@@ -165,128 +186,113 @@ public class GameLoopOSU : MonoBehaviour
 
     private async UniTask StartGame()
     {
-        // Update beat config
         _beatSpawner.UpdateBeatConfig(_defaultBeatConfig);
 
-        // Setup events
+        // ✅ Subscribe to events
         _beatSpawner.OnBeatSpawned += OnBeatSpawned;
-
         _phaseController.OnPhaseStarted += OnPhaseStarted;
         _phaseController.OnPhaseEnded += OnPhaseEnded;
         _phaseController.OnAllPhasesCompleted += OnAllPhasesCompleted;
+        _phaseController.OnTrajectoryTransition += OnTrajectoryTransition; // ✅ NEW
 
         await UniTask.Yield();
 
-        // Đảm bảo beats được setup TRƯỚC KHI time bắt đầu chạy
         _phaseController.StartFirstPhase();
 
         await UniTask.Yield();
 
-        // Start time service (SAU KHI phase đã ready)
         _timeService.Start();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ✅ EVENT HANDLERS
+    // ═══════════════════════════════════════════════════════════
+
+    private void OnTrajectoryTransition(TrajectoryTransitionData transitionData)
+    {
+        // Queue connector để spawn đúng timing
+        _pendingConnectors.Enqueue(new PendingConnector
+        {
+            spawnTime = transitionData.transitionTime,
+            data = transitionData
+        });
     }
 
     private void OnPhaseStarted(PhaseData phase)
     {
-
-        // ✅ Hiển thị phase background + blur khi bắt đầu phase
         if (_blurEffect != null)
         {
             _blurEffect.ShowPhaseBackground(_phaseController.CurrentPhaseIndex);
         }
 
-        // Get BeatConfig for this phase
         BeatConfig beatConfigForPhase = phase.beatConfig != null
             ? phase.beatConfig
             : _defaultBeatConfig;
 
-        // Update spawner with phase's BeatConfig
         _beatSpawner.UpdateBeatConfig(beatConfigForPhase);
-
-        // Set generated beats to spawner
         _beatSpawner.SetBeats(_phaseController.CurrentPhaseBeats);
 
-        // Reset phase score
+        if (_connectorManager != null)
+        {
+            _connectorManager.SetBeatConfig(beatConfigForPhase);
+        }
+
         _scoreService.ResetPhaseScore();
     }
 
     private async void OnPhaseEnded(PhaseData phase, int phaseIndex)
     {
-
         int phaseScore = _scoreService.GetTotalScore();
         _scoreService.RecordPhaseScore(phaseIndex, phaseScore);
 
-        // ✅ CHECK IF MORE PHASES EXIST
+        // ✅ Clear pending connectors khi kết thúc phase
+        _pendingConnectors.Clear();
+
         if (_phaseController.CurrentPhaseIndex < _phaseController.TotalPhases - 1)
         {
-            // ✅ UnBlur và ẩn phase background khi kết thúc phase
             if (_blurEffect != null)
             {
                 _blurEffect.UnBlurBg();
             }
 
-            // Play cutscene tương ứng với phase vừa kết thúc
             await PlayCutsceneForPhase(phaseIndex);
 
-            // Pause if needed
             if (phase.pauseDuration > 0f)
             {
                 await UniTask.Delay((int)(phase.pauseDuration * 1000));
             }
 
-            // Start next phase (sẽ hiện phase background mới trong OnPhaseStarted)
             _phaseController.StartNextPhase();
-        }
-        else
-        {
-            // No more phases - game will end
         }
     }
 
-    /// <summary>
-    /// Play cutscene dựa trên phase index vừa hoàn thành
-    /// Phase 0 (Phase 1) → cutscene_1
-    /// Phase 1 (Phase 2) → cutscene_2
-    /// Phase 2 (Phase 3) → cutscene_3
-    /// </summary>
     private async UniTask PlayCutsceneForPhase(int completedPhaseIndex)
     {
-        AnimationSequencerController cutscene = null;
-
         switch (completedPhaseIndex)
         {
-            case 0: // Sau phase 1
-                cutscene = cutscene_1;
+            case 0:
                 await cutscene_1.PlayAsync();
                 break;
-            case 1: // Sau phase 2
-                cutscene = cutscene_2;
+            case 1:
                 await cutscene_2.PlayAsync();
                 break;
-            case 2: // Sau phase 3
-                cutscene = cutscene_3;
+            case 2:
                 break;
         }
-
-
     }
 
     private void OnAllPhasesCompleted()
     {
-        // Stop time
         _timeService.Stop();
 
-        // Get total score
         int totalScore = _scoreService.GetTotalScore();
         List<int> phaseScores = _scoreService.GetAllPhaseScores();
 
-        // Log statistics (if ScoreServiceOSU)
         if (_scoreService is ScoreServiceOSU osuService)
         {
             osuService.LogStats();
         }
 
-        // OUTPUT SCORE
         OnGameCompleted?.Invoke(totalScore);
 
         ShowEndScreen(totalScore).Forget();
@@ -304,33 +310,20 @@ public class GameLoopOSU : MonoBehaviour
         beat.OnMissed += OnBeatMissed;
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // ✅ BEAT EVENT HANDLERS - FIXED DUPLICATE DISPLAY
-    // ═══════════════════════════════════════════════════════════
-
     private void OnBeatTapped(BeatCircle beat)
     {
         _activeBeats.Remove(beat);
 
-        //  Evaluate judgement (Perfect/Good/OK/Miss based on timing)
         JudgementType judgement = _evaluator.Evaluate(beat.CurrentSize, beat.TargetSize);
-
-        //  Record to score service (updates combo + score)
         _scoreService.RecordJudgement(judgement);
-
-        //  Get feedback data
         FeedbackData feedback = _evaluator.GetFeedback(judgement);
 
-        //  Show judgement UI (ALWAYS show for tap, even if Miss)
         if (_judgementDisplay != null)
         {
             _judgementDisplay.Show(feedback, beat.transform.position);
         }
 
-        //  Play visual feedback on beat
         beat.PlayHitFeedback();
-
-        //  Notify phase controller
         _phaseController.OnBeatCompleted();
     }
 
@@ -338,22 +331,15 @@ public class GameLoopOSU : MonoBehaviour
     {
         _activeBeats.Remove(beat);
 
-        //  Record miss to score service (breaks combo)
         _scoreService.RecordJudgement(JudgementType.Miss);
-
-        //  Get miss feedback
         FeedbackData feedback = _evaluator.GetFeedback(JudgementType.Miss);
 
-        //  Show MISS UI (user didn't tap at all)
         if (_judgementDisplay != null)
         {
             _judgementDisplay.Show(feedback, beat.transform.position);
         }
 
-        //  Play miss feedback on beat
         beat.PlayMissFeedback();
-
-        //  Notify phase controller
         _phaseController.OnBeatCompleted();
     }
 
@@ -380,4 +366,14 @@ public class GameLoopOSU : MonoBehaviour
     {
         return _scoreService?.GetAccuracy() ?? 0f;
     }
+}
+
+/// <summary>
+/// Helper struct để queue connectors
+/// </summary>
+[System.Serializable]
+public struct PendingConnector
+{
+    public float spawnTime;
+    public TrajectoryTransitionData data;
 }

@@ -1,134 +1,183 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 /// <summary>
-/// SRP: Control phase progression (FSM)
-/// Responsibility: Track phase state, handle transitions
+/// SRP: Manage phase progression and beat generation
+/// Responsibility: Track phase state, generate beat data, emit transition events
 /// </summary>
 public class PhaseController
 {
-    private List<PhaseData> _phases;
+    private PhaseData[] _phases;
     private int _currentPhaseIndex = -1;
-    private int _beatsCompletedInPhase = 0;
+    private int _beatsCompleted = 0;
+    private int _totalBeatsInPhase = 0;
 
-    private List<BeatData> _currentPhaseBeats;
-    private BeatConfig _defaultBeatConfig;
+    private List<BeatData> _currentPhaseBeats = new List<BeatData>();
 
-    // ✅ NEW: Reference to GameTimeService để đồng bộ timing
-    private GameTimeService _timeService;
-
-    public GameState CurrentState { get; private set; } = GameState.Idle;
-    public PhaseData CurrentPhase => _currentPhaseIndex >= 0 ? _phases[_currentPhaseIndex] : null;
-    public List<BeatData> CurrentPhaseBeats => _currentPhaseBeats;
-    public int CurrentPhaseIndex => _currentPhaseIndex;
-    public int TotalPhases => _phases.Count;
-
+    // Events
     public event Action<PhaseData> OnPhaseStarted;
     public event Action<PhaseData, int> OnPhaseEnded;
     public event Action OnAllPhasesCompleted;
+    public event Action<TrajectoryTransitionData> OnTrajectoryTransition;
+
+    // Properties
+    public int CurrentPhaseIndex => _currentPhaseIndex;
+    public int TotalPhases => _phases?.Length ?? 0;
+    public List<BeatData> CurrentPhaseBeats => _currentPhaseBeats;
 
     // ═══════════════════════════════════════════════════════════
     // INITIALIZATION
     // ═══════════════════════════════════════════════════════════
 
-    public void Initialize(List<PhaseData> phases, BeatConfig defaultBeatConfig, GameTimeService timeService)
+    public void Initialize(PhaseData[] phases)
     {
-        _phases = phases ?? new List<PhaseData>();
-        _defaultBeatConfig = defaultBeatConfig;
-        _timeService = timeService;
-
-        if (_phases.Count == 0)
-        {
-            return;
-        }
-
+        _phases = phases;
         _currentPhaseIndex = -1;
-        _beatsCompletedInPhase = 0;
-        CurrentState = GameState.Idle;
+        _beatsCompleted = 0;
+        _totalBeatsInPhase = 0;
+        _currentPhaseBeats.Clear();
     }
 
     // ═══════════════════════════════════════════════════════════
-    // STATE TRANSITIONS
+    // PUBLIC API
     // ═══════════════════════════════════════════════════════════
 
     public void StartFirstPhase()
     {
-        if (_phases.Count == 0)
+        if (_phases == null || _phases.Length == 0)
         {
+            Debug.LogError("[PhaseController] No phases configured!");
             return;
         }
 
-        StartPhase(0);
+        _currentPhaseIndex = 0;
+        StartPhase(_phases[0]);
     }
 
-    private void StartPhase(int phaseIndex)
+    public void StartNextPhase()
     {
-        if (phaseIndex >= _phases.Count)
+        _currentPhaseIndex++;
+
+        if (_currentPhaseIndex >= _phases.Length)
         {
+            OnAllPhasesCompleted?.Invoke();
             return;
         }
 
-        _currentPhaseIndex = phaseIndex;
-        _beatsCompletedInPhase = 0;
-        CurrentState = GameState.PlayingPhase;
-
-        PhaseData phase = CurrentPhase;
-
-        // ✅ Get BeatConfig for this phase (or use default)
-        BeatConfig beatConfig = phase.beatConfig != null ? phase.beatConfig : _defaultBeatConfig;
-
-        // ✅ FIX: Sử dụng GameTimeService.CurrentTime thay vì tính toán thủ công
-        // Đây là nguồn sự thật duy nhất về thời gian trong game
-        float currentGameTime = _timeService != null ? _timeService.CurrentTime : 0f;
-
-        // Generate beats using BeatGenerator with ACTUAL game time
-        _currentPhaseBeats = BeatGenerator.GenerateBeats(phase, beatConfig, currentGameTime);
-
-        OnPhaseStarted?.Invoke(phase);
+        StartPhase(_phases[_currentPhaseIndex]);
     }
 
     public void OnBeatCompleted()
     {
-        if (CurrentState != GameState.PlayingPhase) return;
+        _beatsCompleted++;
 
-        _beatsCompletedInPhase++;
-
-        // Check if phase completed
-        if (_beatsCompletedInPhase >= _currentPhaseBeats.Count)
+        if (_beatsCompleted >= _totalBeatsInPhase)
         {
             EndCurrentPhase();
         }
     }
 
-    private void EndCurrentPhase()
+    // ═══════════════════════════════════════════════════════════
+    // PRIVATE METHODS
+    // ═══════════════════════════════════════════════════════════
+
+    private void StartPhase(PhaseData phase)
     {
-        PhaseData completedPhase = CurrentPhase;
+        _beatsCompleted = 0;
+        _currentPhaseBeats.Clear();
 
-        OnPhaseEnded?.Invoke(completedPhase, _currentPhaseIndex);
+        GenerateBeatsForPhase(phase);
 
-        // ✅ REMOVED: Không cần tính toán _currentPhaseStartTime nữa
-        // Thay vào đó, mỗi phase sẽ sử dụng GameTimeService.CurrentTime khi start
+        _totalBeatsInPhase = _currentPhaseBeats.Count;
 
-        // Check if more phases exist
-        if (_currentPhaseIndex < _phases.Count - 1)
-        {
-            CurrentState = GameState.PausingPhase;
-        }
-        else
-        {
-            CurrentState = GameState.Ended;
-            OnAllPhasesCompleted?.Invoke();
-        }
+        OnPhaseStarted?.Invoke(phase);
     }
 
-    public void StartNextPhase()
+    private void GenerateBeatsForPhase(PhaseData phase)
     {
-        if (CurrentState != GameState.PausingPhase)
+        if (phase.trajectoryConfigs == null || phase.trajectoryConfigs.Length == 0)
         {
+            Debug.LogWarning($"[PhaseController] Phase {phase.phaseName} has no trajectories!");
             return;
         }
 
-        StartPhase(_currentPhaseIndex + 1);
+        // ✅ Lấy connectorConfig từ Phase thay vì từ Trajectory
+        BeatConnectorConfig phaseConnector = phase.connectorConfig;
+
+        float currentTime = 0f;
+
+        for (int trajIndex = 0; trajIndex < phase.trajectoryConfigs.Length; trajIndex++)
+        {
+            TrajectoryConfig trajectory = phase.trajectoryConfigs[trajIndex];
+
+            if (trajectory == null) continue;
+
+            Vector2 trajectoryEndPos = Vector2.zero;
+
+            for (int beatIndex = 0; beatIndex < trajectory.beatCount; beatIndex++)
+            {
+                float t = trajectory.beatCount > 1
+                    ? (float)beatIndex / (trajectory.beatCount - 1)
+                    : 0.5f;
+
+                Vector2 position = trajectory.EvaluatePosition(t, beatIndex, trajectory.beatCount);
+
+                if (beatIndex == trajectory.beatCount - 1)
+                {
+                    trajectoryEndPos = position;
+                }
+
+                BeatData beatData = new BeatData
+                {
+                    time = currentTime,
+                    position = position,
+                    size = Vector2.one * 100f,
+                    spriteSet = trajectory.beatSpriteSet
+                };
+
+                _currentPhaseBeats.Add(beatData);
+                currentTime += trajectory.beatInterval;
+            }
+
+            // ✅ Emit transition event dùng phase-level connectorConfig
+            if (trajIndex < phase.trajectoryConfigs.Length - 1 && phaseConnector != null)
+            {
+                TrajectoryConfig nextTrajectory = phase.trajectoryConfigs[trajIndex + 1];
+
+                if (nextTrajectory != null)
+                {
+                    Vector2 nextTrajectoryStartPos = nextTrajectory.EvaluatePosition(0f, 0, nextTrajectory.beatCount);
+
+                    TrajectoryTransitionData transitionData = new TrajectoryTransitionData
+                    {
+                        currentTrajectoryEndPos = trajectoryEndPos,
+                        nextTrajectoryStartPos = nextTrajectoryStartPos,
+                        connectorConfig = phaseConnector,
+                        transitionTime = currentTime - trajectory.beatInterval
+                    };
+
+                    OnTrajectoryTransition?.Invoke(transitionData);
+                }
+            }
+        }
     }
+
+    private void EndCurrentPhase()
+    {
+        PhaseData currentPhase = _phases[_currentPhaseIndex];
+        OnPhaseEnded?.Invoke(currentPhase, _currentPhaseIndex);
+    }
+}
+
+/// <summary>
+/// Data for trajectory transition (connector spawning)
+/// </summary>
+[System.Serializable]
+public struct TrajectoryTransitionData
+{
+    public Vector2 currentTrajectoryEndPos;
+    public Vector2 nextTrajectoryStartPos;
+    public BeatConnectorConfig connectorConfig;
+    public float transitionTime;
 }
