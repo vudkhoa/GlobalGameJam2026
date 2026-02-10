@@ -251,6 +251,7 @@ public class GameLoopOSU : MonoBehaviour
         }
 
         _scoreService.ResetPhaseScore();
+        _timeService.Reset();
     }
 
     private async void OnPhaseEnded(PhaseData phase, int phaseIndex)
