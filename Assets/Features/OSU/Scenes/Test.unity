@@ -185,6 +185,10 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4611085462501111173, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
+      propertyPath: _beatConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 92498d49d530e994a9cdd83094994507, type: 2}
+    - target: {fileID: 4611085462501111173, guid: 8551a9bf6f6ec6846881e4c5a866e884, type: 3}
       propertyPath: _connectorContainer
       value: 
       objectReference: {fileID: 331920852}

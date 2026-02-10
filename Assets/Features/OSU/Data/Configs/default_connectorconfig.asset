@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: default_connectorconfig
   m_EditorClassIdentifier: 
   connectorSprite: {fileID: 21300000, guid: 5344da96b5b243e42a5ed4896a860168, type: 3}
-  lineWidth: 0.2
-  tilesPerUnit: 10
+  lineWidth: 0.25
+  tilesPerUnit: 1
   connectorColor: {r: 1, g: 1, b: 1, a: 1}
-  fadeInSpeed: 5
-  fadeOutSpeed: 5
-  fadeOutDelay: 1
+  fadeInSpeed: 15
+  fadeOutSpeed: 15
+  fadeOutDelay: 0
   sortingLayerName: Gameplay
   sortingOrder: -1

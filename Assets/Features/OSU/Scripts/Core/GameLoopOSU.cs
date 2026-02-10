@@ -18,7 +18,7 @@ public class GameLoopOSU : MonoBehaviour
 
     [Header("Components")]
     [SerializeField] private BeatSpawner _beatSpawner;
-    [SerializeField] private BeatConnector _connectorManager; 
+    [SerializeField] private BeatConnector _connectorManager;
 
     [Header("Input Configuration")]
     [SerializeField] private Camera _gameCamera;
@@ -160,10 +160,22 @@ public class GameLoopOSU : MonoBehaviour
             return;
         }
 
+        // ✅ Fallback to default BeatConfig if phase doesn't have one
+        BeatConfig beatConfigToUse = data.beatConfig != null ? data.beatConfig : _defaultBeatConfig;
+
+        if (beatConfigToUse == null)
+        {
+            Debug.LogWarning("[GameLoopOSU] No BeatConfig available for connector!");
+            return;
+        }
+
+        // ✅ Truyền cả beatInterval để sync timing chính xác
         _connectorManager.SpawnConnector(
             data.currentTrajectoryEndPos,
             data.nextTrajectoryStartPos,
-            data.connectorConfig
+            data.connectorConfig,
+            beatConfigToUse,
+            data.beatInterval 
         );
     }
 
@@ -193,7 +205,7 @@ public class GameLoopOSU : MonoBehaviour
         _phaseController.OnPhaseStarted += OnPhaseStarted;
         _phaseController.OnPhaseEnded += OnPhaseEnded;
         _phaseController.OnAllPhasesCompleted += OnAllPhasesCompleted;
-        _phaseController.OnTrajectoryTransition += OnTrajectoryTransition; // ✅ NEW
+        _phaseController.OnTrajectoryTransition += OnTrajectoryTransition;
 
         await UniTask.Yield();
 
@@ -232,6 +244,7 @@ public class GameLoopOSU : MonoBehaviour
         _beatSpawner.UpdateBeatConfig(beatConfigForPhase);
         _beatSpawner.SetBeats(_phaseController.CurrentPhaseBeats);
 
+        // ✅ Update BeatConfig cho connector manager
         if (_connectorManager != null)
         {
             _connectorManager.SetBeatConfig(beatConfigForPhase);

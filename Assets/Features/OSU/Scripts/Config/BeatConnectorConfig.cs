@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// SRP: Store connector line configuration data
-/// Responsibility: Hold sprite, animation, fade settings for tiled connectors
+/// SRP: Store connector line visual configuration ONLY
+/// Responsibility: Hold sprite, visual settings for tiled connectors
+/// NOTE: Timing auto-sync from BeatConfig at runtime, no manual input needed
 /// </summary>
 [CreateAssetMenu(fileName = "ConnectorConfig", menuName = "OSU/Beat Connector Config")]
 public class BeatConnectorConfig : ScriptableObject
@@ -22,19 +23,6 @@ public class BeatConnectorConfig : ScriptableObject
 
     [Tooltip("Màu của connector")]
     public Color connectorColor = Color.white;
-        
-    [Header("Fade Animation Settings")]
-    [Tooltip("Tốc độ fade in (world units per second) - tốc độ connector xuất hiện")]
-    [Range(1f, 20f)]
-    public float fadeInSpeed = 5f;
-
-    [Tooltip("Tốc độ fade out (world units per second) - tốc độ connector biến mất")]
-    [Range(1f, 20f)]
-    public float fadeOutSpeed = 5f;
-
-    [Tooltip("Độ trễ giữa fade in xong và bắt đầu fade out (seconds)")]
-    [Range(0f, 2f)]
-    public float fadeOutDelay = 0.3f;
 
     [Header("Sorting Layer")]
     [Tooltip("Sorting layer name cho connector (nên thấp hơn beats)")]
@@ -48,8 +36,6 @@ public class BeatConnectorConfig : ScriptableObject
     {
         lineWidth = Mathf.Max(0.05f, lineWidth);
         tilesPerUnit = Mathf.Max(1f, tilesPerUnit);
-        fadeInSpeed = Mathf.Max(1f, fadeInSpeed);
-        fadeOutSpeed = Mathf.Max(1f, fadeOutSpeed);
     }
 #endif
 }

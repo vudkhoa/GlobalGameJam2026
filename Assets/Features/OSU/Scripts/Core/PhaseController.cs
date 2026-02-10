@@ -102,8 +102,9 @@ public class PhaseController
             return;
         }
 
-        // ✅ Lấy connectorConfig từ Phase thay vì từ Trajectory
+        // ✅ Lấy connectorConfig và beatConfig từ Phase
         BeatConnectorConfig phaseConnector = phase.connectorConfig;
+        BeatConfig phaseBeatConfig = phase.beatConfig;
 
         float currentTime = 0f;
 
@@ -140,7 +141,7 @@ public class PhaseController
                 currentTime += trajectory.beatInterval;
             }
 
-            // ✅ Emit transition event dùng phase-level connectorConfig
+            // ✅ Emit transition event với beatConfig và beatInterval
             if (trajIndex < phase.trajectoryConfigs.Length - 1 && phaseConnector != null)
             {
                 TrajectoryConfig nextTrajectory = phase.trajectoryConfigs[trajIndex + 1];
@@ -154,6 +155,8 @@ public class PhaseController
                         currentTrajectoryEndPos = trajectoryEndPos,
                         nextTrajectoryStartPos = nextTrajectoryStartPos,
                         connectorConfig = phaseConnector,
+                        beatConfig = phaseBeatConfig,
+                        beatInterval = nextTrajectory.beatInterval, // ✅ NEW: Thời gian từ spawn connector đến beat B xuất hiện
                         transitionTime = currentTime - trajectory.beatInterval
                     };
 
@@ -179,5 +182,7 @@ public struct TrajectoryTransitionData
     public Vector2 currentTrajectoryEndPos;
     public Vector2 nextTrajectoryStartPos;
     public BeatConnectorConfig connectorConfig;
+    public BeatConfig beatConfig;
+    public float beatInterval; // Thời gian để connector fade in đến beat B
     public float transitionTime;
 }

@@ -1,208 +1,131 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
 /// <summary>
-/// SRP: Handle beat connector animations
-/// Responsibility: Animate connector line từ beat này sang beat khác
+/// SRP: Chỉ chịu trách nhiệm điều khiển Animation của danh sách các chấm (Dots)
+/// Không chịu trách nhiệm tạo object hay tính toán vị trí.
+/// 
 /// </summary>
 public class BeatConnectorAnimator : MonoBehaviour
 {
-    private SpriteRenderer _spriteRenderer;
+    private List<SpriteRenderer> _dots;
     private BeatConnectorConfig _config;
-
-    private Vector2 _startPos;
-    private Vector2 _endPos;
-    private float _lineLength;
-
+    private BeatConfig _beatConfig;
+    private float _beatInterval; // Thời gian để connector nối đến beat B
     private CancellationTokenSource _cts;
 
-    // ✅ NEW: Thêm beat timing
-    private float _beatShrinkDuration;
-    private float _timingOffset = 0.1f; // Fade out sớm hơn beat miss 0.1s
-
-    // ═══════════════════════════════════════════════════════════
-    // LIFECYCLE
-    // ═══════════════════════════════════════════════════════════
-
-    private void Awake()
+    public void Initialize(List<SpriteRenderer> dots, BeatConnectorConfig config, BeatConfig beatConfig, float beatInterval, Action onComplete)
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-    }
-
-    /// <summary>
-    /// Initialize connector từ startPos → endPos
-    /// </summary>
-    public void Initialize(Vector2 startPos, Vector2 endPos, BeatConnectorConfig config, float beatShrinkDuration, Action onComplete = null)
-    {
+        _dots = dots;
         _config = config;
-        _startPos = startPos;
-        _endPos = endPos;
-        _beatShrinkDuration = beatShrinkDuration;
+        _beatConfig = beatConfig;
+        _beatInterval = beatInterval;
 
-        // Cancel previous animation if exists
         Cleanup();
-
         _cts = new CancellationTokenSource();
 
-        // Setup visual
-        SetupVisuals();
-
-        // Start fade animation
-        PlayFadeAnimationAsync(onComplete).Forget();
+        PlayAnimationSequence(onComplete).Forget();
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // VISUAL SETUP
-    // ═══════════════════════════════════════════════════════════
-
-    private void SetupVisuals()
-    {
-        // Calculate line properties
-        Vector2 direction = _endPos - _startPos;
-        _lineLength = direction.magnitude;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        // Position ở điểm START (A), không phải tâm
-        transform.position = _startPos;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
-
-        // Setup sprite renderer
-        _spriteRenderer.sprite = _config.connectorSprite;
-        _spriteRenderer.color = _config.connectorColor;
-        _spriteRenderer.drawMode = SpriteDrawMode.Tiled;
-        _spriteRenderer.sortingLayerName = _config.sortingLayerName;
-        _spriteRenderer.sortingOrder = _config.sortingOrder;
-
-        // ✅ Giảm mật độ tile bằng cách tăng size của sprite
-        // Hoặc giảm tilesPerUnit (nếu dùng)
-        _spriteRenderer.tileMode = SpriteTileMode.Continuous;
-
-        // Initially size = 0 (không hiển thị)
-        _spriteRenderer.size = new Vector2(0, _config.lineWidth);
-
-        // Initially invisible
-        Color col = _spriteRenderer.color;
-        col.a = 0f;
-        _spriteRenderer.color = col;
-
-        Debug.Log($"[BeatConnector] Setup - Start: {_startPos}, End: {_endPos}, Length: {_lineLength}, BeatDuration: {_beatShrinkDuration}s");
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // FADE ANIMATION (A → B fade in, then A → B fade out)
-    // ═══════════════════════════════════════════════════════════
-
-    private async UniTaskVoid PlayFadeAnimationAsync(Action onComplete)
+    private async UniTaskVoid PlayAnimationSequence(Action onComplete)
     {
         try
         {
-            // Phase 1: Fade in from A → B (line vẽ từ A đến B)
-            await FadeInAsync(_cts.Token);
-
-            // Phase 2: Wait until near beat miss time
-            // ✅ Tính toán thời gian chờ dựa trên beat shrink duration
-            float fadeInDuration = _lineLength / _config.fadeInSpeed;
-            float totalVisibleTime = _beatShrinkDuration - _timingOffset; // Fade out sớm hơn beat miss 0.1s
-            float delayBeforeFadeOut = Mathf.Max(0, totalVisibleTime - fadeInDuration);
-
-            if (delayBeforeFadeOut > 0)
+            if (_beatConfig == null)
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(delayBeforeFadeOut), cancellationToken: _cts.Token);
+                Debug.LogWarning("[BeatConnectorAnimator] BeatConfig is null! Cannot animate.");
+                onComplete?.Invoke();
+                Destroy(gameObject);
+                return;
             }
 
-            // Phase 3: Fade out from A → B (line biến mất từ A về B)
-            await FadeOutAsync(_cts.Token);
+            float totalDots = _dots.Count;
+            float shrinkDuration = _beatConfig.shrinkDuration;
 
-            // Complete callback
+            // ═══════════════════════════════════════════════════════════
+            // ✅ PHASE 1: FADE IN - Nối từ A đến B đúng lúc B xuất hiện
+            // Dùng beatInterval làm timing chuẩn
+            // ═══════════════════════════════════════════════════════════
+
+            float fadeInTotalDuration = _beatInterval; //Hoàn thành đúng lúc beat B spawn
+            float fadeInStepDelay = totalDots > 1 ? fadeInTotalDuration / totalDots : 0f;
+            float fadeInPerDotDuration = fadeInTotalDuration * 0.3f; // Mỗi dot fade nhanh
+
+            for (int i = 0; i < _dots.Count; i++)
+            {
+                Color c = _dots[i].color;
+                c.a = 0f;
+                _dots[i].color = c;
+
+                _dots[i].DOFade(_config.connectorColor.a, fadeInPerDotDuration)
+                    .SetDelay(i * fadeInStepDelay)
+                    .SetEase(Ease.OutQuad);
+            }
+
+            // Đợi fade in xong (đúng lúc beat B xuất hiện)
+            float waitFadeIn = fadeInTotalDuration + fadeInPerDotDuration;
+            await UniTask.Delay(TimeSpan.FromSeconds(waitFadeIn), cancellationToken: _cts.Token);
+
+            // ═══════════════════════════════════════════════════════════
+            // ✅ PHASE 2: WAIT - Chờ đến 50% shrink của beat B
+            // Beat B vừa spawn, giờ phải đợi nó shrink được 50%
+            // ═══════════════════════════════════════════════════════════
+
+            float waitUntilHalfShrink = shrinkDuration * 0.5f;
+
+            // Trừ đi thời gian fade in overlap (nếu fade in lâu hơn 50% shrink)
+            float remainingWait = waitUntilHalfShrink - Mathf.Min(waitFadeIn, shrinkDuration * 0.5f);
+
+            if (remainingWait > 0)
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(remainingWait), cancellationToken: _cts.Token);
+            }
+
+            // ═══════════════════════════════════════════════════════════
+            // ✅ PHASE 3: FADE OUT - Từ 50% đến 90% shrink
+            // Connector biến mất trước khi beat shrink xong
+            // ═══════════════════════════════════════════════════════════
+
+            float fadeOutTotalDuration = shrinkDuration * 0.4f; // 40% duration (50% -> 90%)
+            float fadeOutStepDelay = totalDots > 1 ? fadeOutTotalDuration / totalDots : 0f;
+            float fadeOutPerDotDuration = fadeOutTotalDuration * 0.3f;
+
+            for (int i = 0; i < _dots.Count; i++)
+            {
+                _dots[i].DOFade(0f, fadeOutPerDotDuration)
+                    .SetDelay(i * fadeOutStepDelay)
+                    .SetEase(Ease.InQuad);
+            }
+
+            float waitFadeOut = fadeOutTotalDuration + fadeOutPerDotDuration;
+            await UniTask.Delay(TimeSpan.FromSeconds(waitFadeOut), cancellationToken: _cts.Token);
+
             onComplete?.Invoke();
-
-            // Cleanup after animation complete
-            Cleanup();
             Destroy(gameObject);
         }
         catch (OperationCanceledException)
         {
-            // Animation was cancelled - cleanup already handled
+            // Do nothing
         }
     }
-
-    /// <summary>
-    /// Fade in: Connector xuất hiện dần từ A → B (line vẽ từ trái sang phải)
-    /// </summary>
-    private async UniTask FadeInAsync(CancellationToken ct)
-    {
-        float duration = _lineLength / _config.fadeInSpeed;
-        float elapsed = 0f;
-
-        // Fade in entire line alpha first (instant)
-        Color col = _spriteRenderer.color;
-        col.a = _config.connectorColor.a;
-        _spriteRenderer.color = col;
-
-        // Animate size.x from 0 → full length (vẽ từ A → B)
-        while (elapsed < duration)
-        {
-            ct.ThrowIfCancellationRequested();
-
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-
-            // Size.x tăng dần = line vẽ từ A → B
-            float currentLength = _lineLength * t;
-            _spriteRenderer.size = new Vector2(currentLength, _config.lineWidth);
-
-            await UniTask.Yield(PlayerLoopTiming.Update, ct);
-        }
-
-        // Ensure final state
-        _spriteRenderer.size = new Vector2(_lineLength, _config.lineWidth);
-    }
-
-    /// <summary>
-    /// Fade out: Connector biến mất dần từ A → B (đuôi line rút dần từ A về B)
-    /// </summary>
-    private async UniTask FadeOutAsync(CancellationToken ct)
-    {
-        float duration = _lineLength / _config.fadeOutSpeed;
-        float elapsed = 0f;
-
-        Vector2 direction = (_endPos - _startPos).normalized;
-
-        while (elapsed < duration)
-        {
-            ct.ThrowIfCancellationRequested();
-
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-
-            // Shrink from start (đuôi line rút dần)
-            float remainingLength = _lineLength * (1f - t);
-            _spriteRenderer.size = new Vector2(remainingLength, _config.lineWidth);
-
-            // Move position forward để đầu line luôn ở vị trí đúng
-            float movedDistance = _lineLength * t;
-            transform.position = _startPos + direction * movedDistance;
-
-            await UniTask.Yield(PlayerLoopTiming.Update, ct);
-        }
-
-        // Ensure final state (fully faded)
-        _spriteRenderer.size = Vector2.zero;
-        transform.position = _endPos;
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // CLEANUP
-    // ═══════════════════════════════════════════════════════════
 
     private void Cleanup()
     {
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
+
+        if (_dots != null)
+        {
+            foreach (var dot in _dots)
+            {
+                if (dot != null) DOTween.Kill(dot);
+            }
+        }
     }
 
     private void OnDestroy()
